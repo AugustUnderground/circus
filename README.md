@@ -7,3 +7,6 @@
 - [ ] Goal of non-`GoalEnv`s
 - [ ] Integration of Electric <-> Geometric Transformation
 - [ ] Normalization as part of environment
+- [ ] State / Observation filter
+- [ ] Versions / Variants
+- [ ] Multi-Agent
