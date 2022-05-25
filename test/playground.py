@@ -6,15 +6,14 @@ import circus
 ## SINGLE GOAL ENV, gym registry
 env     = gym.make('circus:op2-xh035-geom-v0')
 obs     = env.reset()
-action  = np.random.randn(env.action_space.shape[0])
-o,r,d,i = env.step(action)
+a       = np.random.randn(env.action_space.shape[0])
+o,r,d,i = env.step(a)
 
 ## SINGLE Non-GOAL ENV, gym registry
 env     = gym.make('circus:op2-xh035-geom-v1')
 obs     = env.reset()
-action  = np.random.randn(env.action_space.shape[0])
-o,r,d,i = env.step(action)
-
+a       = np.random.randn(env.action_space.shape[0])
+o,r,d,i = env.step(a)
 
 ## SINGLE GOAL ENV, circus native
 env = circus.make('circus:op2-xh035-geom-v0')
