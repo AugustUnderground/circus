@@ -5,5 +5,8 @@ from .circus import *
 
 # AC²E: OP2 - Symmetrical Amplifier
 register( id          = 'op2-xh035-geom-v0'
-        , entry_point = 'circus.ckt:OP2XH035Geom'
+        , entry_point = 'circus.ckt:OP2XH035GeomV0'
+        , )
+register( id          = 'op2-xh035-geom-v1'
+        , entry_point = 'circus.ckt:OP2XH035GeomV1'
         , )
