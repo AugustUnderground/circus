@@ -40,8 +40,8 @@ def restart(env: CircusEnv) -> CircusEnv:
     circ, ace_id, backend, space, variant, num_envs = env
     return make_env(ace_id, backend, space, variant, num_envs, circ.num_steps)
 
-def reset(circ: CircusEnv, done_mask = None, restart_count = 0) -> np.ndarray:
-    obs = circ.env.reset(done_mask = done_mask)
+def reset(circ: CircusEnv, env_ids = [], restart_count = 0) -> np.ndarray:
+    obs = circ.env.reset(env_ids = env_ids)
     return { n: { 'observation':   obs['observation'][n].tolist()
                 , 'achieved_goal': obs['achieved_goal'][n].tolist()
                 , 'desired_goal':  obs['desired_goal'][n].tolist()
