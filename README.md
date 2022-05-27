@@ -6,6 +6,7 @@
 - [ ] Reward Function
 - [ ] Goal of non-`GoalEnv`s
 - [ ] Reset behaviour
+- [ ] REST API
 - [ ] Integration of Electric <-> Geometric Transformation
 - [ ] Normalization as part of environment
 - [ ] State / Observation filter
