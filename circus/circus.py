@@ -1,11 +1,12 @@
 """Circus"""
 
-import operator
+import os
+from functools import partial
 from collections import OrderedDict
 from typing import Any, List, Optional, Type, Union, Callable
 import gym
 from gym.spaces import Dict, Box
-from gym import Env, GoalEnv
+from gym import GoalEnv
 from stable_baselines3.common.vec_env.base_vec_env import VecEnv, \
                                                           VecEnvIndices, \
                                                           VecEnvStepReturn
@@ -13,21 +14,14 @@ from stable_baselines3.common.vec_env.base_vec_env import VecEnv, \
 import numpy as np
 import hace as ac
 
-def backend_id(pdk:str) -> str:
-    return (pdk + '-3V3' if pdk == 'xh035'  else
-            pdk + '-1V8' if pdk == 'xh018'  else
-            pdk + '-1V8' if pdk == 'xt018'  else
-            pdk + '-1V8' if pdk == 'sky130' else
-            pdk)
-
-def default_reward(observation) -> np.array:
-    return np.sum(observation, axis = 1)
-
-def add_noise(x: np.array, noise: float = 0.1) -> np.array:
-    dim = x.shape
-    return (x + (x * np.random.normal(np.ones(dim), np.full(dim, noise))))
+from .util   import *
+from .reward import *
+from .ace    import *
+from .prim   import *
+from .trafo  import *
 
 class CircusGeom(GoalEnv, VecEnv):
+    """ Geometric Sizing Goal Environment """
     def __init__( self
                 , ace_id: str
                 , ace_backend: str
@@ -36,7 +30,7 @@ class CircusGeom(GoalEnv, VecEnv):
                 , seed: int              = 666
                 , goal_ids: [str]        = []
                 , goal_preds: [Callable] = []
-                , reward_fn: Callable    = default_reward
+                , reward_fn: Callable    = binary_reward
                 , ):
 
         self.ace_id: str       = ace_id
@@ -61,30 +55,7 @@ class CircusGeom(GoalEnv, VecEnv):
         self.goal_idx          = np.array([i for i,p in enumerate(performance_ids)
                                              if p in self.goal_ids])
 
-        self.goal_preds        = [ operator.le # Area (A)
-                                 , operator.ge # Gain (A_0)
-                                 , operator.ge # Common Mode Rejection Ration (CMRR)
-                                 , operator.ge # Cross over Frequency (COF)
-                                 , operator.le # Gain Margin (GM)
-                                 , operator.ge # Maximum Output Current
-                                 , operator.ge # Minimum Output Current
-                                 , operator.ge # Current Consumption
-                                 , operator.ge # Current Consumption
-                                 , operator.ge # Slew Rate Overswing Falling
-                                 , operator.ge # Slew Rate Overswing Rising
-                                 , operator.ge # Phase Margin (PM)
-                                 , operator.ge # Power Supply Rejection Ratio - (PSRR_n)
-                                 , operator.ge # Power Supply Rejection Ratio + (PSRR_p)
-                                 , operator.le # Slew Rate Falling
-                                 , operator.ge # Slew Rate Rising
-                                 , operator.ge # Unity Gain Bandwidth Product (UGBW)
-                                 , operator.ge # Input High
-                                 , operator.ge # Input Low
-                                 , operator.ge # Ouput High
-                                 , operator.ge # Ouput Low
-                                 , operator.ge # Statistical Offset
-                                 , operator.le # Systematic Offset
-                                 ]
+        self.goal_preds        = goal_preds or goal_predicate(self.goal_ids)
 
         self.action_space      = Box( low   = -1.0
                                     , high  = 1.0
@@ -109,15 +80,9 @@ class CircusGeom(GoalEnv, VecEnv):
                                                 for r in results.values() ])
         self.goal              = add_noise(self.reference_goal)
 
-        param_dict             = ac.parameter_dict(self.ace_envs[0])
-        self.action_min        = np.array([ v['min'] for _,v
-                                            in sorted( param_dict.items()
-                                                     , key = lambda kv: kv[0] )
-                                            if v['sizing'] ])
-        self.action_max        = np.array([ v['max'] for _,v
-                                            in sorted( param_dict.items()
-                                                     , key = lambda kv: kv[0] )
-                                            if v['sizing'] ])
+        self.constraints       = ac.parameter_dict(self.ace_envs[0])
+
+        self.unscale_action    = geometric_unscaler(self.constraints)
 
         self.sizing            = {}
 
@@ -126,8 +91,8 @@ class CircusGeom(GoalEnv, VecEnv):
                        , self.action_space )
 
     def close(self) -> None:
-        for env in self.ace_envs:
-            env.close()
+        for _,env in self.ace_envs.items():
+            env.clear()
 
     def reset(self, env_mask: [bool] = [], env_ids: [int] = []):
         reset_ids     = [ i for i,m in enumerate(env_mask) if m
@@ -135,8 +100,9 @@ class CircusGeom(GoalEnv, VecEnv):
         pool          = { i: self.ace_envs[i] for i in reset_ids }
         random_sizing = ac.random_sizing_pool(pool)
         results       = ac.evaluate_circuit_pool(pool, pool_params = random_sizing)
-        state         = np.vstack([ np.array([p for _,p in sorted( results[i].items()
-                                                                 , key = lambda kv: kv[0])])
+        state         = np.vstack([ np.array([ p for _,p in
+                                               sorted( results[i].items()
+                                                     , key = lambda kv: kv[0])])
                                     for i in range(len(results)) ])
         self.goal     = add_noise(self.reference_goal)
         achieved      = ( state[:,self.goal_idx]
@@ -150,28 +116,24 @@ class CircusGeom(GoalEnv, VecEnv):
 
         return observation
 
-    def step(self, action: [np.array]) -> VecEnvStepReturn:
-        self.step_async(np.vstack(action))
+    def step(self, actions: np.ndarray) -> VecEnvStepReturn:
+        self.step_async(actions)
         return self.step_wait()
 
     def step_async(self, actions: np.ndarray) -> None:
-        unscaled = self.action_min + ( ((np.vstack(actions) + 1.0) / 2.0)
-                                     * (self.action_max - self.action_min))
-
-        params = sorted(ac.sizing_identifiers(self.ace_envs[0]))
-
-        sizing = { k: dict(zip(params, v.tolist()))
-                   for k,v in enumerate(list(unscaled))}
-
-        self.sizing = sizing
+        unscaled    = list(self.unscale_action(actions))
+        params      = sorted(ac.sizing_identifiers(self.ace_envs[0]))
+        self.sizing = { env_id: dict(zip(params, action.tolist()))
+                        for env_id,action in enumerate(unscaled)}
 
     def step_wait(self) -> VecEnvStepReturn:
         pool        = { i: self.ace_envs[i]
                         for i in range(self.num_envs) }
         results     = ac.evaluate_circuit_pool(pool, pool_params = self.sizing)
 
-        obs         = np.vstack([ np.array([p for _,p in sorted( results[i].items()
-                                                               , key = lambda kv: kv[0])])
+        obs         = np.vstack([ np.array([ p for _,p in
+                                             sorted( results[i].items()
+                                                   , key = lambda kv: kv[0]) ])
                                   for i in range(len(results)) ])
         achieved    = ( obs[:,self.goal_idx] if (len(obs.shape) > 1)
                                              else obs[self.goal_idx] )
@@ -179,17 +141,16 @@ class CircusGeom(GoalEnv, VecEnv):
                                   , 'achieved_goal': achieved
                                   , 'desired_goal': self.goal })
 
-        reward      = np.array([ (p(g,a) - 1.0) for p,g,a in zip( self.goal_preds
-                                                                , self.goal.tolist()
-                                                                , achieved.tolist()) ])
+        reward      = self.calculate_reward(self.goal_preds, self.goal, achieved)
 
         self.steps  = self.steps + 1
 
-        done        = self.steps >= self.num_steps
+        done        = (reward == 0) | (self.steps >= self.num_steps)
 
         info        = [{ 'outputs': sorted(list(results[0].keys()))
-                       , 'inputs':  sorted(ac.sizing_identifiers(self.ace_envs[0])) }
-                      ] * self.num_envs
+                       , 'goal': self.goal_ids
+                       , 'inputs':  sorted(ac.sizing_identifiers(self.ace_envs[0]))
+                       , }] * self.num_envs
 
         return (observation, reward, done, info)
 
@@ -225,9 +186,59 @@ class CircusGeom(GoalEnv, VecEnv):
     def render(self, mode: str = 'human') -> Optional[np.ndarray]:
         pass
 
-class CircusGeomVec(CircusGeom):
+class CircusElec(CircusGeom):
+    """ Electric Sizing Goal Environment """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        nmos_path = os.path.expanduser(f'~/.ace/{self.ace_backend}/nmos')
+        pmos_path = os.path.expanduser(f'~/.ace/{self.ace_backend}/pmos')
+        params_x  = ['gmoverid', 'fug', 'Vds', 'Vbs']
+        params_y  = ['idoverw', 'L', 'gdsoverw', 'Vgs']
+        trafo_x   = ['fug']
+        trafo_y   = ['idoverw', 'gdsoverw']
+        self.nmos = PrimitiveDevice(nmos_path, params_x, params_y, trafo_x, trafo_y)
+        self.pmos = PrimitiveDevice(pmos_path, params_x, params_y, trafo_x, trafo_y)
+
+        self.transformation = partial( transformation(self.ace_id)
+                                     , self.constraints
+                                     , self.nmos
+                                     , self.pmos
+                                     , )
+
+        electric_ids      = len(electric_identifiers(self.ace_id))
+        self.action_space = Box( low   = -1.0
+                               , high  = 1.0
+                               , shape = (electric_ids,)
+                               , dtype = np.float32 )
+
+        self.unscale_action = electric_unscaler(self.ace_id, self.ace_backend)
+
+    def step_async(self, actions: np.ndarray) -> None:
+        unscaled    = list(self.unscale_action(actions))
+        self.sizing = { env_id: self.transformation(* action.flatten().tolist())
+                        for env_id,action in enumerate(unscaled) }
+
+class CircusGeomVec(CircusGeom):
+    """ Geometric Sizing Non-Goal Environment """
+    def __init__(self, reward_fn: Callable = default_reward, **kwargs):
+        super().__init__(**(kwargs | {'reward_fn': reward_fn}))
+        self.observation_space = self.observation_space['observation']
+
+    def reset(self, **kwargs) -> np.array:
+        obs = super().reset(**kwargs)
+        return obs['observation']
+
+    def step_wait(self) -> VecEnvStepReturn:
+        obs, _, done, info = super().step_wait()
+        observation        = obs['observation']
+        reward             = self.calculate_reward(observation)
+        return (observation, reward, done, info)
+
+class CircusElecVec(CircusElec):
+    """ Geometric Sizing Non-Goal Environment """
+    def __init__(self, reward_fn: Callable = default_reward, **kwargs):
+        super().__init__(**(kwargs | {'reward_fn': reward_fn}))
         self.observation_space = self.observation_space['observation']
 
     def reset(self, **kwargs) -> np.array:
@@ -241,19 +252,29 @@ class CircusGeomVec(CircusGeom):
         return (observation, reward, done, info)
 
 def make(env_id: str, n_envs: int = 1, **kwargs) -> Union[ CircusGeom
-                                                         , CircusGeomVec
-                                                         ]:
+                                                         , CircusGeomVec ]:
+    """ Gym Style Environment Constructor """
     id,pdk,space,var = env_id.split(':')[1].split('-')
     backend = backend_id(pdk)
-    env     = ( CircusGeom( ace_id = id
+    env     = ( CircusGeom( ace_id      = id
                           , ace_backend = backend
-                          , num_envs = n_envs
-                          , **kwargs 
-                          )    if var == "v0" else
-                CircusGeomVec( ace_id = id
+                          , num_envs    = n_envs
+                          , **kwargs
+                          )    if (var == 'v0' and space == 'geom') else
+                CircusGeomVec( ace_id      = id
                              , ace_backend = backend
-                             , num_envs = n_envs
-                             , **kwargs 
-                             ) if var == "v1" else
+                             , num_envs    = n_envs
+                             , **kwargs
+                             ) if (var == 'v1' and space == 'geom') else
+                CircusElec( ace_id      = id
+                          , ace_backend = backend
+                          , num_envs    = n_envs
+                          , **kwargs
+                          )    if (var == 'v0' and space == 'elec') else
+                CircusElecVec( ace_id      = id
+                             , ace_backend = backend
+                             , num_envs    = n_envs
+                             , **kwargs
+                             ) if (var == 'v1' and space == 'elec') else
                 NotImplementedError(f'Variant {var} not available') )
     return env
