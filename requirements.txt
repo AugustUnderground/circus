@@ -1,0 +1,8 @@
+Expression==1.1.0
+Flask==2.0.2
+hace==0.0.8
+joblib==1.0.1
+numpy==1.21.2
+setuptools==58.0.4
+stable_baselines3==1.2.0
+torch==1.10.0
