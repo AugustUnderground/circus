@@ -175,7 +175,7 @@ class CircusGeom(GoalEnv, VecEnv):
 
         done        = (reward == 0) | (self.steps >= self.num_steps)
 
-        info        = [{ 'outputs': sorted(list(results[0].keys()))
+        info        = [{ 'outputs': self.obs_filter
                        , 'goal':    self.goal_filter
                        , 'inputs':  self.input_parameters
                        , }] * self.num_envs
