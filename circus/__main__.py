@@ -21,11 +21,12 @@ def handle_response(res):
 
 def carnival():
     args = rest.parser.parse_args()
-    env_id, pdk, space, var, num, host, port, scale = \
+    env_id, pdk, space, var, num, steps, host, port, scale = \
             [ getattr(args, a) for a in
-              ['env', 'pdk', 'space', 'var', 'num', 'host', 'port', 'scale'] ]
+              [ 'env', 'pdk', 'space', 'var', 'num', 'step'
+              , 'host', 'port', 'scale'] ]
 
-    circ = rest.make_env(env_id, pdk, space, var, num, scale)
+    circ = rest.make_env(env_id, pdk, space, var, num, steps, scale)
 
     route = f'{env_id}-{pdk}-{space}-v{var}'
 

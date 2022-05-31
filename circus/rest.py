@@ -20,6 +20,8 @@ parser.add_argument( '-v', '--var', type = int, default = '0'
                    , help = 'Circus Environment variant, see Circus doc for what\'s available')
 parser.add_argument( '-n', '--num', type = int, default = 1
                    , help = 'Number of Pooled Envs')
+parser.add_argument( '-t', '--step', type = int, default = 50
+                   , help = 'Number of Steps per Episode')
 parser.add_argument( '-c', '--scale', default = True, action = 'store_true'
                    , help = 'Circus Action Space, see Circus doc for what\'s available')
 parser.add_argument( '--pdk', type = str, default = 'xh035'
@@ -48,6 +50,8 @@ def make_env( ace_id: str, backend: str, space: str, variant: int
                                , scale_observation = scale
                                , )
 
+    print(env.num_steps)
+
     return CircusEnv(env, ace_id, backend, space, variant, num_envs)
 
 def restart(circ: CircusEnv) -> CircusEnv:
@@ -63,6 +67,7 @@ def step( circ: CircusEnv, action: dict[str, [[float]]]
         ) -> dict[str, [[float]]]:
     act                = np.array(action['action'])
     obs, rew, don, inf = circ.env.step(act)
+    print(don)
     return ( { p:        o.tolist() for p,o in obs.items() }
            | { 'reward': rew.tolist()
              , 'done':   don.tolist()

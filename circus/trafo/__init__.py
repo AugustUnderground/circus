@@ -39,5 +39,3 @@ def electric_unscaler(ace_id: str, ace_backend: str) -> Callable:
         return y
 
     return unscale
-
-
