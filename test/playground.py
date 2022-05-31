@@ -46,15 +46,3 @@ env     = circus.make('circus:op1-xh035-elec-v0', n_envs = 5)
 obs     = env.reset()
 a       = np.vstack([env.action_space.sample()] * 5)
 o,r,d,i = env.step(a)
-
-
-
-pp = [ pp for pp in ac.performance_identifiers(env.ace_envs[0]) if (pp.islower() or (pp == 'A')) ]
-
-pf = ['a_0', 'ugbw', 'pm', 'voff_stat', 'cmrr', 'psrr_p', 'A']
-
-pm = np.array([ (p in pf) for p in pp ])
-
-p = np.random.rand(10,23)
-
-p[:, pm]
