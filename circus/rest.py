@@ -79,7 +79,7 @@ def random_step(circ: CircusEnv) -> dict[str, [[float]]]:
 
 def reward( circ: CircusEnv, observation: dict[str, [[float]]]
           ) -> dict[str, [float]]:
-    obs = { k: np.array(v) for k,v in observation.items() }
+    obs = { k: np.array(v) for k,v in observation.items() if (k != 'info') }
     rew = circ.env.calculate_reward(obs).tolist()
     return {'reward': rew}
 
