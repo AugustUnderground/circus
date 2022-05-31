@@ -67,6 +67,11 @@ def carnival():
         res = rest.current_performance(circ)
         return handle_response(res)
 
+    @app.route(f'/{route}/current_goal', methods=['GET'])
+    def current_goal():
+        res = rest.current_goal(circ)
+        return handle_response(res)
+
     @app.route(f'/{route}/current_sizing', methods=['GET'])
     def current_sizing():
         res = rest.current_sizing(circ)
