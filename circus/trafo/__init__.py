@@ -23,10 +23,21 @@ def electric_identifiers(ace_id: str) -> [str]:
            , 'op8': op8.INPUTS
            , }.get(ace_id, NotImplementedError(err_msg))
 
-def electric_unscaler(ace_id: str, ace_backend: str) -> tuple[np.array, np.array]:
+def electric_unscaler(ace_id: str, ace_backend: str) -> Callable:
     """ Min-Max scaler for given ACE ID and PDK """
     err_msg = f'No Scaler for {ace_id} available'
-    return { 'op1': op1.unscaler(ace_backend)
-           , 'op2': op2.unscaler(ace_backend)
-           , 'op8': op8.unscaler(ace_backend)
-           , }.get(ace_id, NotImplementedError(err_msg))
+    x_min,x_max,gm,fm,im = { 'op1': op1.unscaler(ace_backend)
+                           , 'op2': op2.unscaler(ace_backend)
+                           , 'op8': op8.unscaler(ace_backend)
+                           , }.get(ace_id, NotImplementedError(err_msg))
+
+    def unscale(x: np.ndarray) -> np.ndarray:
+        y_ = x_min + (((x + 1.0) / 2.0) * (x_max - x_min))
+        y  = (y_ * gm) \
+           + np.log10(y_ * fm, where = (y_ * fm) > 0.0) \
+           + (y_ * im * 1e-6)
+        return y
+
+    return unscale
+
+

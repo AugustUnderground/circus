@@ -3,21 +3,21 @@
 from typing import Any, List, Optional, Type, Union, Callable
 import numpy as np
 
-def default_reward(observation: np.array) -> np.array:
+def dummy_reward(observation: dict[str, np.ndarray]) -> np.array:
     """ Default reward function for non-goal environments (v1).
     Arguments: `observation`
     Returns: `reward`
     """
-    return np.sum(observation, axis = 1)
+    return np.sum(observation['observation'], axis = 1)
 
-def binary_reward( predicate: [Callable]
-                 , desired_goal: np.array
-                 , achieved_goal: np.array
+def binary_reward( predicate: [Callable], observation: dict[str, np.ndarray]
                  , ) -> np.array:
     """ Default reward function for goal environments (v0).
-    Arguments:  `predicate`, `desired_goal`, `achieved_goal`
+    Arguments:  `predicate`, `observation`
     Returns: `reward` in {-1;0}
     """
+    desired_goal  = observation['desired_goal']
+    achieved_goal = observation['achieved_goal']
     return np.all( np.stack([ p(a,d) for p,a,d in zip( predicate
                                                      , list(achieved_goal.T)
                                                      , list(desired_goal.T))

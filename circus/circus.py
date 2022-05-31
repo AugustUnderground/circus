@@ -25,12 +25,14 @@ class CircusGeom(GoalEnv, VecEnv):
     def __init__( self
                 , ace_id: str
                 , ace_backend: str
-                , num_envs: int          = 1
-                , num_steps: int         = 50
-                , seed: int              = 666
-                , goal_ids: [str]        = []
-                , goal_preds: [Callable] = []
-                , reward_fn: Callable    = binary_reward
+                , num_envs: int                    = 1
+                , num_steps: int                   = 50
+                , seed: int                        = 666
+                , obs_filter: Union[str,List[str]] = 'perf'
+                , goal_filter: [str]               = None
+                , goal_preds: [Callable]           = None
+                , reward_fn: Callable              = None
+                , scale_observation: bool          = True
                 , ):
 
         self.ace_id: str       = ace_id
@@ -40,35 +42,60 @@ class CircusGeom(GoalEnv, VecEnv):
         self.num_steps: int    = num_steps
         self.steps: np.array   = np.zeros(num_envs)
 
-        self.calculate_reward  = reward_fn
-
         self.ace_envs          = ac.make_same_env_pool( self.num_envs
                                                       , self.ace_id
                                                       , self.ace_backend )
 
-        performance_ids        = sorted(ac.performance_identifiers(self.ace_envs[0]))
-        sizing_ids             = len(ac.sizing_identifiers(self.ace_envs[0]))
+        self.constraints       = ac.parameter_dict(self.ace_envs[0])
 
-        self.goal_ids          = goal_ids or [ident for ident in performance_ids
-                                                    if ident.islower() or (ident == 'A')]
+        perf_ids               = sorted(ac.performance_identifiers(self.ace_envs[0]))
+        self.obs_filter        = ( perf_ids if obs_filter == 'all' else
+                                   [p for p in perf_ids if (p.islower() or (p == 'A'))]
+                                   if obs_filter == 'perf' else
+                                   obs_filter if isinstance(obs_filter, list)
+                                   else ValueError('Wrong Argument type passed to obs_filter.') )
 
-        self.goal_idx          = np.array([i for i,p in enumerate(performance_ids)
-                                             if p in self.goal_ids])
+        self.obs_idx           = np.array([ i for i,p in enumerate(self.obs_filter)
+                                            if p in self.obs_filter ])
 
-        self.goal_preds        = goal_preds or goal_predicate(self.goal_ids)
+        self.obs_scaler,_      = performance_scaler( self.ace_id
+                                                   , self.ace_backend
+                                                   , self.constraints
+                                                   , self.obs_filter
+                                                   , )
+
+        self.input_parameters  = ac.sizing_identifiers(self.ace_envs[0])
+
+        self.goal_filter       = goal_filter or [ ident for ident in self.obs_filter
+                                                  if ident.islower() or (ident == 'A') ]
+
+        self.goal_idx          = np.array([i for i,p in enumerate(self.obs_filter)
+                                             if p in self.goal_filter])
+
+        self.goal_preds        = goal_preds or goal_predicate(self.goal_filter)
+
+        self.goal_scaler,_     = performance_scaler( self.ace_id
+                                                   , self.ace_backend
+                                                   , self.constraints
+                                                   , self.goal_filter
+                                                   , )
+
+        self.calculate_reward  = reward_fn or partial(binary_reward, self.goal_preds)
 
         self.action_space      = Box( low   = -1.0
                                     , high  = 1.0
-                                    , shape = (sizing_ids,)
+                                    , shape = (len(self.input_parameters),)
                                     , dtype = np.float32 )
 
-        self.observation_space = Dict({ 'observation':  Box( -np.Inf, np.Inf
-                                                           , (len(performance_ids),))
+        self.observation_space = Dict({ 'observation':   Box( -np.Inf, np.Inf
+                                                            , (len(self.obs_filter),))
                                       , 'achieved_goal': Box( -np.Inf, np.Inf
-                                                            , (len(self.goal_ids),))
+                                                            , (len(self.goal_filter),))
                                       , 'desired_goal':  Box( -np.Inf, np.Inf
-                                                            , (len(self.goal_ids),))
+                                                            , (len(self.goal_filter),))
                                       , })
+
+        self.scale_observation = scale_observation
 
         self.rng_seed          = seed
 
@@ -76,11 +103,8 @@ class CircusGeom(GoalEnv, VecEnv):
                                    for i in range(self.num_envs) }
         initial_sizing         = ac.initial_sizing_pool(pool)
         results                = ac.evaluate_circuit_pool(pool, pool_params = initial_sizing)
-        self.reference_goal    = np.array([ [ p for k,p in r.items() if k in self.goal_ids]
-                                                for r in results.values() ])
+        self.reference_goal    = filter_results(self.goal_filter, results)
         self.goal              = add_noise(self.reference_goal)
-
-        self.constraints       = ac.parameter_dict(self.ace_envs[0])
 
         self.unscale_action    = geometric_unscaler(self.constraints)
 
@@ -100,17 +124,18 @@ class CircusGeom(GoalEnv, VecEnv):
         pool          = { i: self.ace_envs[i] for i in reset_ids }
         random_sizing = ac.random_sizing_pool(pool)
         results       = ac.evaluate_circuit_pool(pool, pool_params = random_sizing)
-        state         = np.vstack([ np.array([ p for _,p in
-                                               sorted( results[i].items()
-                                                     , key = lambda kv: kv[0])])
-                                    for i in range(len(results)) ])
         self.goal     = add_noise(self.reference_goal)
-        achieved      = ( state[:,self.goal_idx]
-                        if (len(state.shape) > 1)
-                        else state[self.goal_idx] )
-        observation   = OrderedDict({ 'observation': state
-                                    , 'achieved_goal': achieved
-                                    , 'desired_goal': self.goal })
+        state         = filter_results(self.obs_filter, results)
+        achieved      = filter_results(self.goal_filter, results)
+        observation   = OrderedDict({ 'observation':   ( self.obs_scaler(state)
+                                                         if self.scale_observation
+                                                         else state )
+                                    , 'achieved_goal': ( self.goal_scaler(achieved)
+                                                         if self.scale_observation
+                                                         else achieved )
+                                    , 'desired_goal':  ( self.goal_scaler(self.goal)
+                                                         if self.scale_observation
+                                                         else self.goal ) })
 
         self.steps[reset_ids] = 0
 
@@ -131,25 +156,28 @@ class CircusGeom(GoalEnv, VecEnv):
                         for i in range(self.num_envs) }
         results     = ac.evaluate_circuit_pool(pool, pool_params = self.sizing)
 
-        obs         = np.vstack([ np.array([ p for _,p in
-                                             sorted( results[i].items()
-                                                   , key = lambda kv: kv[0]) ])
-                                  for i in range(len(results)) ])
-        achieved    = ( obs[:,self.goal_idx] if (len(obs.shape) > 1)
-                                             else obs[self.goal_idx] )
-        observation = OrderedDict({ 'observation': obs
-                                  , 'achieved_goal': achieved
-                                  , 'desired_goal': self.goal })
+        state       = filter_results(self.obs_filter, results)
+        achieved    = filter_results(self.goal_filter, results)
 
-        reward      = self.calculate_reward(self.goal_preds, self.goal, achieved)
+        observation = OrderedDict({ 'observation':   ( self.obs_scaler(state)
+                                                       if self.scale_observation
+                                                       else state )
+                                  , 'achieved_goal': ( self.goal_scaler(achieved)
+                                                       if self.scale_observation
+                                                       else achieved )
+                                  , 'desired_goal':  ( self.goal_scaler(self.goal)
+                                                       if self.scale_observation
+                                                       else self.goal ) })
+
+        reward      = self.calculate_reward(observation)
 
         self.steps  = self.steps + 1
 
         done        = (reward == 0) | (self.steps >= self.num_steps)
 
         info        = [{ 'outputs': sorted(list(results[0].keys()))
-                       , 'goal': self.goal_ids
-                       , 'inputs':  sorted(ac.sizing_identifiers(self.ace_envs[0]))
+                       , 'goal':    self.goal_filter
+                       , 'inputs':  self.input_parameters
                        , }] * self.num_envs
 
         return (observation, reward, done, info)
@@ -206,10 +234,11 @@ class CircusElec(CircusGeom):
                                      , self.pmos
                                      , )
 
-        electric_ids      = len(electric_identifiers(self.ace_id))
+        self.input_parameters  = electric_identifiers(self.ace_id)
+
         self.action_space = Box( low   = -1.0
                                , high  = 1.0
-                               , shape = (electric_ids,)
+                               , shape = (len(self.input_parameters),)
                                , dtype = np.float32 )
 
         self.unscale_action = electric_unscaler(self.ace_id, self.ace_backend)
@@ -221,7 +250,7 @@ class CircusElec(CircusGeom):
 
 class CircusGeomVec(CircusGeom):
     """ Geometric Sizing Non-Goal Environment """
-    def __init__(self, reward_fn: Callable = default_reward, **kwargs):
+    def __init__(self, reward_fn: Callable = dummy_reward, **kwargs):
         super().__init__(**(kwargs | {'reward_fn': reward_fn}))
         self.observation_space = self.observation_space['observation']
 
@@ -237,7 +266,7 @@ class CircusGeomVec(CircusGeom):
 
 class CircusElecVec(CircusElec):
     """ Geometric Sizing Non-Goal Environment """
-    def __init__(self, reward_fn: Callable = default_reward, **kwargs):
+    def __init__(self, reward_fn: Callable = dummy_reward, **kwargs):
         super().__init__(**(kwargs | {'reward_fn': reward_fn}))
         self.observation_space = self.observation_space['observation']
 
@@ -254,27 +283,27 @@ class CircusElecVec(CircusElec):
 def make(env_id: str, n_envs: int = 1, **kwargs) -> Union[ CircusGeom
                                                          , CircusGeomVec ]:
     """ Gym Style Environment Constructor """
-    id,pdk,space,var = env_id.split(':')[1].split('-')
+    eid,pdk,spc,var = env_id.split(':')[1].split('-')
     backend = backend_id(pdk)
-    env     = ( CircusGeom( ace_id      = id
+    env     = ( CircusGeom( ace_id      = eid
                           , ace_backend = backend
                           , num_envs    = n_envs
                           , **kwargs
-                          )    if (var == 'v0' and space == 'geom') else
-                CircusGeomVec( ace_id      = id
+                          )    if (var == 'v0' and spc == 'geom') else
+                CircusGeomVec( ace_id      = eid
                              , ace_backend = backend
                              , num_envs    = n_envs
                              , **kwargs
-                             ) if (var == 'v1' and space == 'geom') else
-                CircusElec( ace_id      = id
+                             ) if (var == 'v1' and spc == 'geom') else
+                CircusElec( ace_id      = eid
                           , ace_backend = backend
                           , num_envs    = n_envs
                           , **kwargs
-                          )    if (var == 'v0' and space == 'elec') else
-                CircusElecVec( ace_id      = id
+                          )    if (var == 'v0' and spc == 'elec') else
+                CircusElecVec( ace_id      = eid
                              , ace_backend = backend
                              , num_envs    = n_envs
                              , **kwargs
-                             ) if (var == 'v1' and space == 'elec') else
+                             ) if (var == 'v1' and spc == 'elec') else
                 NotImplementedError(f'Variant {var} not available') )
     return env

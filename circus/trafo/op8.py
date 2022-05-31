@@ -88,17 +88,73 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
 
     return sizing
 
-def unscaler(ace_backend: str) -> Callable:
+def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
+                                       , np.ndarray, np.ndarray]:
     """ Unscale function for a given PDK """
     x_min = np.array([5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 1.0, 4.0])
     x_max = np.array([15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 4.0, 8.0])
     gm    = np.array([(i in range(0,6))   for i in range(14)])
     fm    = np.array([(i in range(6,12))  for i in range(14)])
     im    = np.array([(i in range(12,14)) for i in range(14)])
-    def _unscale(x: np.array) -> np.array:
-        y_ = x_min + ( ((np.vstack(x) + 1.0) / 2.0) * (x_max - x_min))
-        y  = (y_ * gm) \
-           + np.log10(y_ * fm, where = (y_ * fm) > 0.0) \
-           + (y_ * im * 1e-6)
-        return y
-    return _unscale
+    return (x_min, x_max, gm, fm, im)
+
+def output_scale( constraints: dict, ace_backend: str
+                ) -> tuple[dict[str, float], dict[str, float]]:
+    vdd   = constraints.get('vsup', {}).get('init', 3.3)
+    x_min = { 'a_0'         : 25.0
+            , 'ugbw'        : 5.0
+            , 'pm'          : 0.0
+            , 'gm'          : 0.0
+            , 'sr_r'        : 4.0
+            , 'sr_f'        : 4.0
+            , 'vn_1Hz'      : -10.0
+            , 'vn_10Hz'     : -10.0
+            , 'vn_100Hz'    : -10.0
+            , 'vn_1kHz'     : -10.0
+            , 'vn_10kHz'    : -10.0
+            , 'vn_100kHz'   : -10.0
+            , 'cmrr'        : 70
+            , 'psrr_n'      : 30.0
+            , 'psrr_p'      : 40.0
+            , 'v_il'        : 0.0
+            , 'v_ih'        : 0.0
+            , 'v_ol'        : 0.0
+            , 'v_oh'        : 0.0
+            , 'i_out_min'   : -6.0
+            , 'i_out_max'   : -6.0
+            , 'overshoot_r' : 0.0
+            , 'overshoot_f' : 0.0
+            , 'cof'         : 5.0
+            , 'voff_stat'   : -5.0
+            , 'voff_sys'    : -5.0
+            , 'A'           : -15.0
+            , }
+    x_max = { 'a_0'         : 70.0
+            , 'ugbw'        : 10.0
+            , 'pm'          : 120.0
+            , 'gm'          : 80.0
+            , 'sr_r'        : 8.0
+            , 'sr_f'        : 8.0
+            , 'vn_1Hz'      : -4.0
+            , 'vn_10Hz'     : -4.0
+            , 'vn_100Hz'    : -4.0
+            , 'vn_1kHz'     : -4.0
+            , 'vn_10kHz'    : -4.0
+            , 'vn_100kHz'   : -4.0
+            , 'cmrr'        : 150.0
+            , 'psrr_n'      : 70.0
+            , 'psrr_p'      : 140.0
+            , 'v_il'        : (2.0 * vdd)
+            , 'v_ih'        : (2.0 * vdd)
+            , 'v_ol'        : (2.0 * vdd)
+            , 'v_oh'        : (2.0 * vdd)
+            , 'i_out_min'   : -3.0
+            , 'i_out_max'   : -3.0
+            , 'overshoot_r' : 130.0
+            , 'overshoot_f' : 130.0
+            , 'cof'         : 9.0
+            , 'voff_stat'   : 0.0
+            , 'voff_sys'    : 0.0
+            , 'A'           : -5.0
+            , }
+    return (x_min, x_max)

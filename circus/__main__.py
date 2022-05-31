@@ -23,7 +23,7 @@ def carnival():
     args = rest.parser.parse_args()
     env_id, pdk, space, var, num, host, port = \
             [ getattr(args, a) for a in
-              ['env', 'pdk', 'space', 'var', 'num', 'host', 'port']]
+              ['env', 'pdk', 'space', 'var', 'num', 'host', 'port'] ]
 
     circ = rest.make_env(env_id, pdk, space, var, num)
 
@@ -46,69 +46,63 @@ def carnival():
         res = rest.step(circ, request.json)
         return handle_response(res)
 
+    @app.route(f'/{route}/reward', methods=['POST'])
+    def reward():
+        res = rest.reward(circ, request.json)
+        return handle_response(res)
 
-    # @app.route(f'/{route}/current_performance', methods=['GET'])
-    # def current_performance():
-    #     res = gc.current_performance(env)
-    #     return handle_response(res)
+    @app.route(f'/{route}/random_action', methods=['GET'])
+    def random_action():
+        res = rest.random_action(circ)
+        return handle_response(res)
 
-    # @app.route(f'/{route}/current_sizing', methods=['GET'])
-    # def current_sizing():
-    #     res = gc.current_sizing(env)
-    #     return handle_response(res)
+    @app.route(f'/{route}/random_step', methods=['GET'])
+    def random_step():
+        res = rest.random_step(circ)
+        return handle_response(res)
 
-    # @app.route(f'/{route}/log_path', methods=['GET'])
-    # def log_path():
-    #     res = gc.log_path(env)
-    #     return handle_response(res)
+    @app.route(f'/{route}/current_performance', methods=['GET'])
+    def current_performance():
+        res = rest.current_performance(circ)
+        return handle_response(res)
 
-    # @app.route(f'/{route}/target', methods=['GET'])
-    # def target():
-    #     res = gc.target(env)
-    #     return handle_response(res)
-
-    # @app.route(f'/{route}/predicate', methods=['GET'])
-    # def predicate():
-    #     res = gc.predicate(env)
-    #     return handle_response(res)
+    @app.route(f'/{route}/current_sizing', methods=['GET'])
+    def current_sizing():
+        res = rest.current_sizing(circ)
+        return handle_response(res)
 
     # @app.route(f'/{route}/scaler', methods=['GET'])
     # def scaler():
     #     res = gc.scaler(env)
     #     return handle_response(res)
 
-    # @app.route(f'/{route}/action_space', methods=['GET'])
-    # def action_space():
-    #     res = gc.action_space(env)
-    #     return handle_response(res)
+    @app.route(f'/{route}/action_space', methods=['GET'])
+    def action_space():
+        res = rest.action_space(circ)
+        return handle_response(res)
 
-    # @app.route(f'/{route}/action_keys', methods=['GET'])
-    # def action_keys():
-    #     res = gc.action_keys(env)
-    #     return handle_response(res)
+    @app.route(f'/{route}/action_keys', methods=['GET'])
+    def action_keys():
+        res = rest.action_keys(circ)
+        return handle_response(res)
 
-    # @app.route(f'/{route}/observation_space', methods=['GET'])
-    # def observation_space():
-    #     res = gc.observation_space(env)
-    #     return handle_response(res)
+    @app.route(f'/{route}/observation_space', methods=['GET'])
+    def observation_space():
+        res = rest.observation_space(circ)
+        return handle_response(res)
 
-    # @app.route(f'/{route}/observation_keys', methods=['GET'])
-    # def observation_keys():
-    #     res = gc.observation_keys(env)
-    #     return handle_response(res)
+    @app.route(f'/{route}/observation_keys', methods=['GET'])
+    def observation_keys():
+        res = rest.observation_keys(circ)
+        return handle_response(res)
 
-    # @app.route(f'/{route}/random_action', methods=['GET'])
-    # def random_action():
-    #     res = gc.random_action(env)
-    #     return handle_response(res)
+    @app.route(f'/{route}/goal_keys', methods=['GET'])
+    def goal_keys():
+        res = rest.goal_keys(circ)
+        return handle_response(res)
 
-    # @app.route(f'/{route}/random_step', methods=['GET'])
-    # def random_step():
-    #     res = gc.random_step(env)
-    #     return handle_response(res)
-
-    print(f"Launching Circus Server.")
-    print(f"\tURL: http://{host}:{port}/{route}/")
+    print('Launching Circus Server.')
+    print(f'\tURL: http://{host}:{port}/{route}/')
     return app.run(host = host, port = port)
 
 def main():
