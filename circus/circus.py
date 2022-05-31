@@ -180,11 +180,6 @@ class CircusGeom(GoalEnv, VecEnv):
                        , 'inputs':  self.input_parameters
                        , }] * self.num_envs
 
-        print(done)
-        print(reward)
-        print(self.steps)
-        print(self.num_steps)
-
         return (observation, reward, done, info)
 
     def get_attr( self, attr_name: str, indices: VecEnvIndices = None
@@ -290,8 +285,6 @@ def make(env_id: str, n_envs: int = 1, **kwargs) -> Union[ CircusGeom
     """ Gym Style Environment Constructor """
     eid,pdk,spc,var = env_id.split(':')[1].split('-')
     backend = backend_id(pdk)
-
-    print(kwargs)
 
     env     = ( CircusGeom( ace_id      = eid
                           , ace_backend = backend
