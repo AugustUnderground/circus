@@ -1,5 +1,8 @@
 # circus
 
+See the [documentaiton](https://augustunderground.github.io/circus) for more
+details.
+
 ## Discussion
 
 - [ ] Migrate Documentation
