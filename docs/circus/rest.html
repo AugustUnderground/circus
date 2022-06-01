@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>circus.rest API documentation</title>
+<meta name="description" content="REST API" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>circus.rest</code></h1>
+</header>
+<section id="section-intro">
+<p>REST API</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34; REST API &#34;&#34;&#34;
+
+from argparse import ArgumentParser
+from collections import namedtuple
+
+import numpy as np
+import hace as ac
+import circus
+
+parser = ArgumentParser()
+parser.add_argument( &#39;--host&#39;, type = str, default = &#39;localhost&#39;
+                   , help = &#39;Host address&#39;)
+parser.add_argument( &#39;-p&#39;, &#39;--port&#39;, type = int, default = &#39;6006&#39;
+                   , help = &#39;Server Port&#39;)
+parser.add_argument( &#39;-e&#39;, &#39;--env&#39;, type = str, default = &#39;op2&#39;
+                   , help = &#39;ACE Environment ID, see Circus doc for what\&#39;s available&#39;)
+parser.add_argument( &#39;-s&#39;, &#39;--space&#39;, type = str, default = &#39;elec&#39;
+                   , help = &#39;Circus Action Space, see Circus doc for what\&#39;s available&#39;)
+parser.add_argument( &#39;-v&#39;, &#39;--var&#39;, type = int, default = &#39;0&#39;
+                   , help = &#39;Circus Environment variant, see Circus doc for what\&#39;s available&#39;)
+parser.add_argument( &#39;-n&#39;, &#39;--num&#39;, type = int, default = 1
+                   , help = &#39;Number of Pooled Envs&#39;)
+parser.add_argument( &#39;-t&#39;, &#39;--step&#39;, type = int, default = 50
+                   , help = &#39;Number of Steps per Episode&#39;)
+parser.add_argument( &#39;-c&#39;, &#39;--scale&#39;, default = True, action = &#39;store_true&#39;
+                   , help = &#39;Circus Action Space, see Circus doc for what\&#39;s available&#39;)
+parser.add_argument( &#39;--pdk&#39;, type = str, default = &#39;xh035&#39;
+                   , help = &#39;ACE backend, see Circus doc for what\&#39;s available&#39;)
+
+CircusEnv = namedtuple(&#39;Environment&#39;, &#39;env ace_id backend space variant num_envs&#39;)
+
+def make_env( ace_id: str, backend: str, space: str, variant: int
+            , num_envs: int, num_steps: int = 50, scale: bool = True
+            ) -&gt; CircusEnv:
+
+    state_filter  = [ &#39;A&#39;, &#39;a_0&#39;, &#39;cmrr&#39;, &#39;cof&#39;, &#39;gm&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
+                    , &#39;idd&#39;, &#39;iss&#39;, &#39;overshoot_f&#39;, &#39;overshoot_r&#39;, &#39;pm&#39;
+                    , &#39;psrr_n&#39;, &#39;psrr_p&#39;, &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39;, &#39;v_ih&#39;
+                    , &#39;v_il&#39;, &#39;v_oh&#39;, &#39;v_ol&#39;, &#39;voff_stat&#39;, &#39;voff_sys&#39; ]
+
+    target_filter = [&#39;a_0&#39;, &#39;ugbw&#39;, &#39;pm&#39;, &#39;voff_stat&#39;, &#39;cmrr&#39;, &#39;psrr_p&#39;, &#39;A&#39;]
+
+    env_name      = f&#39;circus:{ace_id}-{backend}-{space}-v{variant}&#39;
+
+    env           = circus.make( env_name
+                               , n_envs            = num_envs
+                               , num_steps         = num_steps
+                               , goal_filter       = target_filter
+                               , obs_filter        = state_filter
+                               , scale_observation = scale
+                               , )
+
+    return CircusEnv(env, ace_id, backend, space, variant, num_envs)
+
+def restart(circ: CircusEnv) -&gt; CircusEnv:
+    env, ace_id, backend, space, variant, num_envs = circ
+    return make_env(ace_id, backend, space, variant, num_envs, env.num_steps)
+
+def reset( circ: CircusEnv, env_ids = [], restart_count = 0
+         ) -&gt; dict[str, [[float]]]:
+    obs = circ.env.reset(env_ids = env_ids)
+    return { p: o.tolist() for p,o in obs.items() }
+
+def step( circ: CircusEnv, action: dict[str, [[float]]]
+        ) -&gt; dict[str, [[float]]]:
+    act                = np.array(action[&#39;action&#39;])
+    obs, rew, don, inf = circ.env.step(act)
+    return ( { p:        o.tolist() for p,o in obs.items() }
+           | { &#39;reward&#39;: rew.tolist()
+             , &#39;done&#39;:   don.tolist()
+             , &#39;info&#39;:   inf
+             , } )
+
+def random_action(circ: CircusEnv) -&gt; dict[str, [[float]]]:
+    action = [ circ.env.action_space.sample().tolist()
+               for _ in range(circ.num_envs) ]
+    return {&#39;action&#39;: action}
+
+def random_step(circ: CircusEnv) -&gt; dict[str, [[float]]]:
+    return step(circ, random_action(circ))
+
+def reward( circ: CircusEnv, observation: dict[str, [[float]]]
+          ) -&gt; dict[str, [float]]:
+    obs = { k: np.array(v) for k,v in observation.items() if k != &#39;info&#39; }
+    rew = circ.env.calculate_reward(obs).tolist()
+    return {&#39;reward&#39;: rew}
+
+def current_performance(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
+    perf = ac.current_performance_pool(circ.env.ace_envs)
+    return {i: {o: p[o] for o in circ.env.obs_filter} for i,p in perf.items()}
+
+def current_goal(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
+    return dict(enumerate(list(map( lambda g: dict(zip(circ.env.goal_filter, g))
+                                  , circ.env.goal.tolist() ))))
+
+def current_sizing(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
+    return ac.current_sizing_pool(circ.env.ace_envs)
+
+def last_action(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
+    return { i: { k: v for k,v in p.items() if k in circ.env.input_parameters }
+             for i,p in ac.current_performance_pool(circ.env.ace_envs).items() }
+
+def action_space(circ: CircusEnv) -&gt; dict[int, int]:
+    return { &#39;action&#39;: circ.env.action_space.shape[0] }
+
+def observation_space(circ: CircusEnv) -&gt; dict[int, int]:
+    return { o: s.shape[0] for o,s in circ.env.observation_space.items() }
+
+def action_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
+    return { &#39;action&#39;: circ.env.input_parameters }
+
+def observation_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
+    return { &#39;observation&#39;: circ.env.obs_filter }
+
+def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
+    return { &#39;goal&#39;: circ.env.goal_filter }</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="circus.rest.action_keys"><code class="name flex">
+<span>def <span class="ident">action_keys</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def action_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
+    return { &#39;action&#39;: circ.env.input_parameters }</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.action_space"><code class="name flex">
+<span>def <span class="ident">action_space</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def action_space(circ: CircusEnv) -&gt; dict[int, int]:
+    return { &#39;action&#39;: circ.env.action_space.shape[0] }</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.current_goal"><code class="name flex">
+<span>def <span class="ident">current_goal</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def current_goal(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
+    return dict(enumerate(list(map( lambda g: dict(zip(circ.env.goal_filter, g))
+                                  , circ.env.goal.tolist() ))))</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.current_performance"><code class="name flex">
+<span>def <span class="ident">current_performance</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def current_performance(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
+    perf = ac.current_performance_pool(circ.env.ace_envs)
+    return {i: {o: p[o] for o in circ.env.obs_filter} for i,p in perf.items()}</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.current_sizing"><code class="name flex">
+<span>def <span class="ident">current_sizing</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def current_sizing(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
+    return ac.current_sizing_pool(circ.env.ace_envs)</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.goal_keys"><code class="name flex">
+<span>def <span class="ident">goal_keys</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
+    return { &#39;goal&#39;: circ.env.goal_filter }</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.last_action"><code class="name flex">
+<span>def <span class="ident">last_action</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def last_action(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
+    return { i: { k: v for k,v in p.items() if k in circ.env.input_parameters }
+             for i,p in ac.current_performance_pool(circ.env.ace_envs).items() }</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.make_env"><code class="name flex">
+<span>def <span class="ident">make_env</span></span>(<span>ace_id: str, backend: str, space: str, variant: int, num_envs: int, num_steps: int = 50, scale: bool = True) ‑> <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def make_env( ace_id: str, backend: str, space: str, variant: int
+            , num_envs: int, num_steps: int = 50, scale: bool = True
+            ) -&gt; CircusEnv:
+
+    state_filter  = [ &#39;A&#39;, &#39;a_0&#39;, &#39;cmrr&#39;, &#39;cof&#39;, &#39;gm&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
+                    , &#39;idd&#39;, &#39;iss&#39;, &#39;overshoot_f&#39;, &#39;overshoot_r&#39;, &#39;pm&#39;
+                    , &#39;psrr_n&#39;, &#39;psrr_p&#39;, &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39;, &#39;v_ih&#39;
+                    , &#39;v_il&#39;, &#39;v_oh&#39;, &#39;v_ol&#39;, &#39;voff_stat&#39;, &#39;voff_sys&#39; ]
+
+    target_filter = [&#39;a_0&#39;, &#39;ugbw&#39;, &#39;pm&#39;, &#39;voff_stat&#39;, &#39;cmrr&#39;, &#39;psrr_p&#39;, &#39;A&#39;]
+
+    env_name      = f&#39;circus:{ace_id}-{backend}-{space}-v{variant}&#39;
+
+    env           = circus.make( env_name
+                               , n_envs            = num_envs
+                               , num_steps         = num_steps
+                               , goal_filter       = target_filter
+                               , obs_filter        = state_filter
+                               , scale_observation = scale
+                               , )
+
+    return CircusEnv(env, ace_id, backend, space, variant, num_envs)</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.observation_keys"><code class="name flex">
+<span>def <span class="ident">observation_keys</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def observation_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
+    return { &#39;observation&#39;: circ.env.obs_filter }</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.observation_space"><code class="name flex">
+<span>def <span class="ident">observation_space</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def observation_space(circ: CircusEnv) -&gt; dict[int, int]:
+    return { o: s.shape[0] for o,s in circ.env.observation_space.items() }</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.random_action"><code class="name flex">
+<span>def <span class="ident">random_action</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def random_action(circ: CircusEnv) -&gt; dict[str, [[float]]]:
+    action = [ circ.env.action_space.sample().tolist()
+               for _ in range(circ.num_envs) ]
+    return {&#39;action&#39;: action}</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.random_step"><code class="name flex">
+<span>def <span class="ident">random_step</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def random_step(circ: CircusEnv) -&gt; dict[str, [[float]]]:
+    return step(circ, random_action(circ))</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.reset"><code class="name flex">
+<span>def <span class="ident">reset</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, env_ids=[], restart_count=0) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset( circ: CircusEnv, env_ids = [], restart_count = 0
+         ) -&gt; dict[str, [[float]]]:
+    obs = circ.env.reset(env_ids = env_ids)
+    return { p: o.tolist() for p,o in obs.items() }</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.restart"><code class="name flex">
+<span>def <span class="ident">restart</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def restart(circ: CircusEnv) -&gt; CircusEnv:
+    env, ace_id, backend, space, variant, num_envs = circ
+    return make_env(ace_id, backend, space, variant, num_envs, env.num_steps)</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.reward"><code class="name flex">
+<span>def <span class="ident">reward</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, observation: dict) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reward( circ: CircusEnv, observation: dict[str, [[float]]]
+          ) -&gt; dict[str, [float]]:
+    obs = { k: np.array(v) for k,v in observation.items() if k != &#39;info&#39; }
+    rew = circ.env.calculate_reward(obs).tolist()
+    return {&#39;reward&#39;: rew}</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.step"><code class="name flex">
+<span>def <span class="ident">step</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, action: dict) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def step( circ: CircusEnv, action: dict[str, [[float]]]
+        ) -&gt; dict[str, [[float]]]:
+    act                = np.array(action[&#39;action&#39;])
+    obs, rew, don, inf = circ.env.step(act)
+    return ( { p:        o.tolist() for p,o in obs.items() }
+           | { &#39;reward&#39;: rew.tolist()
+             , &#39;done&#39;:   don.tolist()
+             , &#39;info&#39;:   inf
+             , } )</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="circus.rest.Environment"><code class="flex name class">
+<span>class <span class="ident">CircusEnv</span></span>
+<span>(</span><span>env, ace_id, backend, space, variant, num_envs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Environment(env, ace_id, backend, space, variant, num_envs)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="circus.rest.Environment.ace_id"><code class="name">var <span class="ident">ace_id</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 1</p></div>
+</dd>
+<dt id="circus.rest.Environment.backend"><code class="name">var <span class="ident">backend</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 2</p></div>
+</dd>
+<dt id="circus.rest.Environment.env"><code class="name">var <span class="ident">env</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 0</p></div>
+</dd>
+<dt id="circus.rest.Environment.num_envs"><code class="name">var <span class="ident">num_envs</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 5</p></div>
+</dd>
+<dt id="circus.rest.Environment.space"><code class="name">var <span class="ident">space</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 3</p></div>
+</dd>
+<dt id="circus.rest.Environment.variant"><code class="name">var <span class="ident">variant</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 4</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="circus" href="index.html">circus</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="circus.rest.action_keys" href="#circus.rest.action_keys">action_keys</a></code></li>
+<li><code><a title="circus.rest.action_space" href="#circus.rest.action_space">action_space</a></code></li>
+<li><code><a title="circus.rest.current_goal" href="#circus.rest.current_goal">current_goal</a></code></li>
+<li><code><a title="circus.rest.current_performance" href="#circus.rest.current_performance">current_performance</a></code></li>
+<li><code><a title="circus.rest.current_sizing" href="#circus.rest.current_sizing">current_sizing</a></code></li>
+<li><code><a title="circus.rest.goal_keys" href="#circus.rest.goal_keys">goal_keys</a></code></li>
+<li><code><a title="circus.rest.last_action" href="#circus.rest.last_action">last_action</a></code></li>
+<li><code><a title="circus.rest.make_env" href="#circus.rest.make_env">make_env</a></code></li>
+<li><code><a title="circus.rest.observation_keys" href="#circus.rest.observation_keys">observation_keys</a></code></li>
+<li><code><a title="circus.rest.observation_space" href="#circus.rest.observation_space">observation_space</a></code></li>
+<li><code><a title="circus.rest.random_action" href="#circus.rest.random_action">random_action</a></code></li>
+<li><code><a title="circus.rest.random_step" href="#circus.rest.random_step">random_step</a></code></li>
+<li><code><a title="circus.rest.reset" href="#circus.rest.reset">reset</a></code></li>
+<li><code><a title="circus.rest.restart" href="#circus.rest.restart">restart</a></code></li>
+<li><code><a title="circus.rest.reward" href="#circus.rest.reward">reward</a></code></li>
+<li><code><a title="circus.rest.step" href="#circus.rest.step">step</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a></code></h4>
+<ul class="two-column">
+<li><code><a title="circus.rest.Environment.ace_id" href="#circus.rest.Environment.ace_id">ace_id</a></code></li>
+<li><code><a title="circus.rest.Environment.backend" href="#circus.rest.Environment.backend">backend</a></code></li>
+<li><code><a title="circus.rest.Environment.env" href="#circus.rest.Environment.env">env</a></code></li>
+<li><code><a title="circus.rest.Environment.num_envs" href="#circus.rest.Environment.num_envs">num_envs</a></code></li>
+<li><code><a title="circus.rest.Environment.space" href="#circus.rest.Environment.space">space</a></code></li>
+<li><code><a title="circus.rest.Environment.variant" href="#circus.rest.Environment.variant">variant</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
