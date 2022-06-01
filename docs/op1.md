@@ -17,7 +17,7 @@ gym.spaces.Dict({ 'observation':   Box( -np.Inf, np.Inf
                 , })
 
 # v1
-gym.spaces.Box(low   = -np.inf
+gym.spaces.Box( low   = -np.inf
               , high  = np.inf
               , shape = (len(obs_filter), )
               , dtype = np.float32
