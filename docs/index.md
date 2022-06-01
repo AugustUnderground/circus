@@ -93,8 +93,7 @@ integrated circuit design, based on [AC²E](https://github.com/matthschw/ace) /
 - [Installation](./install.md)
 - [API Documentation](./circus/index.html)
 - [Basic Usage](./usage.md)
-- **Environments:**
-- [Single Ended Operational Amplifiers](./ops.md)
+- [Environments](./env.md)
     + [X] [OP1: Miller Operational Amplifier](./op1.md)
     + [X] [OP2: Symmetrical Amplifier](./op2.md)
     + [ ] [OP3: Un-Symmetrical Amplifier]()
