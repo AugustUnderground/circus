@@ -77,6 +77,14 @@ def carnival():
         res = rest.current_sizing(circ)
         return handle_response(res)
 
+    @app.route(f'/{route}/last_action', methods=['GET'])
+    def last_action():
+        res = ( rest.current_sizing(circ)
+                if space == 'geom' else
+                rest.last_action(circ) )
+        return handle_response(res)
+
+    # @app.route(f'/{route}/scaler', methods=['GET'])
     # @app.route(f'/{route}/scaler', methods=['GET'])
     # def scaler():
     #     res = gc.scaler(env)

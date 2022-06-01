@@ -69,16 +69,16 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
                                , where = (a * log_msk) > 0.0
                                ) + (a * ~log_msk)
         y_           = 2.0 * (l[:,scl_msk] - x_min) / (x_max - x_min) - 1.0
-        y            = x
+        y            = x.copy()
         y[:,scl_msk] = y_
         return y
 
     def unscaler(y: np.ndarray) -> np.ndarray:
-        y_ = ((y + 1.0) / 2.0) * (x_max - x_min) + x_min
-        p  = np.power( 10.0, y_ * log_msk
-                     , where = (y_ * log_msk) > 0.0
-                     ) + (y_ * ~log_msk)
-        x = y
+        y_           = ((y + 1.0) / 2.0) * (x_max - x_min) + x_min
+        p            = np.power( 10.0, y_ * log_msk
+                               , where = (y_ * log_msk) > 0.0
+                               ) + (y_ * ~log_msk)
+        x            = y.copy()
         x[:,scl_msk] = p
         return x
 

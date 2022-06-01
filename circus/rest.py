@@ -87,13 +87,18 @@ def reward( circ: CircusEnv, observation: dict[str, [[float]]]
 
 def current_performance(circ: CircusEnv) -> dict[int, dict[str, float]]:
     perf = ac.current_performance_pool(circ.env.ace_envs)
-    return {i: {p[k] for k in circ.env.obs_filter} for i,p in perf.items()}
+    return {i: {o: p[o] for o in circ.env.obs_filter} for i,p in perf.items()}
 
 def current_goal(circ: CircusEnv) -> dict[int, dict[str, float]]:
-    return dict(enumerate(circ.env.goal))
+    return dict(enumerate(list(map( lambda g: dict(zip(circ.env.goal_filter, g))
+                                  , circ.env.goal.tolist() ))))
 
 def current_sizing(circ: CircusEnv) -> dict[int, dict[str, float]]:
     return ac.current_sizing_pool(circ.env.ace_envs)
+
+def last_action(circ: CircusEnv) -> dict[int, dict[str, float]]:
+    return { i: { k: v for k,v in p.items() if k in circ.env.input_parameters }
+             for i,p in ac.current_performance_pool(circ.env.ace_envs).items() }
 
 def action_space(circ: CircusEnv) -> dict[int, int]:
     return { 'action': circ.env.action_space.shape[0] }
