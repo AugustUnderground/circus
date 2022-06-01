@@ -2,6 +2,7 @@
 
 ## Discussion
 
+- [ ] Migrate Documentation
 - [X] Default should be `VecEnv`
 - [ ] Reward Function
 - [ ] Goal of non-`GoalEnv`s
