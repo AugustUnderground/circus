@@ -148,22 +148,6 @@ the following mapping:
 , Vbs ]             , Vgs ]
 ```
 
-$$
-\begin{bmatrix}
-    g_{\mathrm{m}}/I_{\mathrm{d}} \\
-    f_{\mathrm{ug}} \\
-    V_{\mathrm{ds}} \\
-    V_{\mathrm{bs}}
-\end{bmatrix}
-\mapstop
-\begin{bmatrix}
-    I_{\mathrm{d}}/W \\
-    L \\
-    g_{\mathrm{ds}}/W \\
-    V_{\mathrm{gs}}
-\end{bmatrix}
-$$
-
 The paths (`nmos_path`, `pmos_path`) _must_ be structured like this:
 
 ```
