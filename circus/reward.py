@@ -3,7 +3,7 @@
 from typing import Any, List, Optional, Type, Union, Callable
 import numpy as np
 
-def dummy_reward(observation: dict[str, np.ndarray]) -> np.array:
+def dummy_reward(observation: dict[str, np.ndarray]) -> np.ndarray:
     """ Default reward function for non-goal environments (v1).
     Arguments: `observation`
     Returns: `reward`
@@ -11,7 +11,7 @@ def dummy_reward(observation: dict[str, np.ndarray]) -> np.array:
     return np.sum(observation['observation'], axis = 1)
 
 def binary_reward( predicate: [Callable], observation: dict[str, np.ndarray]
-                 , ) -> np.array:
+                 , ) -> np.ndarray:
     """ Default reward function for goal environments (v0).
     Arguments:  `predicate`, `observation`
     Returns: `reward` in {-1;0}
