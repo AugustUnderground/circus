@@ -133,7 +133,9 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP1: Symmetrical Amplifier Goal Env</p></div>
+<div class="desc"><p>OP1: Symmetrical Amplifier Goal Env</p>
+<p>Construct Electric Sizing Goal Environment. Same Arguments as
+<code>CircusGeom</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -179,7 +181,9 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP1: Symmetrical Amplifier Non-Goal Env</p></div>
+<div class="desc"><p>OP1: Symmetrical Amplifier Non-Goal Env</p>
+<p>Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+<code>CircusElec</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -226,7 +230,32 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP1: Symmetrical Amplifier Goal Env</p></div>
+<div class="desc"><p>OP1: Symmetrical Amplifier Goal Env</p>
+<p>Construct a Geometric Sizing Goal Environment</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>ace_id</code>:
+ID of the form 'op#', see ACE Documentation for further
+details.
+<code>ace_backend</code>:
+PDK, available are 'xh035' and 'xh018'.
+<code>num_envs</code>:
+Numer of Parallel Environments ∈ [ 1 .. <code>nproc</code> ]
+<code>num_steps</code>:
+Number of steps per Episode.
+<code>seed</code>:
+Random Seed
+<code>obs_filter</code>:
+Filter Performance dict obtained from ACE.
+'perf': Only performance paramters
+'all': All parameters from ACE
+[str]: List of parameters
+<code>goal_filter</code>:
+List of parameters
+<code>goal_preds</code>:
+Binary comparison operator
+<code>reward_fn</code>:
+Optional reward function that takes an observation dict.
+<code>scale_observation</code>: Scale the observations and goals as specified in trafo</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -271,7 +300,9 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP1: Symmetrical Amplifier Non-Goal Env</p></div>
+<div class="desc"><p>OP1: Symmetrical Amplifier Non-Goal Env</p>
+<p>Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+<code>CircusGeom</code> but different default <code>reward_fn</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -317,7 +348,9 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP2: Symmetrical Amplifier Goal Env</p></div>
+<div class="desc"><p>OP2: Symmetrical Amplifier Goal Env</p>
+<p>Construct Electric Sizing Goal Environment. Same Arguments as
+<code>CircusGeom</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -363,7 +396,9 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP2: Symmetrical Amplifier Non-Goal Env</p></div>
+<div class="desc"><p>OP2: Symmetrical Amplifier Non-Goal Env</p>
+<p>Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+<code>CircusElec</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -410,7 +445,32 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP2: Symmetrical Amplifier Goal Env</p></div>
+<div class="desc"><p>OP2: Symmetrical Amplifier Goal Env</p>
+<p>Construct a Geometric Sizing Goal Environment</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>ace_id</code>:
+ID of the form 'op#', see ACE Documentation for further
+details.
+<code>ace_backend</code>:
+PDK, available are 'xh035' and 'xh018'.
+<code>num_envs</code>:
+Numer of Parallel Environments ∈ [ 1 .. <code>nproc</code> ]
+<code>num_steps</code>:
+Number of steps per Episode.
+<code>seed</code>:
+Random Seed
+<code>obs_filter</code>:
+Filter Performance dict obtained from ACE.
+'perf': Only performance paramters
+'all': All parameters from ACE
+[str]: List of parameters
+<code>goal_filter</code>:
+List of parameters
+<code>goal_preds</code>:
+Binary comparison operator
+<code>reward_fn</code>:
+Optional reward function that takes an observation dict.
+<code>scale_observation</code>: Scale the observations and goals as specified in trafo</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -455,7 +515,9 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP2: Symmetrical Amplifier Non-Goal Env</p></div>
+<div class="desc"><p>OP2: Symmetrical Amplifier Non-Goal Env</p>
+<p>Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+<code>CircusGeom</code> but different default <code>reward_fn</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -501,7 +563,9 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP8: Symmetrical Amplifier Goal Env</p></div>
+<div class="desc"><p>OP8: Symmetrical Amplifier Goal Env</p>
+<p>Construct Electric Sizing Goal Environment. Same Arguments as
+<code>CircusGeom</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -547,7 +611,9 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP8: Symmetrical Amplifier Non-Goal Env</p></div>
+<div class="desc"><p>OP8: Symmetrical Amplifier Non-Goal Env</p>
+<p>Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+<code>CircusElec</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -594,7 +660,32 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP8: Symmetrical Amplifier Goal Env</p></div>
+<div class="desc"><p>OP8: Symmetrical Amplifier Goal Env</p>
+<p>Construct a Geometric Sizing Goal Environment</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>ace_id</code>:
+ID of the form 'op#', see ACE Documentation for further
+details.
+<code>ace_backend</code>:
+PDK, available are 'xh035' and 'xh018'.
+<code>num_envs</code>:
+Numer of Parallel Environments ∈ [ 1 .. <code>nproc</code> ]
+<code>num_steps</code>:
+Number of steps per Episode.
+<code>seed</code>:
+Random Seed
+<code>obs_filter</code>:
+Filter Performance dict obtained from ACE.
+'perf': Only performance paramters
+'all': All parameters from ACE
+[str]: List of parameters
+<code>goal_filter</code>:
+List of parameters
+<code>goal_preds</code>:
+Binary comparison operator
+<code>reward_fn</code>:
+Optional reward function that takes an observation dict.
+<code>scale_observation</code>: Scale the observations and goals as specified in trafo</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -639,7 +730,9 @@ class OP8XH018ElecV1(OPElecV1):
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>OP8: Symmetrical Amplifier Non-Goal Env</p></div>
+<div class="desc"><p>OP8: Symmetrical Amplifier Non-Goal Env</p>
+<p>Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+<code>CircusGeom</code> but different default <code>reward_fn</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>

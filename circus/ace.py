@@ -4,7 +4,9 @@ import operator
 from typing import Any, List, Optional, Type, Union, Callable
 
 def backend_id(pdk: str) -> str:
-    """ACE Backend ID Generator"""
+    """
+    ACE Backend ID Generator.
+    """
     err_msg = f'No ACE Backend found for {pdk}'
     return (pdk + '-3V3' if pdk == 'xh035'  else
             pdk + '-1V8' if pdk == 'xh018'  else
@@ -13,8 +15,10 @@ def backend_id(pdk: str) -> str:
             NotImplementedError(err_msg))
 
 def goal_predicate(ps: [str] = []) -> [Callable]:
-    """ List of predicates for achived / desired goal comparison """
-
+    """
+    List of default predicates for achived / desired goal comparison:
+        Takes the form: state operator goal
+    """
     preds = { 'A':           operator.le # Area
             , 'a_0':         operator.ge # Gain
             , 'cmrr':        operator.ge # Common Mode Rejection Ration

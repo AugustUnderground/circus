@@ -33,7 +33,9 @@ import operator
 from typing import Any, List, Optional, Type, Union, Callable
 
 def backend_id(pdk: str) -&gt; str:
-    &#34;&#34;&#34;ACE Backend ID Generator&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    ACE Backend ID Generator.
+    &#34;&#34;&#34;
     err_msg = f&#39;No ACE Backend found for {pdk}&#39;
     return (pdk + &#39;-3V3&#39; if pdk == &#39;xh035&#39;  else
             pdk + &#39;-1V8&#39; if pdk == &#39;xh018&#39;  else
@@ -42,8 +44,10 @@ def backend_id(pdk: str) -&gt; str:
             NotImplementedError(err_msg))
 
 def goal_predicate(ps: [str] = []) -&gt; [Callable]:
-    &#34;&#34;&#34; List of predicates for achived / desired goal comparison &#34;&#34;&#34;
-
+    &#34;&#34;&#34;
+    List of default predicates for achived / desired goal comparison:
+        Takes the form: state operator goal
+    &#34;&#34;&#34;
     preds = { &#39;A&#39;:           operator.le # Area
             , &#39;a_0&#39;:         operator.ge # Gain
             , &#39;cmrr&#39;:        operator.ge # Common Mode Rejection Ration
@@ -90,13 +94,15 @@ def goal_predicate(ps: [str] = []) -&gt; [Callable]:
 <span>def <span class="ident">backend_id</span></span>(<span>pdk: str) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>ACE Backend ID Generator</p></div>
+<div class="desc"><p>ACE Backend ID Generator.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def backend_id(pdk: str) -&gt; str:
-    &#34;&#34;&#34;ACE Backend ID Generator&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    ACE Backend ID Generator.
+    &#34;&#34;&#34;
     err_msg = f&#39;No ACE Backend found for {pdk}&#39;
     return (pdk + &#39;-3V3&#39; if pdk == &#39;xh035&#39;  else
             pdk + &#39;-1V8&#39; if pdk == &#39;xh018&#39;  else
@@ -109,14 +115,17 @@ def goal_predicate(ps: [str] = []) -&gt; [Callable]:
 <span>def <span class="ident">goal_predicate</span></span>(<span>ps: [<class 'str'>] = []) ‑> [typing.Callable]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>List of predicates for achived / desired goal comparison</p></div>
+<div class="desc"><p>List of default predicates for achived / desired goal comparison:
+Takes the form: state operator goal</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def goal_predicate(ps: [str] = []) -&gt; [Callable]:
-    &#34;&#34;&#34; List of predicates for achived / desired goal comparison &#34;&#34;&#34;
-
+    &#34;&#34;&#34;
+    List of default predicates for achived / desired goal comparison:
+        Takes the form: state operator goal
+    &#34;&#34;&#34;
     preds = { &#39;A&#39;:           operator.le # Area
             , &#39;a_0&#39;:         operator.ge # Gain
             , &#39;cmrr&#39;:        operator.ge # Common Mode Rejection Ration

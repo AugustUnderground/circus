@@ -1,4 +1,4 @@
-"""Circus"""
+""" Gym compatible Analog Circuit Environment """
 
 import os
 from functools import partial
@@ -34,6 +34,24 @@ class CircusGeom(GoalEnv, VecEnv):
                 , reward_fn: Callable              = None
                 , scale_observation: bool          = True
                 , ):
+        """
+        Construct a Geometric Sizing Goal Environment
+        Arguments:
+            `ace_id`:            ID of the form 'op#', see ACE Documentation for further
+                                 details.
+            `ace_backend`:       PDK, available are 'xh035' and 'xh018'.
+            `num_envs`:          Numer of Parallel Environments ∈ [ 1 .. `nproc` ]
+            `num_steps`:         Number of steps per Episode.
+            `seed`:              Random Seed
+            `obs_filter`:        Filter Performance dict obtained from ACE.
+                                 'perf': Only performance paramters
+                                 'all': All parameters from ACE
+                                 [str]: List of parameters
+            `goal_filter`:       List of parameters
+            `goal_preds`:        Binary comparison operator
+            `reward_fn`:         Optional reward function that takes an observation dict.
+            `scale_observation`: Scale the observations and goals as specified in trafo
+        """
 
         self.ace_id: str       = ace_id
         self.ace_backend: str  = ace_backend
@@ -114,11 +132,24 @@ class CircusGeom(GoalEnv, VecEnv):
                        , self.observation_space
                        , self.action_space )
 
-    def close(self) -> None:
-        for _,env in self.ace_envs.items():
-            env.clear()
+    def close(self, env_ids: list[int] = None) -> None:
+        """
+        Close all (parallel) ACE environment(s).
+        Arguments:
+            `env_ids`: List of environemt IDs that will be closed.
+                       Default = None closes all.
+        """
+        for env_id in (env_ids or self.ace_envs.keys()):
+            self.ace_envs[env_id].clear()
 
     def reset(self, env_mask: [bool] = [], env_ids: [int] = []):
+        """
+        Reset all (parallel) environemt(s).
+        Arguments:
+            `env_mask`: Boolean mask of environemts that will be reset. Passing
+                        the `done` vector works. (Presendece)
+            `env_ids`: List of integer IDs of environemts that will be reset.
+        """
         reset_ids     = [ i for i,m in enumerate(env_mask) if m
                         ] or env_ids or range(self.num_envs)
         pool          = { i: self.ace_envs[i] for i in reset_ids }
@@ -142,18 +173,31 @@ class CircusGeom(GoalEnv, VecEnv):
         return observation
 
     def step(self, actions: np.ndarray) -> VecEnvStepReturn:
+        """
+        Take a step in the Environment. Calls `step_async` and `step_wait`
+        under the hood.
+        Arguments:
+            `actions`: Take Action with shape [num_envs, action_space].
+        """
         self.step_async(actions)
         return self.step_wait()
 
     def step_async(self, actions: np.ndarray) -> None:
+        """
+        Initiate a step in the Environment. 
+        Arguments:
+            `actions`: Take Action with shape [num_envs, action_space].
+        """
         unscaled    = list(self.unscale_action(actions))
         params      = sorted(ac.sizing_identifiers(self.ace_envs[0]))
         self.sizing = { env_id: dict(zip(params, action.tolist()))
                         for env_id,action in enumerate(unscaled)}
 
     def step_wait(self) -> VecEnvStepReturn:
-        pool        = { i: self.ace_envs[i]
-                        for i in range(self.num_envs) }
+        """
+        Complete a step in the Environment.
+        """
+        pool        = { i: self.ace_envs[i] for i in range(self.num_envs) }
         results     = ac.evaluate_circuit_pool(pool, pool_params = self.sizing)
 
         state       = filter_results(self.obs_filter, results)
@@ -215,8 +259,11 @@ class CircusGeom(GoalEnv, VecEnv):
         pass
 
 class CircusElec(CircusGeom):
-    """ Electric Sizing Goal Environment """
     def __init__(self, **kwargs):
+        """
+        Construct Electric Sizing Goal Environment. Same Arguments as
+        `CircusGeom`.
+        """
         super().__init__(**kwargs)
 
         nmos_path = os.path.expanduser(f'~/.ace/{self.ace_backend}/nmos')
@@ -251,6 +298,10 @@ class CircusElec(CircusGeom):
 class CircusGeomVec(CircusGeom):
     """ Geometric Sizing Non-Goal Environment """
     def __init__(self, reward_fn: Callable = dummy_reward, **kwargs):
+        """
+        Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+        `CircusGeom` but different default `reward_fn`.
+        """
         super().__init__(**(kwargs | {'reward_fn': reward_fn}))
         self.observation_space = self.observation_space['observation']
 
@@ -267,6 +318,10 @@ class CircusGeomVec(CircusGeom):
 class CircusElecVec(CircusElec):
     """ Geometric Sizing Non-Goal Environment """
     def __init__(self, reward_fn: Callable = dummy_reward, **kwargs):
+        """
+        Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+        `CircusElec`.
+        """
         super().__init__(**(kwargs | {'reward_fn': reward_fn}))
         self.observation_space = self.observation_space['observation']
 
@@ -280,9 +335,15 @@ class CircusElecVec(CircusElec):
         reward             = self.calculate_reward(observation)
         return (observation, reward, done, info)
 
-def make(env_id: str, n_envs: int = 1, **kwargs) -> Union[ CircusGeom
-                                                         , CircusGeomVec ]:
-    """ Gym Style Environment Constructor """
+def make( env_id: str, n_envs: int = 1, **kwargs
+        ) -> Union[CircusGeom, CircusGeomVec]:
+    """
+    Gym Style Environment Constructor, see `gym.make`.
+    Arguments:
+        `env_id`: Environment ID of the form '<ace id>-<pdk>-<space>-v<var>
+        `n_envs`: Number of Environment
+        `kwargs`: Will be passed to Circus constructor.
+    """
     eid,pdk,spc,var = env_id.split(':')[1].split('-')
     backend = backend_id(pdk)
 

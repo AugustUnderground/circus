@@ -10,6 +10,15 @@ class PrimitiveDevice:
     def __init__( self, path: str
                 , params_x: [str], params_y: [str]
                 , trafo_x: [str] , trafo_y: [str] ):
+        """
+        Construct Primitive Device Model
+        Arguments:
+            `path`:     Path must contain `scale.X`, `scale.Y` and `model.pt`.
+            `params_x`: List of Input parameters.
+            `params_y`: List of Output parameters.
+            `trafo_x`:  List of Input parameters that will be transformed.
+            `trafo_y`:  List of Output parameters taht will be transformed.
+        """
         self.params_x = params_x
         self.params_y = params_y
 
@@ -31,7 +40,11 @@ class PrimitiveDevice:
         self.model    = pt.jit.load(f"{path}/model.pt").cpu().eval()
 
     def predict(self, X: np.array) -> np.array:
-        """ Make a Prediciton """
+        """
+        Make a Prediciton.
+        Arguments:
+            `X`: Array of input parameters.
+        """
         with pt.no_grad():
             return pipe( X
                        , np.nan_to_num

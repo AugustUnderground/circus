@@ -39,6 +39,15 @@ class PrimitiveDevice:
     def __init__( self, path: str
                 , params_x: [str], params_y: [str]
                 , trafo_x: [str] , trafo_y: [str] ):
+        &#34;&#34;&#34;
+        Construct Primitive Device Model
+        Arguments:
+            `path`:     Path must contain `scale.X`, `scale.Y` and `model.pt`.
+            `params_x`: List of Input parameters.
+            `params_y`: List of Output parameters.
+            `trafo_x`:  List of Input parameters that will be transformed.
+            `trafo_y`:  List of Output parameters taht will be transformed.
+        &#34;&#34;&#34;
         self.params_x = params_x
         self.params_y = params_y
 
@@ -60,7 +69,11 @@ class PrimitiveDevice:
         self.model    = pt.jit.load(f&#34;{path}/model.pt&#34;).cpu().eval()
 
     def predict(self, X: np.array) -&gt; np.array:
-        &#34;&#34;&#34; Make a Prediciton &#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Make a Prediciton.
+        Arguments:
+            `X`: Array of input parameters.
+        &#34;&#34;&#34;
         with pt.no_grad():
             return pipe( X
                        , np.nan_to_num
@@ -90,7 +103,17 @@ class PrimitiveDevice:
 <span>(</span><span>path: str, params_x: [<class 'str'>], params_y: [<class 'str'>], trafo_x: [<class 'str'>], trafo_y: [<class 'str'>])</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Primitive Device Model</p></div>
+<div class="desc"><p>Primitive Device Model </p>
+<p>Construct Primitive Device Model</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>path</code>:
+Path must contain <code>scale.X</code>, <code>scale.Y</code> and <code>model.pt</code>.
+<code>params_x</code>: List of Input parameters.
+<code>params_y</code>: List of Output parameters.
+<code>trafo_x</code>:
+List of Input parameters that will be transformed.
+<code>trafo_y</code>:
+List of Output parameters taht will be transformed.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -100,6 +123,15 @@ class PrimitiveDevice:
     def __init__( self, path: str
                 , params_x: [str], params_y: [str]
                 , trafo_x: [str] , trafo_y: [str] ):
+        &#34;&#34;&#34;
+        Construct Primitive Device Model
+        Arguments:
+            `path`:     Path must contain `scale.X`, `scale.Y` and `model.pt`.
+            `params_x`: List of Input parameters.
+            `params_y`: List of Output parameters.
+            `trafo_x`:  List of Input parameters that will be transformed.
+            `trafo_y`:  List of Output parameters taht will be transformed.
+        &#34;&#34;&#34;
         self.params_x = params_x
         self.params_y = params_y
 
@@ -121,7 +153,11 @@ class PrimitiveDevice:
         self.model    = pt.jit.load(f&#34;{path}/model.pt&#34;).cpu().eval()
 
     def predict(self, X: np.array) -&gt; np.array:
-        &#34;&#34;&#34; Make a Prediciton &#34;&#34;&#34;
+        &#34;&#34;&#34;
+        Make a Prediciton.
+        Arguments:
+            `X`: Array of input parameters.
+        &#34;&#34;&#34;
         with pt.no_grad():
             return pipe( X
                        , np.nan_to_num
@@ -142,13 +178,19 @@ class PrimitiveDevice:
 <span>def <span class="ident">predict</span></span>(<span>self, X: <built-in function array>) ‑> <built-in function array></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Make a Prediciton</p></div>
+<div class="desc"><p>Make a Prediciton.</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>X</code>: Array of input parameters.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def predict(self, X: np.array) -&gt; np.array:
-    &#34;&#34;&#34; Make a Prediciton &#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Make a Prediciton.
+    Arguments:
+        `X`: Array of input parameters.
+    &#34;&#34;&#34;
     with pt.no_grad():
         return pipe( X
                    , np.nan_to_num

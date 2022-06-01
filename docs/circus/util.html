@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>circus.util API documentation</title>
-<meta name="description" content="Utility Functions" />
+<meta name="description" content="Circus Utility Functions" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,12 +22,12 @@
 <h1 class="title">Module <code>circus.util</code></h1>
 </header>
 <section id="section-intro">
-<p>Utility Functions</p>
+<p>Circus Utility Functions</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; Utility Functions &#34;&#34;&#34;
+<pre><code class="python">&#34;&#34;&#34; Circus Utility Functions &#34;&#34;&#34;
 
 from typing import Any, List, Optional, Type, Union, Callable, Tuple
 import numpy as np
@@ -35,7 +35,13 @@ import numpy as np
 from .trafo import *
 
 def add_noise(x: np.array, η: float = 0.01) -&gt; np.array:
-    &#34;&#34;&#34; Add some gaussian noise &#34;&#34;&#34;
+    &#34;&#34;&#34;Add some gaussian noise
+    Arguments: 
+        `x`: Input
+        `η`: Standard Deviation
+    Returns:
+        `y`: `x` with noise `η`
+    &#34;&#34;&#34;
     d = x.shape
     μ = np.ones(d)
     σ = np.full(d, η)
@@ -46,14 +52,18 @@ def filter_results( filter_ids: [str], results: dict[int, dict[str, float]]
                   ) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Filter a set of keys from nested dict. Intended to filter observations and
-    goal states.
+    goal states obtained from ACE. Returns a numpy array where 0th dimension is
+    the number of environments and the 1st dimension is `len(filter_ids)`.
     &#34;&#34;&#34;
     return np.vstack([ np.array([ results[i][k] for k in filter_ids ])
                        for i in sorted(list(results.keys())) ])
 
 def geometric_unscaler(constraints: dict) -&gt; Callable:
-    &#34;&#34;&#34; Unscale action ∈ [-1.0;1.0] into real action &#34;&#34;&#34;
-
+    &#34;&#34;&#34; 
+    Unscale action ∈ [-1.0;1.0] into real widths and lengths given
+    constraints obtained from ACE.
+    Returns a scaler function: `scaler :: np.ndarray -&gt; np.ndarray`
+    &#34;&#34;&#34;
     x_min = np.array([ v[&#39;min&#39;] for _,v in sorted( constraints.items()
                                                  , key = lambda kv: kv[0] )
                        if v[&#39;sizing&#39;] ])
@@ -65,6 +75,13 @@ def geometric_unscaler(constraints: dict) -&gt; Callable:
 
 def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
                       , performance_ids: [str] ) -&gt; Tuple[Callable, Callable]:
+    &#34;&#34;&#34;
+    Scale/Unsclae performance obtained from ACE as specified in the
+    corresponding `trafo` module, s.t. ∈ [-1.0;1.0].
+    Returns a scaler and unscaler funciton: 
+        `scaler   :: np.ndarray -&gt; np.ndarray`
+        `unscaler :: np.ndarray -&gt; np.ndarray`
+    &#34;&#34;&#34;
     err_msg = f&#39;No Performance Scale for {ace_id} available&#39;
     x_min_d, x_max_d = { &#39;op1&#39;: op1.output_scale
                        , &#39;op2&#39;: op2.output_scale
@@ -125,13 +142,24 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
 <span>def <span class="ident">add_noise</span></span>(<span>x: <built-in function array>, η: float = 0.01) ‑> <built-in function array></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Add some gaussian noise</p></div>
+<div class="desc"><p>Add some gaussian noise
+Arguments:
+<code>x</code>: Input
+<code>η</code>: Standard Deviation</p>
+<h2 id="returns">Returns</h2>
+<p><code>y</code>: <code>x</code> with noise <code>η</code></p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def add_noise(x: np.array, η: float = 0.01) -&gt; np.array:
-    &#34;&#34;&#34; Add some gaussian noise &#34;&#34;&#34;
+    &#34;&#34;&#34;Add some gaussian noise
+    Arguments: 
+        `x`: Input
+        `η`: Standard Deviation
+    Returns:
+        `y`: `x` with noise `η`
+    &#34;&#34;&#34;
     d = x.shape
     μ = np.ones(d)
     σ = np.full(d, η)
@@ -144,7 +172,8 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
 </code></dt>
 <dd>
 <div class="desc"><p>Filter a set of keys from nested dict. Intended to filter observations and
-goal states.</p></div>
+goal states obtained from ACE. Returns a numpy array where 0th dimension is
+the number of environments and the 1st dimension is <code>len(filter_ids)</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -153,7 +182,8 @@ goal states.</p></div>
                   ) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Filter a set of keys from nested dict. Intended to filter observations and
-    goal states.
+    goal states obtained from ACE. Returns a numpy array where 0th dimension is
+    the number of environments and the 1st dimension is `len(filter_ids)`.
     &#34;&#34;&#34;
     return np.vstack([ np.array([ results[i][k] for k in filter_ids ])
                        for i in sorted(list(results.keys())) ])</code></pre>
@@ -163,14 +193,19 @@ goal states.</p></div>
 <span>def <span class="ident">geometric_unscaler</span></span>(<span>constraints: dict) ‑> Callable</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Unscale action ∈ [-1.0;1.0] into real action</p></div>
+<div class="desc"><p>Unscale action ∈ [-1.0;1.0] into real widths and lengths given
+constraints obtained from ACE.
+Returns a scaler function: <code>scaler :: np.ndarray -&gt; np.ndarray</code></p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def geometric_unscaler(constraints: dict) -&gt; Callable:
-    &#34;&#34;&#34; Unscale action ∈ [-1.0;1.0] into real action &#34;&#34;&#34;
-
+    &#34;&#34;&#34; 
+    Unscale action ∈ [-1.0;1.0] into real widths and lengths given
+    constraints obtained from ACE.
+    Returns a scaler function: `scaler :: np.ndarray -&gt; np.ndarray`
+    &#34;&#34;&#34;
     x_min = np.array([ v[&#39;min&#39;] for _,v in sorted( constraints.items()
                                                  , key = lambda kv: kv[0] )
                        if v[&#39;sizing&#39;] ])
@@ -185,13 +220,25 @@ goal states.</p></div>
 <span>def <span class="ident">performance_scaler</span></span>(<span>ace_id: str, ace_backend: str, constraints: dict, performance_ids: [<class 'str'>]) ‑> Tuple[Callable, Callable]</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Scale/Unsclae performance obtained from ACE as specified in the
+corresponding <code>trafo</code> module, s.t. ∈ [-1.0;1.0].
+Returns a scaler and unscaler funciton:
+<code>scaler
+:: np.ndarray -&gt; np.ndarray</code>
+<code>unscaler :: np.ndarray -&gt; np.ndarray</code></p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
                       , performance_ids: [str] ) -&gt; Tuple[Callable, Callable]:
+    &#34;&#34;&#34;
+    Scale/Unsclae performance obtained from ACE as specified in the
+    corresponding `trafo` module, s.t. ∈ [-1.0;1.0].
+    Returns a scaler and unscaler funciton: 
+        `scaler   :: np.ndarray -&gt; np.ndarray`
+        `unscaler :: np.ndarray -&gt; np.ndarray`
+    &#34;&#34;&#34;
     err_msg = f&#39;No Performance Scale for {ace_id} available&#39;
     x_min_d, x_max_d = { &#39;op1&#39;: op1.output_scale
                        , &#39;op2&#39;: op2.output_scale

@@ -1,4 +1,13 @@
-""" Agnostic Design Space Transforation for OP1: Miller Operational Amplifier """
+"""
+Agnostic Design Space Transforation for OP1: Miller Operational Amplifier
+
+`INPUTS`
+-------
+Input parameters are 
+[ 'MNCM1R:gmoverid', 'MPCM2R:gmoverid', 'MPCS1:gmoverid', 'MND1A:gmoverid'
+, 'MNCM1R:fug',      'MPCM2R:fug',      'MPCS1:fug',      'MND1A:fug'
+, 'MNCM1A:id', 'MNCM1B:id' ]
+"""
 
 from fractions import Fraction
 from typing import Any, List, Optional, Type, Union, Callable
@@ -16,7 +25,23 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
              , fug_cm1: float,  fug_cm2: float,  fug_cs1: float,  fug_dp1: float
              #, res: float, cap: float
              , i1: float, i2: float ) -> dict[str, float]:
-    """ Transforation for OP1 """
+    """
+    Transforation for OP1
+    Arguments:
+        `constraints`: Design constraints as obtained from ACE.
+        `nmos`:     NMOS model of type `PrimitiveDevice`
+        `pmos`:     PMOS model of type `PrimitiveDevice`
+        `gmid_cm1`: MNCM13:gmoverid
+        `gmid_cm2`: MPCM2R:gmoverid
+        `gmid_cs1`: MPCS1:gmoverid
+        `gmid_dp1`: MND1A:gmoverid
+        `fug_cm1`:  MNCM13:fug
+        `fug_cm2`:  MPCM2R:fug
+        `fug_cs1`:  MPCS1:fug
+        `fug_dp1`:  MND1A:fug
+        `i1`:       MNCM1A:id
+        `i2`:       MNCM1B:id
+    """
 
     #sr      = 2.5e6
     #cl      = constraints.get('cl', {}).get('init', 5e-12)
@@ -81,7 +106,11 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
 
 def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
                                        , np.ndarray, np.ndarray]:
-    """ Unscale function for a given PDK """
+    """
+    Unscale function [-1.0; 1.0] for a given PDK. Used for scaling actions.
+    Arguments:
+        `ace_backend`: PDK
+    """
     x_min = np.array([5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 10.0, 40.0])
     x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 30.0, 80.0])
     gm    = np.array([(i in range(0,4))  for i in range(10)])
@@ -91,6 +120,12 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
 
 def output_scale( constraints: dict, ace_backend: str
                 ) -> tuple[dict[str, float], dict[str, float]]:
+    """
+    Estimated [-1.0;1.0] scaler for the Performance obtained from ACE.
+    Arguments:
+        `constraints`: Design constraints obtained from ACE.
+        `ace_backend`: PDK
+    """
     vdd   = constraints.get('vsup', {}).get('init', 3.3)
     x_min = { 'a_0'         : 25.0
             , 'ugbw'        : 5.0

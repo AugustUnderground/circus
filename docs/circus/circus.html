@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>circus.circus API documentation</title>
-<meta name="description" content="Circus" />
+<meta name="description" content="Gym compatible Analog Circuit Environment" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,12 +22,12 @@
 <h1 class="title">Module <code>circus.circus</code></h1>
 </header>
 <section id="section-intro">
-<p>Circus</p>
+<p>Gym compatible Analog Circuit Environment</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;Circus&#34;&#34;&#34;
+<pre><code class="python">&#34;&#34;&#34; Gym compatible Analog Circuit Environment &#34;&#34;&#34;
 
 import os
 from functools import partial
@@ -63,6 +63,24 @@ class CircusGeom(GoalEnv, VecEnv):
                 , reward_fn: Callable              = None
                 , scale_observation: bool          = True
                 , ):
+        &#34;&#34;&#34;
+        Construct a Geometric Sizing Goal Environment
+        Arguments:
+            `ace_id`:            ID of the form &#39;op#&#39;, see ACE Documentation for further
+                                 details.
+            `ace_backend`:       PDK, available are &#39;xh035&#39; and &#39;xh018&#39;.
+            `num_envs`:          Numer of Parallel Environments ∈ [ 1 .. `nproc` ]
+            `num_steps`:         Number of steps per Episode.
+            `seed`:              Random Seed
+            `obs_filter`:        Filter Performance dict obtained from ACE.
+                                 &#39;perf&#39;: Only performance paramters
+                                 &#39;all&#39;: All parameters from ACE
+                                 [str]: List of parameters
+            `goal_filter`:       List of parameters
+            `goal_preds`:        Binary comparison operator
+            `reward_fn`:         Optional reward function that takes an observation dict.
+            `scale_observation`: Scale the observations and goals as specified in trafo
+        &#34;&#34;&#34;
 
         self.ace_id: str       = ace_id
         self.ace_backend: str  = ace_backend
@@ -143,11 +161,24 @@ class CircusGeom(GoalEnv, VecEnv):
                        , self.observation_space
                        , self.action_space )
 
-    def close(self) -&gt; None:
-        for _,env in self.ace_envs.items():
-            env.clear()
+    def close(self, env_ids: list[int] = None) -&gt; None:
+        &#34;&#34;&#34;
+        Close all (parallel) ACE environment(s).
+        Arguments:
+            `env_ids`: List of environemt IDs that will be closed.
+                       Default = None closes all.
+        &#34;&#34;&#34;
+        for env_id in (env_ids or self.ace_envs.keys()):
+            self.ace_envs[env_id].clear()
 
     def reset(self, env_mask: [bool] = [], env_ids: [int] = []):
+        &#34;&#34;&#34;
+        Reset all (parallel) environemt(s).
+        Arguments:
+            `env_mask`: Boolean mask of environemts that will be reset. Passing
+                        the `done` vector works. (Presendece)
+            `env_ids`: List of integer IDs of environemts that will be reset.
+        &#34;&#34;&#34;
         reset_ids     = [ i for i,m in enumerate(env_mask) if m
                         ] or env_ids or range(self.num_envs)
         pool          = { i: self.ace_envs[i] for i in reset_ids }
@@ -171,18 +202,31 @@ class CircusGeom(GoalEnv, VecEnv):
         return observation
 
     def step(self, actions: np.ndarray) -&gt; VecEnvStepReturn:
+        &#34;&#34;&#34;
+        Take a step in the Environment. Calls `step_async` and `step_wait`
+        under the hood.
+        Arguments:
+            `actions`: Take Action with shape [num_envs, action_space].
+        &#34;&#34;&#34;
         self.step_async(actions)
         return self.step_wait()
 
     def step_async(self, actions: np.ndarray) -&gt; None:
+        &#34;&#34;&#34;
+        Initiate a step in the Environment. 
+        Arguments:
+            `actions`: Take Action with shape [num_envs, action_space].
+        &#34;&#34;&#34;
         unscaled    = list(self.unscale_action(actions))
         params      = sorted(ac.sizing_identifiers(self.ace_envs[0]))
         self.sizing = { env_id: dict(zip(params, action.tolist()))
                         for env_id,action in enumerate(unscaled)}
 
     def step_wait(self) -&gt; VecEnvStepReturn:
-        pool        = { i: self.ace_envs[i]
-                        for i in range(self.num_envs) }
+        &#34;&#34;&#34;
+        Complete a step in the Environment.
+        &#34;&#34;&#34;
+        pool        = { i: self.ace_envs[i] for i in range(self.num_envs) }
         results     = ac.evaluate_circuit_pool(pool, pool_params = self.sizing)
 
         state       = filter_results(self.obs_filter, results)
@@ -244,8 +288,11 @@ class CircusGeom(GoalEnv, VecEnv):
         pass
 
 class CircusElec(CircusGeom):
-    &#34;&#34;&#34; Electric Sizing Goal Environment &#34;&#34;&#34;
     def __init__(self, **kwargs):
+        &#34;&#34;&#34;
+        Construct Electric Sizing Goal Environment. Same Arguments as
+        `CircusGeom`.
+        &#34;&#34;&#34;
         super().__init__(**kwargs)
 
         nmos_path = os.path.expanduser(f&#39;~/.ace/{self.ace_backend}/nmos&#39;)
@@ -280,6 +327,10 @@ class CircusElec(CircusGeom):
 class CircusGeomVec(CircusGeom):
     &#34;&#34;&#34; Geometric Sizing Non-Goal Environment &#34;&#34;&#34;
     def __init__(self, reward_fn: Callable = dummy_reward, **kwargs):
+        &#34;&#34;&#34;
+        Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+        `CircusGeom` but different default `reward_fn`.
+        &#34;&#34;&#34;
         super().__init__(**(kwargs | {&#39;reward_fn&#39;: reward_fn}))
         self.observation_space = self.observation_space[&#39;observation&#39;]
 
@@ -296,6 +347,10 @@ class CircusGeomVec(CircusGeom):
 class CircusElecVec(CircusElec):
     &#34;&#34;&#34; Geometric Sizing Non-Goal Environment &#34;&#34;&#34;
     def __init__(self, reward_fn: Callable = dummy_reward, **kwargs):
+        &#34;&#34;&#34;
+        Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+        `CircusElec`.
+        &#34;&#34;&#34;
         super().__init__(**(kwargs | {&#39;reward_fn&#39;: reward_fn}))
         self.observation_space = self.observation_space[&#39;observation&#39;]
 
@@ -309,9 +364,15 @@ class CircusElecVec(CircusElec):
         reward             = self.calculate_reward(observation)
         return (observation, reward, done, info)
 
-def make(env_id: str, n_envs: int = 1, **kwargs) -&gt; Union[ CircusGeom
-                                                         , CircusGeomVec ]:
-    &#34;&#34;&#34; Gym Style Environment Constructor &#34;&#34;&#34;
+def make( env_id: str, n_envs: int = 1, **kwargs
+        ) -&gt; Union[CircusGeom, CircusGeomVec]:
+    &#34;&#34;&#34;
+    Gym Style Environment Constructor, see `gym.make`.
+    Arguments:
+        `env_id`: Environment ID of the form &#39;&lt;ace id&gt;-&lt;pdk&gt;-&lt;space&gt;-v&lt;var&gt;
+        `n_envs`: Number of Environment
+        `kwargs`: Will be passed to Circus constructor.
+    &#34;&#34;&#34;
     eid,pdk,spc,var = env_id.split(&#39;:&#39;)[1].split(&#39;-&#39;)
     backend = backend_id(pdk)
 
@@ -350,14 +411,24 @@ def make(env_id: str, n_envs: int = 1, **kwargs) -&gt; Union[ CircusGeom
 <span>def <span class="ident">make</span></span>(<span>env_id: str, n_envs: int = 1, **kwargs) ‑> Union[<a title="circus.circus.CircusGeom" href="#circus.circus.CircusGeom">CircusGeom</a>, <a title="circus.circus.CircusGeomVec" href="#circus.circus.CircusGeomVec">CircusGeomVec</a>]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Gym Style Environment Constructor</p></div>
+<div class="desc"><p>Gym Style Environment Constructor, see <code>gym.make</code>.</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>env_id</code>: Environment ID of the form '<ace id>-<pdk>-<space>-v<var>
+<code>n_envs</code>: Number of Environment
+<code>kwargs</code>: Will be passed to Circus constructor.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def make(env_id: str, n_envs: int = 1, **kwargs) -&gt; Union[ CircusGeom
-                                                         , CircusGeomVec ]:
-    &#34;&#34;&#34; Gym Style Environment Constructor &#34;&#34;&#34;
+<pre><code class="python">def make( env_id: str, n_envs: int = 1, **kwargs
+        ) -&gt; Union[CircusGeom, CircusGeomVec]:
+    &#34;&#34;&#34;
+    Gym Style Environment Constructor, see `gym.make`.
+    Arguments:
+        `env_id`: Environment ID of the form &#39;&lt;ace id&gt;-&lt;pdk&gt;-&lt;space&gt;-v&lt;var&gt;
+        `n_envs`: Number of Environment
+        `kwargs`: Will be passed to Circus constructor.
+    &#34;&#34;&#34;
     eid,pdk,spc,var = env_id.split(&#39;:&#39;)[1].split(&#39;-&#39;)
     backend = backend_id(pdk)
 
@@ -395,14 +466,19 @@ def make(env_id: str, n_envs: int = 1, **kwargs) -&gt; Union[ CircusGeom
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Electric Sizing Goal Environment</p></div>
+<div class="desc"><p>Geometric Sizing Goal Environment </p>
+<p>Construct Electric Sizing Goal Environment. Same Arguments as
+<code><a title="circus.circus.CircusGeom" href="#circus.circus.CircusGeom">CircusGeom</a></code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class CircusElec(CircusGeom):
-    &#34;&#34;&#34; Electric Sizing Goal Environment &#34;&#34;&#34;
     def __init__(self, **kwargs):
+        &#34;&#34;&#34;
+        Construct Electric Sizing Goal Environment. Same Arguments as
+        `CircusGeom`.
+        &#34;&#34;&#34;
         super().__init__(**kwargs)
 
         nmos_path = os.path.expanduser(f&#39;~/.ace/{self.ace_backend}/nmos&#39;)
@@ -471,7 +547,9 @@ def make(env_id: str, n_envs: int = 1, **kwargs) -&gt; Union[ CircusGeom
 <span>(</span><span>reward_fn: Callable = &lt;function dummy_reward&gt;, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Geometric Sizing Non-Goal Environment</p></div>
+<div class="desc"><p>Geometric Sizing Non-Goal Environment </p>
+<p>Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+<code><a title="circus.circus.CircusElec" href="#circus.circus.CircusElec">CircusElec</a></code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -479,6 +557,10 @@ def make(env_id: str, n_envs: int = 1, **kwargs) -&gt; Union[ CircusGeom
 <pre><code class="python">class CircusElecVec(CircusElec):
     &#34;&#34;&#34; Geometric Sizing Non-Goal Environment &#34;&#34;&#34;
     def __init__(self, reward_fn: Callable = dummy_reward, **kwargs):
+        &#34;&#34;&#34;
+        Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+        `CircusElec`.
+        &#34;&#34;&#34;
         super().__init__(**(kwargs | {&#39;reward_fn&#39;: reward_fn}))
         self.observation_space = self.observation_space[&#39;observation&#39;]
 
@@ -529,7 +611,32 @@ def make(env_id: str, n_envs: int = 1, **kwargs) -&gt; Union[ CircusGeom
 <span>(</span><span>ace_id: str, ace_backend: str, num_envs: int = 1, num_steps: int = 50, seed: int = 666, obs_filter: Union[str, List[str]] = 'perf', goal_filter: [<class 'str'>] = None, goal_preds: [typing.Callable] = None, reward_fn: Callable = None, scale_observation: bool = True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Geometric Sizing Goal Environment</p></div>
+<div class="desc"><p>Geometric Sizing Goal Environment </p>
+<p>Construct a Geometric Sizing Goal Environment</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>ace_id</code>:
+ID of the form 'op#', see ACE Documentation for further
+details.
+<code>ace_backend</code>:
+PDK, available are 'xh035' and 'xh018'.
+<code>num_envs</code>:
+Numer of Parallel Environments ∈ [ 1 .. <code>nproc</code> ]
+<code>num_steps</code>:
+Number of steps per Episode.
+<code>seed</code>:
+Random Seed
+<code>obs_filter</code>:
+Filter Performance dict obtained from ACE.
+'perf': Only performance paramters
+'all': All parameters from ACE
+[str]: List of parameters
+<code>goal_filter</code>:
+List of parameters
+<code>goal_preds</code>:
+Binary comparison operator
+<code>reward_fn</code>:
+Optional reward function that takes an observation dict.
+<code>scale_observation</code>: Scale the observations and goals as specified in trafo</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -548,6 +655,24 @@ def make(env_id: str, n_envs: int = 1, **kwargs) -&gt; Union[ CircusGeom
                 , reward_fn: Callable              = None
                 , scale_observation: bool          = True
                 , ):
+        &#34;&#34;&#34;
+        Construct a Geometric Sizing Goal Environment
+        Arguments:
+            `ace_id`:            ID of the form &#39;op#&#39;, see ACE Documentation for further
+                                 details.
+            `ace_backend`:       PDK, available are &#39;xh035&#39; and &#39;xh018&#39;.
+            `num_envs`:          Numer of Parallel Environments ∈ [ 1 .. `nproc` ]
+            `num_steps`:         Number of steps per Episode.
+            `seed`:              Random Seed
+            `obs_filter`:        Filter Performance dict obtained from ACE.
+                                 &#39;perf&#39;: Only performance paramters
+                                 &#39;all&#39;: All parameters from ACE
+                                 [str]: List of parameters
+            `goal_filter`:       List of parameters
+            `goal_preds`:        Binary comparison operator
+            `reward_fn`:         Optional reward function that takes an observation dict.
+            `scale_observation`: Scale the observations and goals as specified in trafo
+        &#34;&#34;&#34;
 
         self.ace_id: str       = ace_id
         self.ace_backend: str  = ace_backend
@@ -628,11 +753,24 @@ def make(env_id: str, n_envs: int = 1, **kwargs) -&gt; Union[ CircusGeom
                        , self.observation_space
                        , self.action_space )
 
-    def close(self) -&gt; None:
-        for _,env in self.ace_envs.items():
-            env.clear()
+    def close(self, env_ids: list[int] = None) -&gt; None:
+        &#34;&#34;&#34;
+        Close all (parallel) ACE environment(s).
+        Arguments:
+            `env_ids`: List of environemt IDs that will be closed.
+                       Default = None closes all.
+        &#34;&#34;&#34;
+        for env_id in (env_ids or self.ace_envs.keys()):
+            self.ace_envs[env_id].clear()
 
     def reset(self, env_mask: [bool] = [], env_ids: [int] = []):
+        &#34;&#34;&#34;
+        Reset all (parallel) environemt(s).
+        Arguments:
+            `env_mask`: Boolean mask of environemts that will be reset. Passing
+                        the `done` vector works. (Presendece)
+            `env_ids`: List of integer IDs of environemts that will be reset.
+        &#34;&#34;&#34;
         reset_ids     = [ i for i,m in enumerate(env_mask) if m
                         ] or env_ids or range(self.num_envs)
         pool          = { i: self.ace_envs[i] for i in reset_ids }
@@ -656,18 +794,31 @@ def make(env_id: str, n_envs: int = 1, **kwargs) -&gt; Union[ CircusGeom
         return observation
 
     def step(self, actions: np.ndarray) -&gt; VecEnvStepReturn:
+        &#34;&#34;&#34;
+        Take a step in the Environment. Calls `step_async` and `step_wait`
+        under the hood.
+        Arguments:
+            `actions`: Take Action with shape [num_envs, action_space].
+        &#34;&#34;&#34;
         self.step_async(actions)
         return self.step_wait()
 
     def step_async(self, actions: np.ndarray) -&gt; None:
+        &#34;&#34;&#34;
+        Initiate a step in the Environment. 
+        Arguments:
+            `actions`: Take Action with shape [num_envs, action_space].
+        &#34;&#34;&#34;
         unscaled    = list(self.unscale_action(actions))
         params      = sorted(ac.sizing_identifiers(self.ace_envs[0]))
         self.sizing = { env_id: dict(zip(params, action.tolist()))
                         for env_id,action in enumerate(unscaled)}
 
     def step_wait(self) -&gt; VecEnvStepReturn:
-        pool        = { i: self.ace_envs[i]
-                        for i in range(self.num_envs) }
+        &#34;&#34;&#34;
+        Complete a step in the Environment.
+        &#34;&#34;&#34;
+        pool        = { i: self.ace_envs[i] for i in range(self.num_envs) }
         results     = ac.evaluate_circuit_pool(pool, pool_params = self.sizing)
 
         state       = filter_results(self.obs_filter, results)
@@ -744,19 +895,26 @@ def make(env_id: str, n_envs: int = 1, **kwargs) -&gt; Union[ CircusGeom
 <h3>Methods</h3>
 <dl>
 <dt id="circus.circus.CircusGeom.close"><code class="name flex">
-<span>def <span class="ident">close</span></span>(<span>self) ‑> None</span>
+<span>def <span class="ident">close</span></span>(<span>self, env_ids: list = None) ‑> None</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Override close in your subclass to perform any necessary cleanup.</p>
-<p>Environments will automatically close() themselves when
-garbage collected or when the program exits.</p></div>
+<div class="desc"><p>Close all (parallel) ACE environment(s).</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>env_ids</code>: List of environemt IDs that will be closed.
+Default = None closes all.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def close(self) -&gt; None:
-    for _,env in self.ace_envs.items():
-        env.clear()</code></pre>
+<pre><code class="python">def close(self, env_ids: list[int] = None) -&gt; None:
+    &#34;&#34;&#34;
+    Close all (parallel) ACE environment(s).
+    Arguments:
+        `env_ids`: List of environemt IDs that will be closed.
+                   Default = None closes all.
+    &#34;&#34;&#34;
+    for env_id in (env_ids or self.ace_envs.keys()):
+        self.ace_envs[env_id].clear()</code></pre>
 </details>
 </dd>
 <dt id="circus.circus.CircusGeom.env_is_wrapped"><code class="name flex">
@@ -868,20 +1026,23 @@ metadata = {'render.modes': ['human', 'rgb_array']}</p>
 <span>def <span class="ident">reset</span></span>(<span>self, env_mask: [<class 'bool'>] = [], env_ids: [<class 'int'>] = [])</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Resets the environment to an initial state and returns an initial
-observation.</p>
-<p>Note that this function should not reset the environment's random
-number generator(s); random variables in the environment's state should
-be sampled independently between multiple calls to <code>reset()</code>. In other
-words, each call of <code>reset()</code> should yield an environment suitable for
-a new episode, independent of previous episodes.</p>
-<h2 id="returns">Returns</h2>
-<p>observation (object): the initial observation.</p></div>
+<div class="desc"><p>Reset all (parallel) environemt(s).</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>env_mask</code>: Boolean mask of environemts that will be reset. Passing
+the <code>done</code> vector works. (Presendece)
+<code>env_ids</code>: List of integer IDs of environemts that will be reset.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def reset(self, env_mask: [bool] = [], env_ids: [int] = []):
+    &#34;&#34;&#34;
+    Reset all (parallel) environemt(s).
+    Arguments:
+        `env_mask`: Boolean mask of environemts that will be reset. Passing
+                    the `done` vector works. (Presendece)
+        `env_ids`: List of integer IDs of environemts that will be reset.
+    &#34;&#34;&#34;
     reset_ids     = [ i for i,m in enumerate(env_mask) if m
                     ] or env_ids or range(self.num_envs)
     pool          = { i: self.ace_envs[i] for i in reset_ids }
@@ -953,25 +1114,21 @@ this won't be true if seed=None, for example.</p></div>
 <span>def <span class="ident">step</span></span>(<span>self, actions: numpy.ndarray) ‑> Tuple[Union[numpy.ndarray, Dict[str, numpy.ndarray], Tuple[numpy.ndarray, ...]], numpy.ndarray, numpy.ndarray, List[Dict]]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Run one timestep of the environment's dynamics. When end of
-episode is reached, you are responsible for calling <code>reset()</code>
-to reset this environment's state.</p>
-<p>Accepts an action and returns a tuple (observation, reward, done, info).</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>action</code></strong> :&ensp;<code>object</code></dt>
-<dd>an action provided by the agent</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<p>observation (object): agent's observation of the current environment
-reward (float) : amount of reward returned after previous action
-done (bool): whether the episode has ended, in which case further step() calls will return undefined results
-info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)</p></div>
+<div class="desc"><p>Take a step in the Environment. Calls <code>step_async</code> and <code>step_wait</code>
+under the hood.</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>actions</code>: Take Action with shape [num_envs, action_space].</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def step(self, actions: np.ndarray) -&gt; VecEnvStepReturn:
+    &#34;&#34;&#34;
+    Take a step in the Environment. Calls `step_async` and `step_wait`
+    under the hood.
+    Arguments:
+        `actions`: Take Action with shape [num_envs, action_space].
+    &#34;&#34;&#34;
     self.step_async(actions)
     return self.step_wait()</code></pre>
 </details>
@@ -980,16 +1137,19 @@ info (dict): contains auxiliary diagnostic information (helpful for debugging, a
 <span>def <span class="ident">step_async</span></span>(<span>self, actions: numpy.ndarray) ‑> None</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Tell all the environments to start taking a step
-with the given actions.
-Call step_wait() to get the results of the step.</p>
-<p>You should not call this if a step_async run is
-already pending.</p></div>
+<div class="desc"><p>Initiate a step in the Environment. </p>
+<h2 id="arguments">Arguments</h2>
+<p><code>actions</code>: Take Action with shape [num_envs, action_space].</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def step_async(self, actions: np.ndarray) -&gt; None:
+    &#34;&#34;&#34;
+    Initiate a step in the Environment. 
+    Arguments:
+        `actions`: Take Action with shape [num_envs, action_space].
+    &#34;&#34;&#34;
     unscaled    = list(self.unscale_action(actions))
     params      = sorted(ac.sizing_identifiers(self.ace_envs[0]))
     self.sizing = { env_id: dict(zip(params, action.tolist()))
@@ -1000,15 +1160,16 @@ already pending.</p></div>
 <span>def <span class="ident">step_wait</span></span>(<span>self) ‑> Tuple[Union[numpy.ndarray, Dict[str, numpy.ndarray], Tuple[numpy.ndarray, ...]], numpy.ndarray, numpy.ndarray, List[Dict]]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Wait for the step taken with step_async().</p>
-<p>:return: observation, reward, done, information</p></div>
+<div class="desc"><p>Complete a step in the Environment.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def step_wait(self) -&gt; VecEnvStepReturn:
-    pool        = { i: self.ace_envs[i]
-                    for i in range(self.num_envs) }
+    &#34;&#34;&#34;
+    Complete a step in the Environment.
+    &#34;&#34;&#34;
+    pool        = { i: self.ace_envs[i] for i in range(self.num_envs) }
     results     = ac.evaluate_circuit_pool(pool, pool_params = self.sizing)
 
     state       = filter_results(self.obs_filter, results)
@@ -1045,7 +1206,9 @@ already pending.</p></div>
 <span>(</span><span>reward_fn: Callable = &lt;function dummy_reward&gt;, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Geometric Sizing Non-Goal Environment</p></div>
+<div class="desc"><p>Geometric Sizing Non-Goal Environment </p>
+<p>Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+<code><a title="circus.circus.CircusGeom" href="#circus.circus.CircusGeom">CircusGeom</a></code> but different default <code>reward_fn</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1053,6 +1216,10 @@ already pending.</p></div>
 <pre><code class="python">class CircusGeomVec(CircusGeom):
     &#34;&#34;&#34; Geometric Sizing Non-Goal Environment &#34;&#34;&#34;
     def __init__(self, reward_fn: Callable = dummy_reward, **kwargs):
+        &#34;&#34;&#34;
+        Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+        `CircusGeom` but different default `reward_fn`.
+        &#34;&#34;&#34;
         super().__init__(**(kwargs | {&#39;reward_fn&#39;: reward_fn}))
         self.observation_space = self.observation_space[&#39;observation&#39;]
 

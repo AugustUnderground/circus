@@ -1,4 +1,4 @@
-""" Utility Functions """
+""" Circus Utility Functions """
 
 from typing import Any, List, Optional, Type, Union, Callable, Tuple
 import numpy as np
@@ -6,7 +6,13 @@ import numpy as np
 from .trafo import *
 
 def add_noise(x: np.array, η: float = 0.01) -> np.array:
-    """ Add some gaussian noise """
+    """Add some gaussian noise
+    Arguments: 
+        `x`: Input
+        `η`: Standard Deviation
+    Returns:
+        `y`: `x` with noise `η`
+    """
     d = x.shape
     μ = np.ones(d)
     σ = np.full(d, η)
@@ -17,14 +23,18 @@ def filter_results( filter_ids: [str], results: dict[int, dict[str, float]]
                   ) -> np.ndarray:
     """
     Filter a set of keys from nested dict. Intended to filter observations and
-    goal states.
+    goal states obtained from ACE. Returns a numpy array where 0th dimension is
+    the number of environments and the 1st dimension is `len(filter_ids)`.
     """
     return np.vstack([ np.array([ results[i][k] for k in filter_ids ])
                        for i in sorted(list(results.keys())) ])
 
 def geometric_unscaler(constraints: dict) -> Callable:
-    """ Unscale action ∈ [-1.0;1.0] into real action """
-
+    """ 
+    Unscale action ∈ [-1.0;1.0] into real widths and lengths given
+    constraints obtained from ACE.
+    Returns a scaler function: `scaler :: np.ndarray -> np.ndarray`
+    """
     x_min = np.array([ v['min'] for _,v in sorted( constraints.items()
                                                  , key = lambda kv: kv[0] )
                        if v['sizing'] ])
@@ -36,6 +46,13 @@ def geometric_unscaler(constraints: dict) -> Callable:
 
 def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
                       , performance_ids: [str] ) -> Tuple[Callable, Callable]:
+    """
+    Scale/Unsclae performance obtained from ACE as specified in the
+    corresponding `trafo` module, s.t. ∈ [-1.0;1.0].
+    Returns a scaler and unscaler funciton: 
+        `scaler   :: np.ndarray -> np.ndarray`
+        `unscaler :: np.ndarray -> np.ndarray`
+    """
     err_msg = f'No Performance Scale for {ace_id} available'
     x_min_d, x_max_d = { 'op1': op1.output_scale
                        , 'op2': op2.output_scale

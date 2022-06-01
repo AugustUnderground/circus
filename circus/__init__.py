@@ -1,4 +1,4 @@
-""" Circus Gym Registry """
+""" Gym compatible Analog Circuit Environment """
 
 from gym.envs.registration import register
 from .circus import *

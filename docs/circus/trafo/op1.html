@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>circus.trafo.op1 API documentation</title>
-<meta name="description" content="Agnostic Design Space Transforation for OP1: Miller Operational Amplifier" />
+<meta name="description" content="Agnostic Design Space Transforation for OP1: Miller Operational Amplifier …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -23,11 +23,28 @@
 </header>
 <section id="section-intro">
 <p>Agnostic Design Space Transforation for OP1: Miller Operational Amplifier</p>
+<h2 id="inputs"><code>INPUTS</code></h2>
+<p>Input parameters are
+[ 'MNCM1R:gmoverid', 'MPCM2R:gmoverid', 'MPCS1:gmoverid', 'MND1A:gmoverid'
+, 'MNCM1R:fug',
+'MPCM2R:fug',
+'MPCS1:fug',
+'MND1A:fug'
+, 'MNCM1A:id', 'MNCM1B:id' ]</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; Agnostic Design Space Transforation for OP1: Miller Operational Amplifier &#34;&#34;&#34;
+<pre><code class="python">&#34;&#34;&#34;
+Agnostic Design Space Transforation for OP1: Miller Operational Amplifier
+
+`INPUTS`
+-------
+Input parameters are 
+[ &#39;MNCM1R:gmoverid&#39;, &#39;MPCM2R:gmoverid&#39;, &#39;MPCS1:gmoverid&#39;, &#39;MND1A:gmoverid&#39;
+, &#39;MNCM1R:fug&#39;,      &#39;MPCM2R:fug&#39;,      &#39;MPCS1:fug&#39;,      &#39;MND1A:fug&#39;
+, &#39;MNCM1A:id&#39;, &#39;MNCM1B:id&#39; ]
+&#34;&#34;&#34;
 
 from fractions import Fraction
 from typing import Any, List, Optional, Type, Union, Callable
@@ -45,7 +62,23 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
              , fug_cm1: float,  fug_cm2: float,  fug_cs1: float,  fug_dp1: float
              #, res: float, cap: float
              , i1: float, i2: float ) -&gt; dict[str, float]:
-    &#34;&#34;&#34; Transforation for OP1 &#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Transforation for OP1
+    Arguments:
+        `constraints`: Design constraints as obtained from ACE.
+        `nmos`:     NMOS model of type `PrimitiveDevice`
+        `pmos`:     PMOS model of type `PrimitiveDevice`
+        `gmid_cm1`: MNCM13:gmoverid
+        `gmid_cm2`: MPCM2R:gmoverid
+        `gmid_cs1`: MPCS1:gmoverid
+        `gmid_dp1`: MND1A:gmoverid
+        `fug_cm1`:  MNCM13:fug
+        `fug_cm2`:  MPCM2R:fug
+        `fug_cs1`:  MPCS1:fug
+        `fug_dp1`:  MND1A:fug
+        `i1`:       MNCM1A:id
+        `i2`:       MNCM1B:id
+    &#34;&#34;&#34;
 
     #sr      = 2.5e6
     #cl      = constraints.get(&#39;cl&#39;, {}).get(&#39;init&#39;, 5e-12)
@@ -110,7 +143,11 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
 
 def unscaler(ace_backend: str) -&gt; tuple[ np.ndarray, np.ndarray, np.ndarray
                                        , np.ndarray, np.ndarray]:
-    &#34;&#34;&#34; Unscale function for a given PDK &#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Unscale function [-1.0; 1.0] for a given PDK. Used for scaling actions.
+    Arguments:
+        `ace_backend`: PDK
+    &#34;&#34;&#34;
     x_min = np.array([5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 10.0, 40.0])
     x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 30.0, 80.0])
     gm    = np.array([(i in range(0,4))  for i in range(10)])
@@ -120,6 +157,12 @@ def unscaler(ace_backend: str) -&gt; tuple[ np.ndarray, np.ndarray, np.ndarray
 
 def output_scale( constraints: dict, ace_backend: str
                 ) -&gt; tuple[dict[str, float], dict[str, float]]:
+    &#34;&#34;&#34;
+    Estimated [-1.0;1.0] scaler for the Performance obtained from ACE.
+    Arguments:
+        `constraints`: Design constraints obtained from ACE.
+        `ace_backend`: PDK
+    &#34;&#34;&#34;
     vdd   = constraints.get(&#39;vsup&#39;, {}).get(&#39;init&#39;, 3.3)
     x_min = { &#39;a_0&#39;         : 25.0
             , &#39;ugbw&#39;        : 5.0
@@ -191,13 +234,22 @@ def output_scale( constraints: dict, ace_backend: str
 <span>def <span class="ident">output_scale</span></span>(<span>constraints: dict, ace_backend: str) ‑> tuple</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Estimated [-1.0;1.0] scaler for the Performance obtained from ACE.</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>constraints</code>: Design constraints obtained from ACE.
+<code>ace_backend</code>: PDK</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def output_scale( constraints: dict, ace_backend: str
                 ) -&gt; tuple[dict[str, float], dict[str, float]]:
+    &#34;&#34;&#34;
+    Estimated [-1.0;1.0] scaler for the Performance obtained from ACE.
+    Arguments:
+        `constraints`: Design constraints obtained from ACE.
+        `ace_backend`: PDK
+    &#34;&#34;&#34;
     vdd   = constraints.get(&#39;vsup&#39;, {}).get(&#39;init&#39;, 3.3)
     x_min = { &#39;a_0&#39;         : 25.0
             , &#39;ugbw&#39;        : 5.0
@@ -262,7 +314,29 @@ def output_scale( constraints: dict, ace_backend: str
 <span>def <span class="ident">transform</span></span>(<span>constraints: dict, nmos: <a title="circus.prim.PrimitiveDevice" href="../prim.html#circus.prim.PrimitiveDevice">PrimitiveDevice</a>, pmos: <a title="circus.prim.PrimitiveDevice" href="../prim.html#circus.prim.PrimitiveDevice">PrimitiveDevice</a>, gmid_cm1: float, gmid_cm2: float, gmid_cs1: float, gmid_dp1: float, fug_cm1: float, fug_cm2: float, fug_cs1: float, fug_dp1: float, i1: float, i2: float) ‑> dict</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Transforation for OP1</p></div>
+<div class="desc"><p>Transforation for OP1</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>constraints</code>: Design constraints as obtained from ACE.
+<code>nmos</code>:
+NMOS model of type <code>PrimitiveDevice</code>
+<code>pmos</code>:
+PMOS model of type <code>PrimitiveDevice</code>
+<code>gmid_cm1</code>: MNCM13:gmoverid
+<code>gmid_cm2</code>: MPCM2R:gmoverid
+<code>gmid_cs1</code>: MPCS1:gmoverid
+<code>gmid_dp1</code>: MND1A:gmoverid
+<code>fug_cm1</code>:
+MNCM13:fug
+<code>fug_cm2</code>:
+MPCM2R:fug
+<code>fug_cs1</code>:
+MPCS1:fug
+<code>fug_dp1</code>:
+MND1A:fug
+<code>i1</code>:
+MNCM1A:id
+<code>i2</code>:
+MNCM1B:id</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -272,7 +346,23 @@ def output_scale( constraints: dict, ace_backend: str
              , fug_cm1: float,  fug_cm2: float,  fug_cs1: float,  fug_dp1: float
              #, res: float, cap: float
              , i1: float, i2: float ) -&gt; dict[str, float]:
-    &#34;&#34;&#34; Transforation for OP1 &#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Transforation for OP1
+    Arguments:
+        `constraints`: Design constraints as obtained from ACE.
+        `nmos`:     NMOS model of type `PrimitiveDevice`
+        `pmos`:     PMOS model of type `PrimitiveDevice`
+        `gmid_cm1`: MNCM13:gmoverid
+        `gmid_cm2`: MPCM2R:gmoverid
+        `gmid_cs1`: MPCS1:gmoverid
+        `gmid_dp1`: MND1A:gmoverid
+        `fug_cm1`:  MNCM13:fug
+        `fug_cm2`:  MPCM2R:fug
+        `fug_cs1`:  MPCS1:fug
+        `fug_dp1`:  MND1A:fug
+        `i1`:       MNCM1A:id
+        `i2`:       MNCM1B:id
+    &#34;&#34;&#34;
 
     #sr      = 2.5e6
     #cl      = constraints.get(&#39;cl&#39;, {}).get(&#39;init&#39;, 5e-12)
@@ -340,14 +430,20 @@ def output_scale( constraints: dict, ace_backend: str
 <span>def <span class="ident">unscaler</span></span>(<span>ace_backend: str) ‑> tuple</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Unscale function for a given PDK</p></div>
+<div class="desc"><p>Unscale function [-1.0; 1.0] for a given PDK. Used for scaling actions.</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>ace_backend</code>: PDK</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def unscaler(ace_backend: str) -&gt; tuple[ np.ndarray, np.ndarray, np.ndarray
                                        , np.ndarray, np.ndarray]:
-    &#34;&#34;&#34; Unscale function for a given PDK &#34;&#34;&#34;
+    &#34;&#34;&#34;
+    Unscale function [-1.0; 1.0] for a given PDK. Used for scaling actions.
+    Arguments:
+        `ace_backend`: PDK
+    &#34;&#34;&#34;
     x_min = np.array([5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 10.0, 40.0])
     x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 30.0, 80.0])
     gm    = np.array([(i in range(0,4))  for i in range(10)])
@@ -364,7 +460,9 @@ def output_scale( constraints: dict, ace_backend: str
 <nav id="sidebar">
 <h1>Index</h1>
 <div class="toc">
-<ul></ul>
+<ul>
+<li><a href="#inputs">INPUTS</a></li>
+</ul>
 </div>
 <ul id="index">
 <li><h3>Super-module</h3>

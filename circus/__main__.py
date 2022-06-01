@@ -12,6 +12,9 @@ under certain conditions.
 """
 
 def handle_response(res):
+    """
+    HTTP Response Handler.
+    """
     if isinstance(res, int):
         abort(res)
     elif res is None:
@@ -20,6 +23,9 @@ def handle_response(res):
         return res
 
 def carnival():
+    """
+    Defines Flask Routes.
+    """
     args = rest.parser.parse_args()
     env_id, pdk, space, var, num, steps, host, port, scale = \
             [ getattr(args, a) for a in
@@ -120,6 +126,9 @@ def carnival():
     return app.run(host = host, port = port)
 
 def main():
+    """
+    Do nothing, print GPL Notice.
+    """
     print(GPL_NOTICE)
     return 0
 
