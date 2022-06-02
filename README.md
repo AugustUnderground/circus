@@ -16,4 +16,3 @@ details.
 - [X] State / Observation filter
 - [ ] Versions / Variants
 - [ ] Multi-Agent
-- [ ] 
