@@ -42,7 +42,8 @@ a2c  = A2C("MlpPolicy", envs, verbose=1)
 a2c.learn(total_timesteps=2, log_interval=1)
 
 ## Random Test
-env     = circus.make('circus:op1-xh035-elec-v0', n_envs = 5)
+n       = 5
+env     = circus.make('circus:op2-xh035-elec-v0', n_envs = n)
 obs     = env.reset()
-a       = np.vstack([env.action_space.sample()] * 5)
-o,r,d,i = env.step(a)
+act     = np.vstack([env.action_space.sample()] * n)
+o,r,d,i = env.step(act)
