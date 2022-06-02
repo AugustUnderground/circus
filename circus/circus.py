@@ -340,9 +340,8 @@ class CircusGeomVec(CircusGeom):
         return obs['observation']
 
     def step_wait(self) -> VecEnvStepReturn:
-        obs, _, done, info = super().step_wait()
+        obs, reward, done, info = super().step_wait()
         observation        = obs['observation']
-        reward             = self.calculate_reward(observation)
         return (observation, reward, done, info)
 
 class CircusElecVec(CircusElec):
@@ -360,9 +359,8 @@ class CircusElecVec(CircusElec):
         return obs['observation']
 
     def step_wait(self) -> VecEnvStepReturn:
-        obs, _, done, info = super().step_wait()
+        obs, reward, done, info = super().step_wait()
         observation        = obs['observation']
-        reward             = self.calculate_reward(observation)
         return (observation, reward, done, info)
 
 def make( env_id: str, n_envs: int = 1, **kwargs

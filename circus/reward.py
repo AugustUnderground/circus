@@ -8,7 +8,7 @@ def dummy_reward(observation: np.ndarray) -> np.ndarray:
     Arguments: `observation`
     Returns: `reward`
     """
-    return np.sum(observation, axis = 1)
+    return np.sum(observation['observation'], axis = 1)
 
 def binary_reward( predicate: [Callable], observation: dict[str, np.ndarray]
                  , ) -> np.ndarray:
