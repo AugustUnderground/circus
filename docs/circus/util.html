@@ -48,6 +48,31 @@ def add_noise(x: np.array, η: float = 0.01) -&gt; np.array:
     ε = np.random.normal(μ, σ)
     return x * ε
 
+def goal_generator( kind: str, reference: np.ndarray, num_envs: int = 1
+                  ) -&gt; Callable:
+    &#34;&#34;&#34;
+    Returns a goal generator function
+    Arguments:
+        `kind`:
+            - &#39;noisy&#39;: Add noise to reference goal
+            - &#39;random&#39;: Choose a random goal between reference
+            - &#39;fix&#39;: Goal remains the same
+        `reference`: Must be of shape (num_envs, len(goal_filter)) for &#39;noisy&#39;
+                     and (2, len(goal_filter)) for &#39;random&#39;. In case of random,
+                     `reference[0] == min` and `reference[1] == max` for
+                     generating random values in range.
+    &#34;&#34;&#34;
+    return ( (lambda : add_noise(reference))
+             if kind == &#39;noisy&#39; else
+             (lambda : np.random.uniform( *reference
+                                        , size = ( num_envs
+                                                 , reference.shape[1] )
+                                        , ))
+             if kind == &#39;random&#39; else
+             (lambda : reference)
+             if kind == &#39;fix&#39; else
+             NotImplementedError(f&#39;Goal kind {kind} not implemented.&#39;) )
+
 def filter_results( filter_ids: [str], results: dict[int, dict[str, float]]
                   ) -&gt; np.ndarray:
     &#34;&#34;&#34;
@@ -81,24 +106,23 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
     Returns a scaler and unscaler funciton: 
         `scaler   :: np.ndarray -&gt; np.ndarray`
         `unscaler :: np.ndarray -&gt; np.ndarray`
+    **Note**: Since the scaling uses log10, it&#39;s a destructive operation,
+    unscaling won&#39;t work.
     &#34;&#34;&#34;
-    err_msg = f&#39;No Performance Scale for {ace_id} available&#39;
-    x_min_d, x_max_d = { &#39;op1&#39;: op1.output_scale
-                       , &#39;op2&#39;: op2.output_scale
-                       , &#39;op8&#39;: op8.output_scale
-                       , }.get( ace_id, NotImplementedError(err_msg)
-                              )(constraints, ace_backend)
+    x_min_d, x_max_d = performance_scale(ace_id, ace_backend, constraints)
 
     abs_msk = np.array([ (pp in [ &#39;A&#39;, &#39;cof&#39;, &#39;gm&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
                                 , &#39;pm&#39;, &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39; , &#39;voff_stat&#39;
                                 , &#39;voff_sys&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39; , &#39;vn_100Hz&#39;
-                                , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;] )
+                                , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;
+                                , &#39;idd&#39;, &#39;iss&#39; ] )
                           for pp in performance_ids ])
 
     log_msk = np.array([ (pp in [ &#39;A&#39;, &#39;cof&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
                                 , &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39;, &#39;voff_stat&#39;
                                 , &#39;voff_sys&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39;, &#39;vn_100Hz&#39;
-                                , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;])
+                                , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;
+                                , &#39;idd&#39;, &#39;iss&#39;])
                           for pp in performance_ids ])
 
     scl_msk = np.array([pp in list(x_min_d.keys()) for pp in performance_ids])
@@ -107,7 +131,6 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
                                      if  pp in x_min_d.keys() ])
     x_max   = np.array([ x_max_d[pp] for pp in performance_ids
                                      if  pp in x_max_d.keys() ])
-
 
     def scaler(x: np.ndarray) -&gt; np.ndarray:
         a            = np.abs(x * abs_msk) + (x * ~abs_msk)
@@ -120,12 +143,11 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
         return y
 
     def unscaler(y: np.ndarray) -&gt; np.ndarray:
-        y_           = ((y + 1.0) / 2.0) * (x_max - x_min) + x_min
-        p            = np.power( 10.0, y_ * log_msk
-                               , where = (y_ * log_msk) &gt; 0.0
-                               ) + (y_ * ~log_msk)
-        x            = y.copy()
-        x[:,scl_msk] = p
+        x_            = y.copy()
+        x_[:,scl_msk] = ((y[:,scl_msk] + 1.0) / 2.0) * (x_max - x_min) + x_min
+        x             = np.power( 10.0, x_ * log_msk
+                                , where = (x_ * log_msk) &gt; 0.0
+                                ) + (x_ * ~log_msk)
         return x
 
     return (scaler, unscaler)</code></pre>
@@ -216,6 +238,50 @@ Returns a scaler function: <code>scaler :: np.ndarray -&gt; np.ndarray</code></p
     return (lambda x: x_min + ( ((np.vstack(x) + 1.0) / 2.0) * (x_max - x_min)))</code></pre>
 </details>
 </dd>
+<dt id="circus.util.goal_generator"><code class="name flex">
+<span>def <span class="ident">goal_generator</span></span>(<span>kind: str, reference: numpy.ndarray, num_envs: int = 1) ‑> Callable</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a goal generator function</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>kind</code>:
+- 'noisy': Add noise to reference goal
+- 'random': Choose a random goal between reference
+- 'fix': Goal remains the same
+<code>reference</code>: Must be of shape (num_envs, len(goal_filter)) for 'noisy'
+and (2, len(goal_filter)) for 'random'. In case of random,
+<code>reference[0] == min</code> and <code>reference[1] == max</code> for
+generating random values in range.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def goal_generator( kind: str, reference: np.ndarray, num_envs: int = 1
+                  ) -&gt; Callable:
+    &#34;&#34;&#34;
+    Returns a goal generator function
+    Arguments:
+        `kind`:
+            - &#39;noisy&#39;: Add noise to reference goal
+            - &#39;random&#39;: Choose a random goal between reference
+            - &#39;fix&#39;: Goal remains the same
+        `reference`: Must be of shape (num_envs, len(goal_filter)) for &#39;noisy&#39;
+                     and (2, len(goal_filter)) for &#39;random&#39;. In case of random,
+                     `reference[0] == min` and `reference[1] == max` for
+                     generating random values in range.
+    &#34;&#34;&#34;
+    return ( (lambda : add_noise(reference))
+             if kind == &#39;noisy&#39; else
+             (lambda : np.random.uniform( *reference
+                                        , size = ( num_envs
+                                                 , reference.shape[1] )
+                                        , ))
+             if kind == &#39;random&#39; else
+             (lambda : reference)
+             if kind == &#39;fix&#39; else
+             NotImplementedError(f&#39;Goal kind {kind} not implemented.&#39;) )</code></pre>
+</details>
+</dd>
 <dt id="circus.util.performance_scaler"><code class="name flex">
 <span>def <span class="ident">performance_scaler</span></span>(<span>ace_id: str, ace_backend: str, constraints: dict, performance_ids: [<class 'str'>]) ‑> Tuple[Callable, Callable]</span>
 </code></dt>
@@ -225,7 +291,9 @@ corresponding <code>trafo</code> module, s.t. ∈ [-1.0;1.0].
 Returns a scaler and unscaler funciton:
 <code>scaler
 :: np.ndarray -&gt; np.ndarray</code>
-<code>unscaler :: np.ndarray -&gt; np.ndarray</code></p></div>
+<code>unscaler :: np.ndarray -&gt; np.ndarray</code>
+<strong>Note</strong>: Since the scaling uses log10, it's a destructive operation,
+unscaling won't work.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -238,24 +306,23 @@ Returns a scaler and unscaler funciton:
     Returns a scaler and unscaler funciton: 
         `scaler   :: np.ndarray -&gt; np.ndarray`
         `unscaler :: np.ndarray -&gt; np.ndarray`
+    **Note**: Since the scaling uses log10, it&#39;s a destructive operation,
+    unscaling won&#39;t work.
     &#34;&#34;&#34;
-    err_msg = f&#39;No Performance Scale for {ace_id} available&#39;
-    x_min_d, x_max_d = { &#39;op1&#39;: op1.output_scale
-                       , &#39;op2&#39;: op2.output_scale
-                       , &#39;op8&#39;: op8.output_scale
-                       , }.get( ace_id, NotImplementedError(err_msg)
-                              )(constraints, ace_backend)
+    x_min_d, x_max_d = performance_scale(ace_id, ace_backend, constraints)
 
     abs_msk = np.array([ (pp in [ &#39;A&#39;, &#39;cof&#39;, &#39;gm&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
                                 , &#39;pm&#39;, &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39; , &#39;voff_stat&#39;
                                 , &#39;voff_sys&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39; , &#39;vn_100Hz&#39;
-                                , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;] )
+                                , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;
+                                , &#39;idd&#39;, &#39;iss&#39; ] )
                           for pp in performance_ids ])
 
     log_msk = np.array([ (pp in [ &#39;A&#39;, &#39;cof&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
                                 , &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39;, &#39;voff_stat&#39;
                                 , &#39;voff_sys&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39;, &#39;vn_100Hz&#39;
-                                , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;])
+                                , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;
+                                , &#39;idd&#39;, &#39;iss&#39;])
                           for pp in performance_ids ])
 
     scl_msk = np.array([pp in list(x_min_d.keys()) for pp in performance_ids])
@@ -264,7 +331,6 @@ Returns a scaler and unscaler funciton:
                                      if  pp in x_min_d.keys() ])
     x_max   = np.array([ x_max_d[pp] for pp in performance_ids
                                      if  pp in x_max_d.keys() ])
-
 
     def scaler(x: np.ndarray) -&gt; np.ndarray:
         a            = np.abs(x * abs_msk) + (x * ~abs_msk)
@@ -277,12 +343,11 @@ Returns a scaler and unscaler funciton:
         return y
 
     def unscaler(y: np.ndarray) -&gt; np.ndarray:
-        y_           = ((y + 1.0) / 2.0) * (x_max - x_min) + x_min
-        p            = np.power( 10.0, y_ * log_msk
-                               , where = (y_ * log_msk) &gt; 0.0
-                               ) + (y_ * ~log_msk)
-        x            = y.copy()
-        x[:,scl_msk] = p
+        x_            = y.copy()
+        x_[:,scl_msk] = ((y[:,scl_msk] + 1.0) / 2.0) * (x_max - x_min) + x_min
+        x             = np.power( 10.0, x_ * log_msk
+                                , where = (x_ * log_msk) &gt; 0.0
+                                ) + (x_ * ~log_msk)
         return x
 
     return (scaler, unscaler)</code></pre>
@@ -309,6 +374,7 @@ Returns a scaler and unscaler funciton:
 <li><code><a title="circus.util.add_noise" href="#circus.util.add_noise">add_noise</a></code></li>
 <li><code><a title="circus.util.filter_results" href="#circus.util.filter_results">filter_results</a></code></li>
 <li><code><a title="circus.util.geometric_unscaler" href="#circus.util.geometric_unscaler">geometric_unscaler</a></code></li>
+<li><code><a title="circus.util.goal_generator" href="#circus.util.goal_generator">goal_generator</a></code></li>
 <li><code><a title="circus.util.performance_scaler" href="#circus.util.performance_scaler">performance_scaler</a></code></li>
 </ul>
 </li>

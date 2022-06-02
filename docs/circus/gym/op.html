@@ -256,14 +256,20 @@ Number of steps per Episode.
 <code>seed</code>:
 Random Seed
 <code>obs_filter</code>:
-Filter Performance dict obtained from ACE.
-'perf': Only performance paramters
+Filter Performance dict obtained from ACE:
+'perf': Only performance paramters (default)
 'all': All parameters from ACE
 [str]: List of parameters
 <code>goal_filter</code>:
 List of parameters
 <code>goal_preds</code>:
 Binary comparison operator
+<code>goal_init</code>:
+How to initialize new goals on reset:
+'noisy': Put some noise on a reference goal (default)
+'random': Choose a point in goal space
+np.ndarray: A specific goal of shape
+(num_envs, len(goal_filter))
 <code>reward_fn</code>:
 Optional reward function that takes an observation dict.
 <code>scale_observation</code>: Scale the observations and goals as specified in trafo</p></div>

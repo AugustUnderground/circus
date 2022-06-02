@@ -67,7 +67,17 @@ def electric_unscaler(ace_id: str, ace_backend: str) -&gt; Callable:
            + (y_ * im * 1e-6)
         return y
 
-    return unscale</code></pre>
+    return unscale
+
+def performance_scale( ace_id: str, ace_backend: str, constraints: dict
+                          ) -&gt; (dict[str,float], dict[str,float]):
+    &#34;&#34;&#34; Return performance scaling dicts (min,max) &#34;&#34;&#34;
+    err_msg = f&#39;No Performance Scale for {ace_id} available&#39;
+    return { &#39;op1&#39;: op1.output_scale
+           , &#39;op2&#39;: op2.output_scale
+           , &#39;op8&#39;: op8.output_scale
+           , }.get( ace_id, NotImplementedError(err_msg)
+                  )(constraints, ace_backend)</code></pre>
 </details>
 </section>
 <section>
@@ -137,6 +147,26 @@ def electric_unscaler(ace_id: str, ace_backend: str) -&gt; Callable:
     return unscale</code></pre>
 </details>
 </dd>
+<dt id="circus.trafo.performance_scale"><code class="name flex">
+<span>def <span class="ident">performance_scale</span></span>(<span>ace_id: str, ace_backend: str, constraints: dict) ‑> (dict[str, float], dict[str, float])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return performance scaling dicts (min,max)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def performance_scale( ace_id: str, ace_backend: str, constraints: dict
+                          ) -&gt; (dict[str,float], dict[str,float]):
+    &#34;&#34;&#34; Return performance scaling dicts (min,max) &#34;&#34;&#34;
+    err_msg = f&#39;No Performance Scale for {ace_id} available&#39;
+    return { &#39;op1&#39;: op1.output_scale
+           , &#39;op2&#39;: op2.output_scale
+           , &#39;op8&#39;: op8.output_scale
+           , }.get( ace_id, NotImplementedError(err_msg)
+                  )(constraints, ace_backend)</code></pre>
+</details>
+</dd>
 <dt id="circus.trafo.transformation"><code class="name flex">
 <span>def <span class="ident">transformation</span></span>(<span>ace_id: str) ‑> Callable</span>
 </code></dt>
@@ -182,6 +212,7 @@ def electric_unscaler(ace_id: str, ace_backend: str) -&gt; Callable:
 <ul class="">
 <li><code><a title="circus.trafo.electric_identifiers" href="#circus.trafo.electric_identifiers">electric_identifiers</a></code></li>
 <li><code><a title="circus.trafo.electric_unscaler" href="#circus.trafo.electric_unscaler">electric_unscaler</a></code></li>
+<li><code><a title="circus.trafo.performance_scale" href="#circus.trafo.performance_scale">performance_scale</a></code></li>
 <li><code><a title="circus.trafo.transformation" href="#circus.trafo.transformation">transformation</a></code></li>
 </ul>
 </li>
