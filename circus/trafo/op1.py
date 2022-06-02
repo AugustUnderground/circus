@@ -148,6 +148,8 @@ def output_scale( constraints: dict, ace_backend: str
             , 'v_oh'        : 0.0
             , 'i_out_min'   : -6.0
             , 'i_out_max'   : -6.0
+            , 'idd'         : -6.0
+            , 'iss'         : -6.0
             , 'overshoot_r' : 0.0
             , 'overshoot_f' : 0.0
             , 'cof'         : 5.0
@@ -176,6 +178,8 @@ def output_scale( constraints: dict, ace_backend: str
             , 'v_oh'        : (2.0 * vdd)
             , 'i_out_min'   : -3.0
             , 'i_out_max'   : -3.0
+            , 'idd'         : -3.0
+            , 'iss'         : -3.0
             , 'overshoot_r' : 130.0
             , 'overshoot_f' : 130.0
             , 'cof'         : 9.0
