@@ -26,8 +26,8 @@ def goal_predicate(ps: [str] = []) -> [Callable]:
             , 'gm':          operator.le # Gain Margin
             , 'i_out_max':   operator.ge # Maximum Output Current
             , 'i_out_min':   operator.ge # Minimum Output Current
-            , 'idd':         operator.ge # Current Consumption
-            , 'iss':         operator.ge # Current Consumption
+            , 'idd':         operator.le # Current Consumption
+            , 'iss':         operator.le # Current Consumption
             , 'overshoot_f': operator.ge # Slew Rate Overswing Falling
             , 'overshoot_r': operator.ge # Slew Rate Overswing Rising
             , 'pm':          operator.ge # Phase Margin

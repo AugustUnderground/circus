@@ -42,7 +42,11 @@ a2c  = A2C("MlpPolicy", envs, verbose=1)
 a2c.learn(total_timesteps=2, log_interval=1)
 
 ## Random Test
-env     = circus.make('circus:op1-xh035-elec-v0', n_envs = 5)
+env     = circus.make('circus:op1-xh035-elec-v0', n_envs = 5, goal_init = 'random', goal_filter = ['a_0', 'ugbw'])
 obs     = env.reset()
 a       = np.vstack([env.action_space.sample()] * 5)
 o,r,d,i = env.step(a)
+
+
+a = {'A', 'a_0', 'cmrr', 'cof', 'gm', 'i_out_max', 'i_out_min', 'idd', 'iss', 'overshoot_f', 'overshoot_r', 'pm', 'psrr_n', 'psrr_p', 'sr_f', 'sr_r', 'ugbw', 'v_ih', 'v_il', 'v_oh', 'v_ol', 'voff_stat', 'voff_sys'}
+b = { 'a_0', 'ugbw', 'pm', 'gm', 'sr_r', 'sr_f', 'vn_1Hz', 'vn_10Hz', 'vn_100Hz'    , 'vn_1kHz', 'vn_10kHz', 'vn_100kHz', 'cmrr', 'psrr_n', 'psrr_p', 'v_il'        , 'v_ih', 'v_ol', 'v_oh', 'i_out_min', 'i_out_max', 'overshoot_r' , 'overshoot_f', 'cof', 'voff_stat', 'voff_sys', 'A' }

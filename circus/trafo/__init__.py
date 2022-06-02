@@ -39,3 +39,13 @@ def electric_unscaler(ace_id: str, ace_backend: str) -> Callable:
         return y
 
     return unscale
+
+def performance_scale( ace_id: str, ace_backend: str, constraints: dict
+                          ) -> (dict[str,float], dict[str,float]):
+    """ Return performance scaling dicts (min,max) """
+    err_msg = f'No Performance Scale for {ace_id} available'
+    return { 'op1': op1.output_scale
+           , 'op2': op2.output_scale
+           , 'op8': op8.output_scale
+           , }.get( ace_id, NotImplementedError(err_msg)
+                  )(constraints, ace_backend)

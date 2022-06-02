@@ -70,7 +70,7 @@ def _test_goal_env(env: GoalEnv):
     assert env.num_envs == obs['desired_goal'].shape[0], \
            f'Number of Environments {env.num_envs} must align with first dimension of desired goal {obs["desired_goal"].shape[0]}'
 
-    act = [env.action_space.sample()] * env.num_envs
+    act = np.stack([env.action_space.sample()] * env.num_envs)
 
     assert all([env.action_space.shape[0] == a.shape[0] for a in act]), \
            f'The dimensions of the action ({env.action_space.shape[0]}) space do not match ({act.shape[1]}).'
@@ -122,7 +122,7 @@ def _test_goal_env(env: GoalEnv):
            f'Number of Environments {env.num_envs} must align with shape of done {d.shape[0]}'
 
     for _ in range(10):
-        act = env.action_space.sample()
+        act = np.stack([env.action_space.sample()] * env.num_envs)
         obs, rew, don, inf = env.step(act)
 
         assert not np.any(np.isnan(obs['observation'])), \
@@ -248,20 +248,20 @@ def test_op2_xh035_elec_v0():
 def test_op8_xh035_elec_v0():
     _test_op_v0('circus:op8-xh035-elec-v0')
 
-def test_op1_xh018_geom_v0():
-    _test_op_v0('circus:op1-xh018-geom-v0')
-
-def test_op2_xh018_geom_v0():
-    _test_op_v0('circus:op2-xh018-geom-v0')
-
-def test_op8_xh018_geom_v0():
-    _test_op_v0('circus:op8-xh018-geom-v0')
-
-def test_op1_xh018_elec_v0():
-    _test_op_v0('circus:op1-xh018-elec-v0')
-
-def test_op2_xh018_elec_v0():
-    _test_op_v0('circus:op2-xh018-elec-v0')
-
-def test_op8_xh018_elec_v0():
-    _test_op_v0('circus:op8-xh018-elec-v0')
+#def test_op1_xh018_geom_v0():
+#    _test_op_v0('circus:op1-xh018-geom-v0')
+#
+#def test_op2_xh018_geom_v0():
+#    _test_op_v0('circus:op2-xh018-geom-v0')
+#
+#def test_op8_xh018_geom_v0():
+#    _test_op_v0('circus:op8-xh018-geom-v0')
+#
+#def test_op1_xh018_elec_v0():
+#    _test_op_v0('circus:op1-xh018-elec-v0')
+#
+#def test_op2_xh018_elec_v0():
+#    _test_op_v0('circus:op2-xh018-elec-v0')
+#
+#def test_op8_xh018_elec_v0():
+#    _test_op_v0('circus:op8-xh018-elec-v0')

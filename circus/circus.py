@@ -31,6 +31,7 @@ class CircusGeom(GoalEnv, VecEnv):
                 , obs_filter: Union[str,List[str]] = 'perf'
                 , goal_filter: [str]               = None
                 , goal_preds: [Callable]           = None
+                , goal_init: Union[str,np.ndarray] = 'noisy'
                 , reward_fn: Callable              = None
                 , scale_observation: bool          = True
                 , ):
@@ -43,12 +44,17 @@ class CircusGeom(GoalEnv, VecEnv):
             `num_envs`:          Numer of Parallel Environments ∈ [ 1 .. `nproc` ]
             `num_steps`:         Number of steps per Episode.
             `seed`:              Random Seed
-            `obs_filter`:        Filter Performance dict obtained from ACE.
-                                 'perf': Only performance paramters
+            `obs_filter`:        Filter Performance dict obtained from ACE:
+                                 'perf': Only performance paramters (default)
                                  'all': All parameters from ACE
                                  [str]: List of parameters
             `goal_filter`:       List of parameters
             `goal_preds`:        Binary comparison operator
+            `goal_init`:         How to initialize new goals on reset:
+                                 'noisy': Put some noise on a reference goal (default)
+                                 'random': Choose a point in goal space
+                                 np.ndarray: A specific goal of shape
+                                 (num_envs, len(goal_filter))
             `reward_fn`:         Optional reward function that takes an observation dict.
             `scale_observation`: Scale the observations and goals as specified in trafo
         """
@@ -68,11 +74,12 @@ class CircusGeom(GoalEnv, VecEnv):
 
         perf_ids               = sorted(ac.performance_identifiers(self.ace_envs[0]))
         self.obs_filter        = ( perf_ids if obs_filter == 'all' else
-                                   [p for p in perf_ids if (p.islower() or (p == 'A'))]
+                                   [p for p in perf_ids 
+                                      if (p.islower() or (p == 'A') 
+                                                      or (p.startswith('vn_')))]
                                    if obs_filter == 'perf' else
                                    obs_filter if isinstance(obs_filter, list)
                                    else ValueError('Wrong Argument type passed to obs_filter.') )
-
         self.obs_idx           = np.array([ i for i,p in enumerate(self.obs_filter)
                                             if p in self.obs_filter ])
 
@@ -92,7 +99,8 @@ class CircusGeom(GoalEnv, VecEnv):
 
         self.goal_preds        = goal_preds or goal_predicate(self.goal_filter)
 
-        self.goal_scaler,_     = performance_scaler( self.ace_id
+        self.goal_scaler, \
+        self.goal_unscaler     = performance_scaler( self.ace_id
                                                    , self.ace_backend
                                                    , self.constraints
                                                    , self.goal_filter
@@ -117,12 +125,33 @@ class CircusGeom(GoalEnv, VecEnv):
 
         self.rng_seed          = seed
 
-        pool                   = { i: self.ace_envs[i]
+        if goal_init == 'noisy':
+            self.goal_init     = goal_init
+            pool               = { i: self.ace_envs[i]
                                    for i in range(self.num_envs) }
-        initial_sizing         = ac.initial_sizing_pool(pool)
-        results                = ac.evaluate_circuit_pool(pool, pool_params = initial_sizing)
-        self.reference_goal    = filter_results(self.goal_filter, results)
-        self.goal              = add_noise(self.reference_goal)
+            initial_sizing     = ac.initial_sizing_pool(pool)
+            results            = ac.evaluate_circuit_pool(pool, pool_params = initial_sizing)
+            reference_goal     = filter_results(self.goal_filter, results)
+        elif goal_init == 'random':
+            self.goal_init     = goal_init
+            x_min_d, x_max_d   = performance_scale( self.ace_id
+                                                  , self.ace_backend
+                                                  , self.constraints
+                                                  , )
+            reference_goal     = np.array([ [x_min_d[gp] for gp in self.goal_filter]
+                                          , [x_max_d[gp] for gp in self.goal_filter]
+                                          ])
+        elif isinstance(goal_init, np.ndarray):
+            self.goal_init     = 'fix'
+            goal_shape         = (num_envs, len(goal_filter))
+            reference_goal     = ( goal_init
+                                   if goal_init.shape == goal_shape else
+                                   np.repeat(goal_init[None], num_envs, axis = 0) )
+        else:
+            NotImplementedError(f'Goal initializer {goal_init} not available.')
+
+        self.new_goal          = goal_generator(goal_init, reference_goal, self.num_envs)
+        self.goal              = self.new_goal()
 
         self.unscale_action    = geometric_unscaler(self.constraints)
 
@@ -155,7 +184,8 @@ class CircusGeom(GoalEnv, VecEnv):
         pool          = { i: self.ace_envs[i] for i in reset_ids }
         random_sizing = ac.random_sizing_pool(pool)
         results       = ac.evaluate_circuit_pool(pool, pool_params = random_sizing)
-        self.goal     = add_noise(self.reference_goal)
+        self.goal     = self.new_goal()
+
         state         = filter_results(self.obs_filter, results)
         achieved      = filter_results(self.goal_filter, results)
         observation   = OrderedDict({ 'observation':   ( self.obs_scaler(state)

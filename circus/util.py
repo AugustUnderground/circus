@@ -19,6 +19,31 @@ def add_noise(x: np.array, η: float = 0.01) -> np.array:
     ε = np.random.normal(μ, σ)
     return x * ε
 
+def goal_generator( kind: str, reference: np.ndarray, num_envs: int = 1
+                  ) -> Callable:
+    """
+    Returns a goal generator function
+    Arguments:
+        `kind`:
+            - 'noisy': Add noise to reference goal
+            - 'random': Choose a random goal between reference
+            - 'fix': Goal remains the same
+        `reference`: Must be of shape (num_envs, len(goal_filter)) for 'noisy'
+                     and (2, len(goal_filter)) for 'random'. In case of random,
+                     `reference[0] == min` and `reference[1] == max` for
+                     generating random values in range.
+    """
+    return ( (lambda : add_noise(reference))
+             if kind == 'noisy' else
+             (lambda : np.random.uniform( *reference
+                                        , size = ( num_envs
+                                                 , reference.shape[1] )
+                                        , ))
+             if kind == 'random' else
+             (lambda : reference)
+             if kind == 'fix' else
+             NotImplementedError(f'Goal kind {kind} not implemented.') )
+
 def filter_results( filter_ids: [str], results: dict[int, dict[str, float]]
                   ) -> np.ndarray:
     """
@@ -52,24 +77,23 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
     Returns a scaler and unscaler funciton: 
         `scaler   :: np.ndarray -> np.ndarray`
         `unscaler :: np.ndarray -> np.ndarray`
+    **Note**: Since the scaling uses log10, it's a destructive operation,
+    unscaling won't work.
     """
-    err_msg = f'No Performance Scale for {ace_id} available'
-    x_min_d, x_max_d = { 'op1': op1.output_scale
-                       , 'op2': op2.output_scale
-                       , 'op8': op8.output_scale
-                       , }.get( ace_id, NotImplementedError(err_msg)
-                              )(constraints, ace_backend)
+    x_min_d, x_max_d = performance_scale(ace_id, ace_backend, constraints)
 
     abs_msk = np.array([ (pp in [ 'A', 'cof', 'gm', 'i_out_max', 'i_out_min'
                                 , 'pm', 'sr_f', 'sr_r', 'ugbw' , 'voff_stat'
                                 , 'voff_sys', 'vn_1Hz', 'vn_10Hz' , 'vn_100Hz'
-                                , 'vn_1kHz', 'vn_10kHz', 'vn_100kHz'] )
+                                , 'vn_1kHz', 'vn_10kHz', 'vn_100kHz'
+                                , 'idd', 'iss' ] )
                           for pp in performance_ids ])
 
     log_msk = np.array([ (pp in [ 'A', 'cof', 'i_out_max', 'i_out_min'
                                 , 'sr_f', 'sr_r', 'ugbw', 'voff_stat'
                                 , 'voff_sys', 'vn_1Hz', 'vn_10Hz', 'vn_100Hz'
-                                , 'vn_1kHz', 'vn_10kHz', 'vn_100kHz'])
+                                , 'vn_1kHz', 'vn_10kHz', 'vn_100kHz'
+                                , 'idd', 'iss'])
                           for pp in performance_ids ])
 
     scl_msk = np.array([pp in list(x_min_d.keys()) for pp in performance_ids])
@@ -78,7 +102,6 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
                                      if  pp in x_min_d.keys() ])
     x_max   = np.array([ x_max_d[pp] for pp in performance_ids
                                      if  pp in x_max_d.keys() ])
-
 
     def scaler(x: np.ndarray) -> np.ndarray:
         a            = np.abs(x * abs_msk) + (x * ~abs_msk)
@@ -91,12 +114,11 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
         return y
 
     def unscaler(y: np.ndarray) -> np.ndarray:
-        y_           = ((y + 1.0) / 2.0) * (x_max - x_min) + x_min
-        p            = np.power( 10.0, y_ * log_msk
-                               , where = (y_ * log_msk) > 0.0
-                               ) + (y_ * ~log_msk)
-        x            = y.copy()
-        x[:,scl_msk] = p
+        x_            = y.copy()
+        x_[:,scl_msk] = ((y[:,scl_msk] + 1.0) / 2.0) * (x_max - x_min) + x_min
+        x             = np.power( 10.0, x_ * log_msk
+                                , where = (x_ * log_msk) > 0.0
+                                ) + (x_ * ~log_msk)
         return x
 
     return (scaler, unscaler)
