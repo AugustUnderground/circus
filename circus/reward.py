@@ -10,7 +10,7 @@ def dummy_reward(observation: np.ndarray) -> np.ndarray:
     """
     return np.sum(observation['observation'], axis = 1)
 
-def binary_reward( predicate: [Callable], observation: dict[str, np.ndarray]
+def binary_reward( predicate: list[Callable], observation: dict[str, np.ndarray]
                  , ) -> np.ndarray:
     """ Default reward function for goal environments (v0).
     Arguments:  `predicate`, `observation`

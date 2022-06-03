@@ -3,7 +3,7 @@
 import os
 from functools import partial
 from collections import OrderedDict
-from typing import Any, List, Optional, Type, Union, Callable
+from typing import Any, List, Optional, Type, Union, Callable, Mapping
 import gym
 from gym.spaces import Dict, Box
 from gym import GoalEnv
@@ -29,8 +29,8 @@ class CircusGeom(GoalEnv, VecEnv):
                 , num_steps: int                   = 50
                 , seed: int                        = 666
                 , obs_filter: Union[str,List[str]] = 'perf'
-                , goal_filter: [str]               = None
-                , goal_preds: [Callable]           = None
+                , goal_filter: list[str]           = None
+                , goal_preds: list[Callable]       = None
                 , goal_init: Union[str,np.ndarray] = 'noisy'
                 , reward_fn: Callable              = None
                 , scale_observation: bool          = True
@@ -171,7 +171,7 @@ class CircusGeom(GoalEnv, VecEnv):
         for env_id in (env_ids or self.ace_envs.keys()):
             self.ace_envs[env_id].clear()
 
-    def reset(self, env_mask: [bool] = [], env_ids: [int] = []):
+    def reset(self, env_mask: list[bool] = [], env_ids: list[int] = []):
         """
         Reset all (parallel) environemt(s).
         Arguments:
@@ -255,6 +255,9 @@ class CircusGeom(GoalEnv, VecEnv):
                        , }] * self.num_envs
 
         return (observation, reward, done, info)
+
+    def compute_reward(self, achieved_goal: object, desired_goal: object, info: Mapping[str, Any]) -> float:
+        return self.calculate_reward(observation={"achieved_goal": achieved_goal, "desired_goal": desired_goal})
 
     def get_attr( self, attr_name: str, indices: VecEnvIndices = None
                 ) -> List[Any]:
