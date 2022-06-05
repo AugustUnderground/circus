@@ -61,12 +61,12 @@ def restart(circ: CircusEnv) -> CircusEnv:
     env, ace_id, backend, space, variant, num_envs = circ
     return make_env(ace_id, backend, space, variant, num_envs, env.num_steps)
 
-def reset( circ: CircusEnv, env_ids = [], restart_count = 0
+def reset( circ: CircusEnv, env_mask: list[bool] = [], env_ids: list[int] = []
          ) -> dict[str, [[float]]]:
     """
-    Reset Environment(s).
+    Reset (selected) Environment(s).
     """
-    obs = circ.env.reset(env_ids = env_ids)
+    obs = circ.env.reset(env_mask = env_mask, env_ids = env_ids)
     return { p: o.tolist() for p,o in obs.items() }
 
 def step( circ: CircusEnv, action: dict[str, [[float]]]
