@@ -1,4 +1,4 @@
-### Amplifier with Wideswing Current Mirror (OP8)
+### Folded Cascode Amplifier (OP8)
 
 ![op8](https://raw.githubusercontent.com/matthschw/ace/main/figures/op8.png)
 
