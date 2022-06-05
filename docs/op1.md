@@ -6,29 +6,25 @@ Available via `circus` constructor with `circus:op1-<tech>-<space>-<variant>`.
 
 #### Observation Space
 
+By default, the `observation` space is set to `'perf'` via the `obs_filter`
+kwarg. If it is set to `'all'` the shape will be `(159,)` instead. Otherwise it
+will be the length of the given list. Same goes for the goal space.
+
 ```python
 # v0
-gym.spaces.Dict({ 'observation':   Box( -np.Inf, np.Inf
-                                      , (len(obs_filter),))
-                , 'achieved_goal': Box( -np.Inf, np.Inf
-                                      , (len(goal_filter),))
-                , 'desired_goal':  Box( -np.Inf, np.Inf
-                                      , (len(goal_filter),))
+gym.spaces.Dict({ 'observation':   Box( -np.Inf, np.Inf, (29,))
+                , 'achieved_goal': Box( -np.Inf, np.Inf, (23,))
+                , 'desired_goal':  Box( -np.Inf, np.Inf, (23,))
                 , })
 
 # v1
 gym.spaces.Box( low   = -np.inf
               , high  = np.inf
-              , shape = (len(obs_filter), )
+              , shape = (29,)
               , dtype = np.float32
               , )
 
 ```
-
-Where `obs_filter` can be
-- `'perf'` by default = `(23,)`
-- `'all'` = `(159,)`
-- `[...]` = `len`
 
 #### Action Space 
 
