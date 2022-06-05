@@ -222,7 +222,7 @@ class CircusGeom(GoalEnv, VecEnv):
 
     def step_async(self, actions: np.ndarray) -> None:
         """
-        Initiate a step in the Environment. 
+        Initiate a step in the Environment.
         Arguments:
             `actions`: Take Action with shape [num_envs, action_space].
         """
@@ -308,6 +308,7 @@ class CircusGeom(GoalEnv, VecEnv):
         pass
 
 class CircusElec(CircusGeom):
+    """ Electric Sizing Goal Environment """
     def __init__(self, **kwargs):
         """
         Construct Electric Sizing Goal Environment. Same Arguments as
