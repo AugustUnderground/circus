@@ -37,9 +37,9 @@ def dummy_reward(observation: np.ndarray) -&gt; np.ndarray:
     Arguments: `observation`
     Returns: `reward`
     &#34;&#34;&#34;
-    return np.sum(observation, axis = 1)
+    return np.sum(observation[&#39;observation&#39;], axis = 1)
 
-def binary_reward( predicate: [Callable], observation: dict[str, np.ndarray]
+def binary_reward( predicate: list[Callable], observation: dict[str, np.ndarray]
                  , ) -&gt; np.ndarray:
     &#34;&#34;&#34; Default reward function for goal environments (v0).
     Arguments:  `predicate`, `observation`
@@ -62,7 +62,7 @@ def binary_reward( predicate: [Callable], observation: dict[str, np.ndarray]
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="circus.reward.binary_reward"><code class="name flex">
-<span>def <span class="ident">binary_reward</span></span>(<span>predicate: [typing.Callable], observation: dict) ‑> numpy.ndarray</span>
+<span>def <span class="ident">binary_reward</span></span>(<span>predicate: list, observation: dict) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Default reward function for goal environments (v0).
@@ -73,7 +73,7 @@ Returns: <code>reward</code> in {-1;0}</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def binary_reward( predicate: [Callable], observation: dict[str, np.ndarray]
+<pre><code class="python">def binary_reward( predicate: list[Callable], observation: dict[str, np.ndarray]
                  , ) -&gt; np.ndarray:
     &#34;&#34;&#34; Default reward function for goal environments (v0).
     Arguments:  `predicate`, `observation`
@@ -104,7 +104,7 @@ Returns: <code>reward</code></p></div>
     Arguments: `observation`
     Returns: `reward`
     &#34;&#34;&#34;
-    return np.sum(observation, axis = 1)</code></pre>
+    return np.sum(observation[&#39;observation&#39;], axis = 1)</code></pre>
 </details>
 </dd>
 </dl>
