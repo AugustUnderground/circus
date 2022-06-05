@@ -20,7 +20,7 @@ gym.spaces.Dict({ 'observation':   Box( -np.Inf, np.Inf, (29,))
 # v1
 gym.spaces.Box( low   = -np.inf
               , high  = np.inf
-              , shape = (len(obs_filter), )
+              , shape = (29,)
               , dtype = np.float32
               , )
 
