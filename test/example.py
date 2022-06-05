@@ -43,7 +43,7 @@ a2c.learn(total_timesteps=2, log_interval=1)
 
 ## Random Test
 n       = 5
-env     = circus.make('circus:op2-xh035-elec-v0', n_envs = n)
+env     = circus.make('circus:op2-xh035-elec-v0', n_envs = n, obs_filter = 'perf')
 obs     = env.reset()
 act     = np.vstack([env.action_space.sample()] * n)
 o,r,d,i = env.step(act)

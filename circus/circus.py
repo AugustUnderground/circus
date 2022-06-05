@@ -256,8 +256,16 @@ class CircusGeom(GoalEnv, VecEnv):
 
         return (observation, reward, done, info)
 
-    def compute_reward(self, achieved_goal: object, desired_goal: object, info: Mapping[str, Any]) -> np.array:
-        return self.calculate_reward(observation={"achieved_goal": achieved_goal, "desired_goal": desired_goal})
+    def compute_reward( self, achieved_goal: object, desired_goal: object
+                      , info: Mapping[str, Any] ) -> np.array:
+        """
+        Externalized reward calculation for stable baselines compatibility.
+        Calls `self.calculate_reward` under the hood.
+        """
+        observation = { "achieved_goal": achieved_goal
+                      , "desired_goal":  desired_goal
+                      , }
+        return self.calculate_reward(observation = observation)
 
     def get_attr( self, attr_name: str, indices: VecEnvIndices = None
                 ) -> List[Any]:
