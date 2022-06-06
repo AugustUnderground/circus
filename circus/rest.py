@@ -10,7 +10,7 @@ import circus
 parser = ArgumentParser()
 parser.add_argument( '--host', type = str, default = 'localhost'
                    , help = 'Host address')
-parser.add_argument( '-p', '--port', type = int, default = '6006'
+parser.add_argument( '-p', '--port', type = int, default = '6007'
                    , help = 'Server Port')
 parser.add_argument( '-e', '--env', type = str, default = 'op2'
                    , help = 'ACE Environment ID, see Circus doc for what\'s available')
