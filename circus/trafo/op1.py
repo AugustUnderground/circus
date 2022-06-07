@@ -70,7 +70,7 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
 
     Mcm11   = max(M1.numerator, 1)
     Mcm12   = max(M1.denominator, 1)
-    Mcm13   = (M1.numerator * M3.denominator) // M3.numerator
+    Mcm13   = max((M1.numerator * M3.denominator) // max(M3.numerator, 1), 1)
 
     cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.0),         0.0 ]])
     cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.0),         0.0 ]])
