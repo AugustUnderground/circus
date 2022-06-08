@@ -65,8 +65,8 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
 def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
                                        , np.ndarray, np.ndarray]:
     """ Unscale function for a given PDK """
-    x_min = np.array([5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 1.0,  1.0])
-    x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 30.0, 30.0])
+    x_min = np.array([5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 1.0,  3.0])
+    x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 6.0, 15.0])
     gm    = np.array([(i in range(0,4))  for i in range(10)])
     fm    = np.array([(i in range(4,8))  for i in range(10)])
     im    = np.array([(i in range(8,10)) for i in range(10)])
