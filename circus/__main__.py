@@ -45,7 +45,11 @@ def carnival():
 
     @app.route(f'/{route}/reset', methods=['GET', 'POST'])
     def reset():
-        res = rest.reset(circ, **(request.json or {}))
+        req = request.json
+        res = rest.reset( circ
+                        , env_mask = req.get('env_mask', []) if req else []
+                        , env_ids  = req.get('env_ids', [])  if req else []
+                        , )
         return handle_response(res)
 
     @app.route(f'/{route}/restore', methods=['POST'])
@@ -99,12 +103,6 @@ def carnival():
                 if space == 'geom' else
                 rest.last_action(circ) )
         return handle_response(res)
-
-    # @app.route(f'/{route}/scaler', methods=['GET'])
-    # @app.route(f'/{route}/scaler', methods=['GET'])
-    # def scaler():
-    #     res = gc.scaler(env)
-    #     return handle_response(res)
 
     @app.route(f'/{route}/action_space', methods=['GET'])
     def action_space():
