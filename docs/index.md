@@ -92,6 +92,7 @@ integrated circuit design, based on [AC²E](https://github.com/matthschw/ace) /
 
 - [Installation](./install.md)
 - [API Documentation](./circus/index.html)
+- [REST API](./rest.md)
 - [Basic Usage](./usage.md)
 - [Environments](./env.md)
     + [X] [OP1: Miller Operational Amplifier](./op1.md)
