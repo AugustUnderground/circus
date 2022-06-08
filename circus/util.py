@@ -7,7 +7,7 @@ from .trafo import *
 
 def add_noise(x: np.array, η: float = 0.01) -> np.array:
     """Add some gaussian noise
-    Arguments: 
+    Arguments:
         `x`: Input
         `η`: Standard Deviation
     Returns:
@@ -55,7 +55,7 @@ def filter_results( filter_ids: list[str], results: dict[int, dict[str, float]]
                        for i in sorted(list(results.keys())) ])
 
 def geometric_unscaler(constraints: dict) -> Callable:
-    """ 
+    """
     Unscale action ∈ [-1.0;1.0] into real widths and lengths given
     constraints obtained from ACE.
     Returns a scaler function: `scaler :: np.ndarray -> np.ndarray`
@@ -74,7 +74,7 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
     """
     Scale/Unsclae performance obtained from ACE as specified in the
     corresponding `trafo` module, s.t. ∈ [-1.0;1.0].
-    Returns a scaler and unscaler funciton: 
+    Returns a scaler and unscaler funciton:
         `scaler   :: np.ndarray -> np.ndarray`
         `unscaler :: np.ndarray -> np.ndarray`
     **Note**: Since the scaling uses log10, it's a destructive operation,
