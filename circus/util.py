@@ -44,7 +44,7 @@ def goal_generator( kind: str, reference: np.ndarray, num_envs: int = 1
              if kind == 'fix' else
              NotImplementedError(f'Goal kind {kind} not implemented.') )
 
-def filter_results( filter_ids: [str], results: dict[int, dict[str, float]]
+def filter_results( filter_ids: list[str], results: dict[int, dict[str, float]]
                   ) -> np.ndarray:
     """
     Filter a set of keys from nested dict. Intended to filter observations and
@@ -110,7 +110,7 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
                                ) + (a * ~log_msk)
         y_           = 2.0 * (l[:,scl_msk] - x_min) / (x_max - x_min) - 1.0
         y            = x.copy()
-        y[:,scl_msk] = y_
+        y[:,scl_msk] = np.clip(y_, -2.0, 2.0)
         return y
 
     def unscaler(y: np.ndarray) -> np.ndarray:
