@@ -74,8 +74,8 @@ class CircusGeom(GoalEnv, VecEnv):
 
         perf_ids               = sorted(ac.performance_identifiers(self.ace_envs[0]))
         self.obs_filter        = ( perf_ids if obs_filter == 'all' else
-                                   [p for p in perf_ids 
-                                      if (p.islower() or (p == 'A') 
+                                   [p for p in perf_ids
+                                      if (p.islower() or (p == 'A')
                                                       or (p.startswith('vn_')))]
                                    if obs_filter == 'perf' else
                                    obs_filter if isinstance(obs_filter, list)
@@ -83,7 +83,8 @@ class CircusGeom(GoalEnv, VecEnv):
         self.obs_idx           = np.array([ i for i,p in enumerate(self.obs_filter)
                                             if p in self.obs_filter ])
 
-        self.obs_scaler,_      = performance_scaler( self.ace_id
+        self.obs_scaler,\
+        self.obs_unscaler      = performance_scaler( self.ace_id
                                                    , self.ace_backend
                                                    , self.constraints
                                                    , self.obs_filter
