@@ -69,6 +69,21 @@ def reset( circ: CircusEnv, env_mask: list[bool] = [], env_ids: list[int] = []
     obs = circ.env.reset(env_mask = env_mask, env_ids = env_ids)
     return { p: o.tolist() for p,o in obs.items() }
 
+def restore( circ: CircusEnv, sizing: dict[str, dict[str, float]]
+           ) -> dict[str, [[float]]]:
+    """
+    Restore a given state.
+    """
+    circ.env.reset()
+    circ.env.sizing = sizing
+    return circ.step_wait()
+
+def restore_last(circ: CircusEnv) -> dict[str, [[float]]]:
+    """
+    Restore the last state.
+    """
+    return restore(circ, circ.env.sizing)
+
 def step( circ: CircusEnv, action: dict[str, [[float]]]
         ) -> dict[str, [[float]]]:
     """

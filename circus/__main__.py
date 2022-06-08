@@ -48,6 +48,16 @@ def carnival():
         res = rest.reset(circ, **(request.json or {}))
         return handle_response(res)
 
+    @app.route(f'/{route}/restore', methods=['POST'])
+    def restore():
+        res = rest.restore(circ, request.json)
+        return handle_response(res)
+
+    @app.route(f'/{route}/restore_last', methods=['GET'])
+    def restore_last():
+        res = rest.restore_last(circ)
+        return handle_response(res)
+
     @app.route(f'/{route}/step', methods=['POST'])
     def step():
         res = rest.step(circ, request.json)
