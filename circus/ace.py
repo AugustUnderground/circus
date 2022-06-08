@@ -23,7 +23,7 @@ def goal_predicate(ps: [str] = []) -> [Callable]:
             , 'a_0':         operator.ge # Gain
             , 'cmrr':        operator.ge # Common Mode Rejection Ration
             , 'cof':         operator.ge # Cross over Frequency
-            , 'gm':          operator.le # Gain Margin
+            , 'gm':          operator.ge # Gain Margin
             , 'i_out_max':   operator.ge # Maximum Output Current
             , 'i_out_min':   operator.ge # Minimum Output Current
             , 'idd':         operator.le # Current Consumption
@@ -46,7 +46,7 @@ def goal_predicate(ps: [str] = []) -> [Callable]:
             , 'vn_10kHz':    operator.le # Output-referred noise density @ 10kHz
             , 'vn_1Hz':      operator.le # Output-referred noise density @ 1Hz
             , 'vn_1kHz':     operator.le # Output-referred noise density @ 1kHz
-            , 'voff_stat':   operator.ge # Statistical Offset
+            , 'voff_stat':   operator.le # Statistical Offset
             , 'voff_sys':    operator.le # Systematic Offset
             , }
 
