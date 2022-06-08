@@ -16,3 +16,12 @@ Or clone and install a local copy
 $ git clone https://github.com/augustunderground/gace.git
 $ pip install .
 ```
+
+## Testing
+
+After installation, running the [pytest](https://docs.pytest.org/) test suite
+in the `circuis` directory takes about ~5min.
+
+```bash
+$ pytest
+```
