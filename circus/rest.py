@@ -74,9 +74,12 @@ def restore( circ: CircusEnv, sizing: dict[str, dict[str, float]]
     """
     Restore a given state.
     """
+    circ            = make_env( circ.env_id, circ.pdk, circ.space, circ.var
+                              , circ.num, circ.steps, circ.scale )
     circ.env.reset()
     circ.env.sizing = sizing
-    return circ.step_wait()
+    observation     = circ.env.step_wait()
+    return observation
 
 def restore_last(circ: CircusEnv) -> dict[str, [[float]]]:
     """
