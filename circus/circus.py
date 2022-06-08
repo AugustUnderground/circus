@@ -10,7 +10,7 @@ from gym import GoalEnv
 from stable_baselines3.common.vec_env.base_vec_env import VecEnv, \
                                                           VecEnvIndices, \
                                                           VecEnvStepReturn
-
+import json
 import numpy as np
 import hace as ac
 
@@ -171,6 +171,26 @@ class CircusGeom(GoalEnv, VecEnv):
         for env_id in (env_ids or self.ace_envs.keys()):
             self.ace_envs[env_id].clear()
 
+    def observation_dict( self, observation: dict[int, dict[str, float]]
+                        ) -> dict[str, np.ndarray]:
+        """
+        Takes an observation from a pooled ACE Environment and returns a
+        GoalEnv compliant OrderedDict.
+        """
+        state       = filter_results(self.obs_filter, observation)
+        achieved    = filter_results(self.goal_filter, observation)
+
+        obs         = np.nan_to_num( self.obs_scaler(state)
+                                     if self.scale_observation else state )
+        a_goal      = np.nan_to_num( self.goal_scaler(achieved)
+                                     if self.scale_observation else achieved )
+        d_goal      = np.nan_to_num( self.goal_scaler(self.goal)
+                                     if self.scale_observation else self.goal )
+
+        return OrderedDict({ 'observation':   obs
+                           , 'achieved_goal': a_goal
+                           , 'desired_goal':  d_goal })
+
     def reset(self, env_mask: list[bool] = [], env_ids: list[int] = []):
         """
         Reset all (parallel) environment(s).
@@ -183,32 +203,35 @@ class CircusGeom(GoalEnv, VecEnv):
         """
 
         previous              = ac.current_performance_pool(self.ace_envs)
-        state                 = filter_results(self.obs_filter, previous)
-        achieved              = filter_results(self.goal_filter, previous)
+        prev_obs              = self.observation_dict(previous)
+        state                 = prev_obs['observation']
+        achieved              = prev_obs['achieved_goal']
 
         reset_ids             = [ i for i,m in enumerate(env_mask) if m
                                 ] or env_ids or range(self.num_envs)
 
         pool                  = { i: self.ace_envs[i] for i in reset_ids }
         random_sizing         = ac.random_sizing_pool(pool)
-        results               = ac.evaluate_circuit_pool(pool, pool_params = random_sizing)
+        results               = ac.evaluate_circuit_pool( pool
+                                                        , pool_params = random_sizing
+                                                        , )
 
-        state[reset_ids]      = filter_results(self.obs_filter, results)
-        achieved[reset_ids]   = filter_results(self.goal_filter, results)
+        observation           = self.observation_dict(results)
+
+        state[reset_ids]      = observation['observation']
+        achieved[reset_ids]   = observation['achieved_goal']
 
         self.goal[reset_ids]  = self.new_goal()[reset_ids]
 
+        goal                  = ( self.goal_scaler(self.goal)
+                                  if self.scale_observation else
+                                  self.goal )
+
         self.steps[reset_ids] = 0
 
-        return OrderedDict({ 'observation':   ( self.obs_scaler(state)
-                                                if self.scale_observation
-                                                else state )
-                           , 'achieved_goal': ( self.goal_scaler(achieved)
-                                                if self.scale_observation
-                                                else achieved )
-                           , 'desired_goal':  ( self.goal_scaler(self.goal)
-                                                if self.scale_observation
-                                                else self.goal ) })
+        return OrderedDict({ 'observation':   state
+                           , 'achieved_goal': achieved
+                           , 'desired_goal':  goal })
 
     def step(self, actions: np.ndarray) -> VecEnvStepReturn:
         """
@@ -238,19 +261,7 @@ class CircusGeom(GoalEnv, VecEnv):
         pool        = { i: self.ace_envs[i] for i in range(self.num_envs) }
         results     = ac.evaluate_circuit_pool(pool, pool_params = self.sizing)
 
-        state       = filter_results(self.obs_filter, results)
-        achieved    = filter_results(self.goal_filter, results)
-
-        obs         = np.nan_to_num( self.obs_scaler(state)
-                                     if self.scale_observation else state )
-        a_goal      = np.nan_to_num( self.goal_scaler(achieved)
-                                     if self.scale_observation else achieved )
-        d_goal      = np.nan_to_num( self.goal_scaler(self.goal)
-                                     if self.scale_observation else self.goal )
-
-        observation = OrderedDict({ 'observation':   obs
-                                  , 'achieved_goal': a_goal
-                                  , 'desired_goal':  d_goal })
+        observation = self.observation_dict(results)
 
         reward      = self.calculate_reward(observation)
 
