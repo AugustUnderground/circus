@@ -33,7 +33,9 @@ def electric_unscaler(ace_id: str, ace_backend: str) -> Callable:
 
     def unscale(x: np.ndarray) -> np.ndarray:
         y_ = x_min + (((x + 1.0) / 2.0) * (x_max - x_min))
-        y  = (y_ * gm) + np.power(10.0, y_ * fm) + (y_ * im * 1e-6)
+        y  = ( (y_ * gm)
+             + np.power( 10.0, y_ * fm, where = (y_ * fm) > 0.0)
+             + (y_ * im * 1e-6) )
         return y
 
     return unscale
