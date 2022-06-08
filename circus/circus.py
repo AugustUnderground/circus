@@ -241,15 +241,16 @@ class CircusGeom(GoalEnv, VecEnv):
         state       = filter_results(self.obs_filter, results)
         achieved    = filter_results(self.goal_filter, results)
 
-        observation = OrderedDict({ 'observation':   ( self.obs_scaler(state)
-                                                       if self.scale_observation
-                                                       else state )
-                                  , 'achieved_goal': ( self.goal_scaler(achieved)
-                                                       if self.scale_observation
-                                                       else achieved )
-                                  , 'desired_goal':  ( self.goal_scaler(self.goal)
-                                                       if self.scale_observation
-                                                       else self.goal ) })
+        obs         = np.nan_to_num( self.obs_scaler(state)
+                                     if self.scale_observation else state )
+        a_goal      = np.nan_to_num( self.goal_scaler(achieved)
+                                     if self.scale_observation else achieved )
+        d_goal      = np.nan_to_num( self.goal_scaler(self.goal)
+                                     if self.scale_observation else self.goal )
+
+        observation = OrderedDict({ 'observation':   obs
+                                  , 'achieved_goal': a_goal
+                                  , 'desired_goal':  d_goal })
 
         reward      = self.calculate_reward(observation)
 

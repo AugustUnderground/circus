@@ -18,8 +18,10 @@ def binary_reward( predicate: list[Callable], observation: dict[str, np.ndarray]
     """
     desired_goal  = observation['desired_goal']
     achieved_goal = observation['achieved_goal']
-    return np.all( np.stack([ p(a,d) for p,a,d in zip( predicate
-                                                     , list(achieved_goal.T)
-                                                     , list(desired_goal.T))
+    return np.all( np.stack([ (p(a,d) if (a is not None) and (d is not None)
+                                      else False)
+                              for p,a,d in zip( predicate
+                                              , list(achieved_goal.T)
+                                              , list(desired_goal.T))
                             ]).T
                  , axis = 1) - 1.0
