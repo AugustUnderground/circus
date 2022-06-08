@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 from collections import namedtuple
 
+import json
 import numpy as np
 import hace as ac
 import circus
@@ -119,7 +120,10 @@ def reward( circ: CircusEnv, observation: dict[str, [[float]]]
     """
     Calculate reward given an observation Dict.
     """
-    obs = { k: np.array(v) for k,v in observation.items() if k != 'info' }
+    obs = { k: np.array(v)
+            for k,v in observation.items()
+            if k in ['observation', 'desired_goal', 'achieved_goal'] }
+
     rew = circ.env.calculate_reward(obs).tolist()
     return {'reward': rew}
 
