@@ -17,7 +17,7 @@ def backend_id(pdk: str) -> str:
 def goal_predicate(ps: [str] = []) -> [Callable]:
     """
     List of default predicates for achived / desired goal comparison:
-        Takes the form: state operator goal
+        lambda achived desired: ...
     """
     preds = { 'A':           operator.le # Area
             , 'a_0':         operator.ge # Gain
@@ -34,7 +34,7 @@ def goal_predicate(ps: [str] = []) -> [Callable]:
             , 'psrr_n':      operator.ge # Power Supply Rejection Ratio -
             , 'psrr_p':      operator.ge # Power Supply Rejection Ratio +
             , 'sr_f':        operator.le # Slew Rate Falling
-            , 'sr_r':        operator.ge # Slew Rate Rising
+            , 'sr_r':        operator.le # Slew Rate Rising
             , 'ugbw':        operator.ge # Unity Gain Bandwidth Product
             , 'v_ih':        operator.ge # Input Voltage High
             , 'v_il':        operator.ge # Input Voltage Low
