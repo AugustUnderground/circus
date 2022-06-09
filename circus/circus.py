@@ -278,7 +278,7 @@ class CircusGeom(GoalEnv, VecEnv):
                       , 'inputs':  self.input_parameters
                       , }
 
-        info        = [ info_dict | {'is_success': d} for d in done.tolist() ]
+        info        = [ info_dict | {'is_success': s} for s in (reward == 0).tolist() ]
 
         return (observation, reward, done, info)
 
