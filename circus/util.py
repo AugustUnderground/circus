@@ -105,7 +105,8 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
 
     def scaler(x: np.ndarray) -> np.ndarray:
         a            = (np.abs(x) * abs_msk) + (x * ~abs_msk)
-        l            = (np.log10(a, where = log_msk) * log_msk) + (a * ~log_msk)
+        l            = (np.log10(a, where = (a * log_msk) > 0.0) * log_msk
+                       ) + (a * ~log_msk)
         x_           = np.clip(l[:,scl_msk], x_min, x_max)
         y_           = 2.0 * (x_ - x_min) / (x_max - x_min) - 1.0
         y            = x.copy()
