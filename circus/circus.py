@@ -276,6 +276,7 @@ class CircusGeom(GoalEnv, VecEnv):
         info        = [{ 'outputs': self.obs_filter
                        , 'goal':    self.goal_filter
                        , 'inputs':  self.input_parameters
+                       , 'is_success': reward == 0
                        , }] * self.num_envs
 
         return (observation, reward, done, info)
