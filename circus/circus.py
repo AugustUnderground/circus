@@ -154,7 +154,7 @@ class CircusGeom(GoalEnv, VecEnv):
         self.new_goal          = goal_generator(goal_init, reference_goal, self.num_envs)
         self.goal              = self.new_goal()
 
-        self.unscale_action    = geometric_unscaler(self.constraints)
+        self.act_unscaler      = geometric_unscaler(self.constraints)
 
         self.sizing            = {}
 
@@ -250,10 +250,13 @@ class CircusGeom(GoalEnv, VecEnv):
         Arguments:
             `actions`: Take Action with shape [num_envs, action_space].
         """
-        unscaled    = list(self.unscale_action(actions))
+
+        unscaled    = self.act_unscaler(np.clip( actions
+                                               , self.action_space.low
+                                               , self.action_space.high ))
         params      = sorted(ac.sizing_identifiers(self.ace_envs[0]))
         self.sizing = { env_id: dict(zip(params, action.tolist()))
-                        for env_id,action in enumerate(unscaled)}
+                        for env_id,action in enumerate(list(unscaled))}
 
     def step_wait(self) -> VecEnvStepReturn:
         """
@@ -346,17 +349,20 @@ class CircusElec(CircusGeom):
 
         self.input_parameters  = electric_identifiers(self.ace_id)
 
-        self.action_space = Box( low   = -1.0
-                               , high  = 1.0
-                               , shape = (len(self.input_parameters),)
-                               , dtype = np.float32 )
+        self.action_space      = Box( low   = -1.0
+                                    , high  = 1.0
+                                    , shape = (len(self.input_parameters),)
+                                    , dtype = np.float32 )
 
-        self.unscale_action = electric_unscaler(self.ace_id, self.ace_backend)
+        self.act_unscaler      = electric_unscaler(self.ace_id, self.ace_backend)
 
     def step_async(self, actions: np.ndarray) -> None:
-        unscaled    = list(self.unscale_action(actions))
-        self.sizing = { env_id: self.transformation(* action.flatten().tolist())
-                        for env_id,action in enumerate(unscaled) }
+        unscaled    = self.act_unscaler(np.clip( actions
+                                               , self.action_space.low
+                                               , self.action_space.high ))
+
+        self.sizing = { env_id: self.transformation(* action.tolist())
+                        for env_id,action in enumerate(list(unscaled)) }
 
 class CircusGeomVec(CircusGeom):
     """ Geometric Sizing Non-Goal Environment """
