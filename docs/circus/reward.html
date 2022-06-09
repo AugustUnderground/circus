@@ -47,11 +47,12 @@ def binary_reward( predicate: list[Callable], observation: dict[str, np.ndarray]
     &#34;&#34;&#34;
     desired_goal  = observation[&#39;desired_goal&#39;]
     achieved_goal = observation[&#39;achieved_goal&#39;]
+
     return np.all( np.stack([ p(a,d) for p,a,d in zip( predicate
                                                      , list(achieved_goal.T)
                                                      , list(desired_goal.T))
                             ]).T
-                 , axis = 1) - 1.0</code></pre>
+                 , axis = 1 ) - 1.0</code></pre>
 </details>
 </section>
 <section>
@@ -81,11 +82,12 @@ Returns: <code>reward</code> in {-1;0}</p></div>
     &#34;&#34;&#34;
     desired_goal  = observation[&#39;desired_goal&#39;]
     achieved_goal = observation[&#39;achieved_goal&#39;]
+
     return np.all( np.stack([ p(a,d) for p,a,d in zip( predicate
                                                      , list(achieved_goal.T)
                                                      , list(desired_goal.T))
                             ]).T
-                 , axis = 1) - 1.0</code></pre>
+                 , axis = 1 ) - 1.0</code></pre>
 </details>
 </dd>
 <dt id="circus.reward.dummy_reward"><code class="name flex">

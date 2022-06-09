@@ -39,7 +39,7 @@ from gym import GoalEnv
 from stable_baselines3.common.vec_env.base_vec_env import VecEnv, \
                                                           VecEnvIndices, \
                                                           VecEnvStepReturn
-
+import json
 import numpy as np
 import hace as ac
 
@@ -103,8 +103,8 @@ class CircusGeom(GoalEnv, VecEnv):
 
         perf_ids               = sorted(ac.performance_identifiers(self.ace_envs[0]))
         self.obs_filter        = ( perf_ids if obs_filter == &#39;all&#39; else
-                                   [p for p in perf_ids 
-                                      if (p.islower() or (p == &#39;A&#39;) 
+                                   [p for p in perf_ids
+                                      if (p.islower() or (p == &#39;A&#39;)
                                                       or (p.startswith(&#39;vn_&#39;)))]
                                    if obs_filter == &#39;perf&#39; else
                                    obs_filter if isinstance(obs_filter, list)
@@ -112,7 +112,8 @@ class CircusGeom(GoalEnv, VecEnv):
         self.obs_idx           = np.array([ i for i,p in enumerate(self.obs_filter)
                                             if p in self.obs_filter ])
 
-        self.obs_scaler,_      = performance_scaler( self.ace_id
+        self.obs_scaler,\
+        self.obs_unscaler      = performance_scaler( self.ace_id
                                                    , self.ace_backend
                                                    , self.constraints
                                                    , self.obs_filter
@@ -182,7 +183,7 @@ class CircusGeom(GoalEnv, VecEnv):
         self.new_goal          = goal_generator(goal_init, reference_goal, self.num_envs)
         self.goal              = self.new_goal()
 
-        self.unscale_action    = geometric_unscaler(self.constraints)
+        self.act_unscaler      = geometric_unscaler(self.constraints)
 
         self.sizing            = {}
 
@@ -194,42 +195,73 @@ class CircusGeom(GoalEnv, VecEnv):
         &#34;&#34;&#34;
         Close all (parallel) ACE environment(s).
         Arguments:
-            `env_ids`: List of environemt IDs that will be closed.
+            `env_ids`: List of environment IDs that will be closed.
                        Default = None closes all.
         &#34;&#34;&#34;
         for env_id in (env_ids or self.ace_envs.keys()):
             self.ace_envs[env_id].clear()
 
+    def observation_dict( self, observation: dict[int, dict[str, float]]
+                        ) -&gt; dict[str, np.ndarray]:
+        &#34;&#34;&#34;
+        Takes an observation from a pooled ACE Environment and returns a
+        GoalEnv compliant OrderedDict.
+        &#34;&#34;&#34;
+        state       = filter_results(self.obs_filter, observation)
+        achieved    = filter_results(self.goal_filter, observation)
+
+        obs         = np.nan_to_num( self.obs_scaler(state)
+                                     if self.scale_observation else state )
+        a_goal      = np.nan_to_num( self.goal_scaler(achieved)
+                                     if self.scale_observation else achieved )
+        d_goal      = np.nan_to_num( self.goal_scaler(self.goal)
+                                     if self.scale_observation else self.goal )
+
+        return OrderedDict({ &#39;observation&#39;:   obs
+                           , &#39;achieved_goal&#39;: a_goal
+                           , &#39;desired_goal&#39;:  d_goal })
+
     def reset(self, env_mask: list[bool] = [], env_ids: list[int] = []):
         &#34;&#34;&#34;
-        Reset all (parallel) environemt(s).
+        Reset all (parallel) environment(s).
         Arguments:
             `env_mask`: Boolean mask of environemts that will be reset. Passing
-                        the `done` vector works. (Presendece)
-            `env_ids`: List of integer IDs of environemts that will be reset.
+                        the `done` vector works. This argument is prioritized
+                        over `env_ids`.
+            `env_ids`: List of integer IDs of environments that will be reset.
+                       This argument is discarded in favour of `env_mask`.
         &#34;&#34;&#34;
-        reset_ids     = [ i for i,m in enumerate(env_mask) if m
-                        ] or env_ids or range(self.num_envs)
-        pool          = { i: self.ace_envs[i] for i in reset_ids }
-        random_sizing = ac.random_sizing_pool(pool)
-        results       = ac.evaluate_circuit_pool(pool, pool_params = random_sizing)
-        self.goal     = self.new_goal()
 
-        state         = filter_results(self.obs_filter, results)
-        achieved      = filter_results(self.goal_filter, results)
-        observation   = OrderedDict({ &#39;observation&#39;:   ( self.obs_scaler(state)
-                                                         if self.scale_observation
-                                                         else state )
-                                    , &#39;achieved_goal&#39;: ( self.goal_scaler(achieved)
-                                                         if self.scale_observation
-                                                         else achieved )
-                                    , &#39;desired_goal&#39;:  ( self.goal_scaler(self.goal)
-                                                         if self.scale_observation
-                                                         else self.goal ) })
+        previous              = ac.current_performance_pool(self.ace_envs)
+        prev_obs              = self.observation_dict(previous)
+        state                 = prev_obs[&#39;observation&#39;]
+        achieved              = prev_obs[&#39;achieved_goal&#39;]
+
+        reset_ids             = [ i for i,m in enumerate(env_mask) if m
+                                ] or env_ids or range(self.num_envs)
+
+        pool                  = { i: self.ace_envs[i] for i in reset_ids }
+        random_sizing         = ac.random_sizing_pool(pool)
+        results               = ac.evaluate_circuit_pool( pool
+                                                        , pool_params = random_sizing
+                                                        , )
+
+        observation           = self.observation_dict(results)
+
+        state[reset_ids]      = observation[&#39;observation&#39;]
+        achieved[reset_ids]   = observation[&#39;achieved_goal&#39;]
+
+        self.goal[reset_ids]  = self.new_goal()[reset_ids]
+
+        goal                  = ( self.goal_scaler(self.goal)
+                                  if self.scale_observation else
+                                  self.goal )
 
         self.steps[reset_ids] = 0
 
-        return observation
+        return OrderedDict({ &#39;observation&#39;:   state
+                           , &#39;achieved_goal&#39;: achieved
+                           , &#39;desired_goal&#39;:  goal })
 
     def step(self, actions: np.ndarray) -&gt; VecEnvStepReturn:
         &#34;&#34;&#34;
@@ -243,14 +275,17 @@ class CircusGeom(GoalEnv, VecEnv):
 
     def step_async(self, actions: np.ndarray) -&gt; None:
         &#34;&#34;&#34;
-        Initiate a step in the Environment. 
+        Initiate a step in the Environment.
         Arguments:
             `actions`: Take Action with shape [num_envs, action_space].
         &#34;&#34;&#34;
-        unscaled    = list(self.unscale_action(actions))
+
+        unscaled    = self.act_unscaler(np.clip( actions
+                                               , self.action_space.low
+                                               , self.action_space.high ))
         params      = sorted(ac.sizing_identifiers(self.ace_envs[0]))
         self.sizing = { env_id: dict(zip(params, action.tolist()))
-                        for env_id,action in enumerate(unscaled)}
+                        for env_id,action in enumerate(list(unscaled))}
 
     def step_wait(self) -&gt; VecEnvStepReturn:
         &#34;&#34;&#34;
@@ -259,18 +294,7 @@ class CircusGeom(GoalEnv, VecEnv):
         pool        = { i: self.ace_envs[i] for i in range(self.num_envs) }
         results     = ac.evaluate_circuit_pool(pool, pool_params = self.sizing)
 
-        state       = filter_results(self.obs_filter, results)
-        achieved    = filter_results(self.goal_filter, results)
-
-        observation = OrderedDict({ &#39;observation&#39;:   ( self.obs_scaler(state)
-                                                       if self.scale_observation
-                                                       else state )
-                                  , &#39;achieved_goal&#39;: ( self.goal_scaler(achieved)
-                                                       if self.scale_observation
-                                                       else achieved )
-                                  , &#39;desired_goal&#39;:  ( self.goal_scaler(self.goal)
-                                                       if self.scale_observation
-                                                       else self.goal ) })
+        observation = self.observation_dict(results)
 
         reward      = self.calculate_reward(observation)
 
@@ -329,6 +353,7 @@ class CircusGeom(GoalEnv, VecEnv):
         pass
 
 class CircusElec(CircusGeom):
+    &#34;&#34;&#34; Electric Sizing Goal Environment &#34;&#34;&#34;
     def __init__(self, **kwargs):
         &#34;&#34;&#34;
         Construct Electric Sizing Goal Environment. Same Arguments as
@@ -353,17 +378,20 @@ class CircusElec(CircusGeom):
 
         self.input_parameters  = electric_identifiers(self.ace_id)
 
-        self.action_space = Box( low   = -1.0
-                               , high  = 1.0
-                               , shape = (len(self.input_parameters),)
-                               , dtype = np.float32 )
+        self.action_space      = Box( low   = -1.0
+                                    , high  = 1.0
+                                    , shape = (len(self.input_parameters),)
+                                    , dtype = np.float32 )
 
-        self.unscale_action = electric_unscaler(self.ace_id, self.ace_backend)
+        self.act_unscaler      = electric_unscaler(self.ace_id, self.ace_backend)
 
     def step_async(self, actions: np.ndarray) -&gt; None:
-        unscaled    = list(self.unscale_action(actions))
-        self.sizing = { env_id: self.transformation(* action.flatten().tolist())
-                        for env_id,action in enumerate(unscaled) }
+        unscaled    = self.act_unscaler(np.clip( actions
+                                               , self.action_space.low
+                                               , self.action_space.high ))
+
+        self.sizing = { env_id: self.transformation(* action.tolist())
+                        for env_id,action in enumerate(list(unscaled)) }
 
 class CircusGeomVec(CircusGeom):
     &#34;&#34;&#34; Geometric Sizing Non-Goal Environment &#34;&#34;&#34;
@@ -505,7 +533,7 @@ def make( env_id: str, n_envs: int = 1, **kwargs
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Geometric Sizing Goal Environment </p>
+<div class="desc"><p>Electric Sizing Goal Environment </p>
 <p>Construct Electric Sizing Goal Environment. Same Arguments as
 <code><a title="circus.circus.CircusGeom" href="#circus.circus.CircusGeom">CircusGeom</a></code>.</p></div>
 <details class="source">
@@ -513,6 +541,7 @@ def make( env_id: str, n_envs: int = 1, **kwargs
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class CircusElec(CircusGeom):
+    &#34;&#34;&#34; Electric Sizing Goal Environment &#34;&#34;&#34;
     def __init__(self, **kwargs):
         &#34;&#34;&#34;
         Construct Electric Sizing Goal Environment. Same Arguments as
@@ -537,17 +566,20 @@ def make( env_id: str, n_envs: int = 1, **kwargs
 
         self.input_parameters  = electric_identifiers(self.ace_id)
 
-        self.action_space = Box( low   = -1.0
-                               , high  = 1.0
-                               , shape = (len(self.input_parameters),)
-                               , dtype = np.float32 )
+        self.action_space      = Box( low   = -1.0
+                                    , high  = 1.0
+                                    , shape = (len(self.input_parameters),)
+                                    , dtype = np.float32 )
 
-        self.unscale_action = electric_unscaler(self.ace_id, self.ace_backend)
+        self.act_unscaler      = electric_unscaler(self.ace_id, self.ace_backend)
 
     def step_async(self, actions: np.ndarray) -&gt; None:
-        unscaled    = list(self.unscale_action(actions))
-        self.sizing = { env_id: self.transformation(* action.flatten().tolist())
-                        for env_id,action in enumerate(unscaled) }</code></pre>
+        unscaled    = self.act_unscaler(np.clip( actions
+                                               , self.action_space.low
+                                               , self.action_space.high ))
+
+        self.sizing = { env_id: self.transformation(* action.tolist())
+                        for env_id,action in enumerate(list(unscaled)) }</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -571,6 +603,7 @@ def make( env_id: str, n_envs: int = 1, **kwargs
 <li><code><a title="circus.circus.CircusGeom.env_is_wrapped" href="#circus.circus.CircusGeom.env_is_wrapped">env_is_wrapped</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.env_method" href="#circus.circus.CircusGeom.env_method">env_method</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.get_attr" href="#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
+<li><code><a title="circus.circus.CircusGeom.observation_dict" href="#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.render" href="#circus.circus.CircusGeom.render">render</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.reset" href="#circus.circus.CircusGeom.reset">reset</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.seed" href="#circus.circus.CircusGeom.seed">seed</a></code></li>
@@ -635,6 +668,7 @@ def make( env_id: str, n_envs: int = 1, **kwargs
 <li><code><a title="circus.circus.CircusElec.env_is_wrapped" href="#circus.circus.CircusGeom.env_is_wrapped">env_is_wrapped</a></code></li>
 <li><code><a title="circus.circus.CircusElec.env_method" href="#circus.circus.CircusGeom.env_method">env_method</a></code></li>
 <li><code><a title="circus.circus.CircusElec.get_attr" href="#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
+<li><code><a title="circus.circus.CircusElec.observation_dict" href="#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.circus.CircusElec.render" href="#circus.circus.CircusGeom.render">render</a></code></li>
 <li><code><a title="circus.circus.CircusElec.reset" href="#circus.circus.CircusGeom.reset">reset</a></code></li>
 <li><code><a title="circus.circus.CircusElec.seed" href="#circus.circus.CircusGeom.seed">seed</a></code></li>
@@ -741,8 +775,8 @@ Optional reward function that takes an observation dict.
 
         perf_ids               = sorted(ac.performance_identifiers(self.ace_envs[0]))
         self.obs_filter        = ( perf_ids if obs_filter == &#39;all&#39; else
-                                   [p for p in perf_ids 
-                                      if (p.islower() or (p == &#39;A&#39;) 
+                                   [p for p in perf_ids
+                                      if (p.islower() or (p == &#39;A&#39;)
                                                       or (p.startswith(&#39;vn_&#39;)))]
                                    if obs_filter == &#39;perf&#39; else
                                    obs_filter if isinstance(obs_filter, list)
@@ -750,7 +784,8 @@ Optional reward function that takes an observation dict.
         self.obs_idx           = np.array([ i for i,p in enumerate(self.obs_filter)
                                             if p in self.obs_filter ])
 
-        self.obs_scaler,_      = performance_scaler( self.ace_id
+        self.obs_scaler,\
+        self.obs_unscaler      = performance_scaler( self.ace_id
                                                    , self.ace_backend
                                                    , self.constraints
                                                    , self.obs_filter
@@ -820,7 +855,7 @@ Optional reward function that takes an observation dict.
         self.new_goal          = goal_generator(goal_init, reference_goal, self.num_envs)
         self.goal              = self.new_goal()
 
-        self.unscale_action    = geometric_unscaler(self.constraints)
+        self.act_unscaler      = geometric_unscaler(self.constraints)
 
         self.sizing            = {}
 
@@ -832,42 +867,73 @@ Optional reward function that takes an observation dict.
         &#34;&#34;&#34;
         Close all (parallel) ACE environment(s).
         Arguments:
-            `env_ids`: List of environemt IDs that will be closed.
+            `env_ids`: List of environment IDs that will be closed.
                        Default = None closes all.
         &#34;&#34;&#34;
         for env_id in (env_ids or self.ace_envs.keys()):
             self.ace_envs[env_id].clear()
 
+    def observation_dict( self, observation: dict[int, dict[str, float]]
+                        ) -&gt; dict[str, np.ndarray]:
+        &#34;&#34;&#34;
+        Takes an observation from a pooled ACE Environment and returns a
+        GoalEnv compliant OrderedDict.
+        &#34;&#34;&#34;
+        state       = filter_results(self.obs_filter, observation)
+        achieved    = filter_results(self.goal_filter, observation)
+
+        obs         = np.nan_to_num( self.obs_scaler(state)
+                                     if self.scale_observation else state )
+        a_goal      = np.nan_to_num( self.goal_scaler(achieved)
+                                     if self.scale_observation else achieved )
+        d_goal      = np.nan_to_num( self.goal_scaler(self.goal)
+                                     if self.scale_observation else self.goal )
+
+        return OrderedDict({ &#39;observation&#39;:   obs
+                           , &#39;achieved_goal&#39;: a_goal
+                           , &#39;desired_goal&#39;:  d_goal })
+
     def reset(self, env_mask: list[bool] = [], env_ids: list[int] = []):
         &#34;&#34;&#34;
-        Reset all (parallel) environemt(s).
+        Reset all (parallel) environment(s).
         Arguments:
             `env_mask`: Boolean mask of environemts that will be reset. Passing
-                        the `done` vector works. (Presendece)
-            `env_ids`: List of integer IDs of environemts that will be reset.
+                        the `done` vector works. This argument is prioritized
+                        over `env_ids`.
+            `env_ids`: List of integer IDs of environments that will be reset.
+                       This argument is discarded in favour of `env_mask`.
         &#34;&#34;&#34;
-        reset_ids     = [ i for i,m in enumerate(env_mask) if m
-                        ] or env_ids or range(self.num_envs)
-        pool          = { i: self.ace_envs[i] for i in reset_ids }
-        random_sizing = ac.random_sizing_pool(pool)
-        results       = ac.evaluate_circuit_pool(pool, pool_params = random_sizing)
-        self.goal     = self.new_goal()
 
-        state         = filter_results(self.obs_filter, results)
-        achieved      = filter_results(self.goal_filter, results)
-        observation   = OrderedDict({ &#39;observation&#39;:   ( self.obs_scaler(state)
-                                                         if self.scale_observation
-                                                         else state )
-                                    , &#39;achieved_goal&#39;: ( self.goal_scaler(achieved)
-                                                         if self.scale_observation
-                                                         else achieved )
-                                    , &#39;desired_goal&#39;:  ( self.goal_scaler(self.goal)
-                                                         if self.scale_observation
-                                                         else self.goal ) })
+        previous              = ac.current_performance_pool(self.ace_envs)
+        prev_obs              = self.observation_dict(previous)
+        state                 = prev_obs[&#39;observation&#39;]
+        achieved              = prev_obs[&#39;achieved_goal&#39;]
+
+        reset_ids             = [ i for i,m in enumerate(env_mask) if m
+                                ] or env_ids or range(self.num_envs)
+
+        pool                  = { i: self.ace_envs[i] for i in reset_ids }
+        random_sizing         = ac.random_sizing_pool(pool)
+        results               = ac.evaluate_circuit_pool( pool
+                                                        , pool_params = random_sizing
+                                                        , )
+
+        observation           = self.observation_dict(results)
+
+        state[reset_ids]      = observation[&#39;observation&#39;]
+        achieved[reset_ids]   = observation[&#39;achieved_goal&#39;]
+
+        self.goal[reset_ids]  = self.new_goal()[reset_ids]
+
+        goal                  = ( self.goal_scaler(self.goal)
+                                  if self.scale_observation else
+                                  self.goal )
 
         self.steps[reset_ids] = 0
 
-        return observation
+        return OrderedDict({ &#39;observation&#39;:   state
+                           , &#39;achieved_goal&#39;: achieved
+                           , &#39;desired_goal&#39;:  goal })
 
     def step(self, actions: np.ndarray) -&gt; VecEnvStepReturn:
         &#34;&#34;&#34;
@@ -881,14 +947,17 @@ Optional reward function that takes an observation dict.
 
     def step_async(self, actions: np.ndarray) -&gt; None:
         &#34;&#34;&#34;
-        Initiate a step in the Environment. 
+        Initiate a step in the Environment.
         Arguments:
             `actions`: Take Action with shape [num_envs, action_space].
         &#34;&#34;&#34;
-        unscaled    = list(self.unscale_action(actions))
+
+        unscaled    = self.act_unscaler(np.clip( actions
+                                               , self.action_space.low
+                                               , self.action_space.high ))
         params      = sorted(ac.sizing_identifiers(self.ace_envs[0]))
         self.sizing = { env_id: dict(zip(params, action.tolist()))
-                        for env_id,action in enumerate(unscaled)}
+                        for env_id,action in enumerate(list(unscaled))}
 
     def step_wait(self) -&gt; VecEnvStepReturn:
         &#34;&#34;&#34;
@@ -897,18 +966,7 @@ Optional reward function that takes an observation dict.
         pool        = { i: self.ace_envs[i] for i in range(self.num_envs) }
         results     = ac.evaluate_circuit_pool(pool, pool_params = self.sizing)
 
-        state       = filter_results(self.obs_filter, results)
-        achieved    = filter_results(self.goal_filter, results)
-
-        observation = OrderedDict({ &#39;observation&#39;:   ( self.obs_scaler(state)
-                                                       if self.scale_observation
-                                                       else state )
-                                  , &#39;achieved_goal&#39;: ( self.goal_scaler(achieved)
-                                                       if self.scale_observation
-                                                       else achieved )
-                                  , &#39;desired_goal&#39;:  ( self.goal_scaler(self.goal)
-                                                       if self.scale_observation
-                                                       else self.goal ) })
+        observation = self.observation_dict(results)
 
         reward      = self.calculate_reward(observation)
 
@@ -987,7 +1045,7 @@ Optional reward function that takes an observation dict.
 <dd>
 <div class="desc"><p>Close all (parallel) ACE environment(s).</p>
 <h2 id="arguments">Arguments</h2>
-<p><code>env_ids</code>: List of environemt IDs that will be closed.
+<p><code>env_ids</code>: List of environment IDs that will be closed.
 Default = None closes all.</p></div>
 <details class="source">
 <summary>
@@ -997,7 +1055,7 @@ Default = None closes all.</p></div>
     &#34;&#34;&#34;
     Close all (parallel) ACE environment(s).
     Arguments:
-        `env_ids`: List of environemt IDs that will be closed.
+        `env_ids`: List of environment IDs that will be closed.
                    Default = None closes all.
     &#34;&#34;&#34;
     for env_id in (env_ids or self.ace_envs.keys()):
@@ -1085,6 +1143,37 @@ Calls <code>self.calculate_reward</code> under the hood.</p></div>
     return [getattr(env_i, attr_name) for env_i in target_envs]</code></pre>
 </details>
 </dd>
+<dt id="circus.circus.CircusGeom.observation_dict"><code class="name flex">
+<span>def <span class="ident">observation_dict</span></span>(<span>self, observation: dict) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Takes an observation from a pooled ACE Environment and returns a
+GoalEnv compliant OrderedDict.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def observation_dict( self, observation: dict[int, dict[str, float]]
+                    ) -&gt; dict[str, np.ndarray]:
+    &#34;&#34;&#34;
+    Takes an observation from a pooled ACE Environment and returns a
+    GoalEnv compliant OrderedDict.
+    &#34;&#34;&#34;
+    state       = filter_results(self.obs_filter, observation)
+    achieved    = filter_results(self.goal_filter, observation)
+
+    obs         = np.nan_to_num( self.obs_scaler(state)
+                                 if self.scale_observation else state )
+    a_goal      = np.nan_to_num( self.goal_scaler(achieved)
+                                 if self.scale_observation else achieved )
+    d_goal      = np.nan_to_num( self.goal_scaler(self.goal)
+                                 if self.scale_observation else self.goal )
+
+    return OrderedDict({ &#39;observation&#39;:   obs
+                       , &#39;achieved_goal&#39;: a_goal
+                       , &#39;desired_goal&#39;:  d_goal })</code></pre>
+</details>
+</dd>
 <dt id="circus.circus.CircusGeom.render"><code class="name flex">
 <span>def <span class="ident">render</span></span>(<span>self, mode: str = 'human') ‑> Optional[numpy.ndarray]</span>
 </code></dt>
@@ -1135,45 +1224,58 @@ metadata = {'render.modes': ['human', 'rgb_array']}</p>
 <span>def <span class="ident">reset</span></span>(<span>self, env_mask: list = [], env_ids: list = [])</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Reset all (parallel) environemt(s).</p>
+<div class="desc"><p>Reset all (parallel) environment(s).</p>
 <h2 id="arguments">Arguments</h2>
 <p><code>env_mask</code>: Boolean mask of environemts that will be reset. Passing
-the <code>done</code> vector works. (Presendece)
-<code>env_ids</code>: List of integer IDs of environemts that will be reset.</p></div>
+the <code>done</code> vector works. This argument is prioritized
+over <code>env_ids</code>.
+<code>env_ids</code>: List of integer IDs of environments that will be reset.
+This argument is discarded in favour of <code>env_mask</code>.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def reset(self, env_mask: list[bool] = [], env_ids: list[int] = []):
     &#34;&#34;&#34;
-    Reset all (parallel) environemt(s).
+    Reset all (parallel) environment(s).
     Arguments:
         `env_mask`: Boolean mask of environemts that will be reset. Passing
-                    the `done` vector works. (Presendece)
-        `env_ids`: List of integer IDs of environemts that will be reset.
+                    the `done` vector works. This argument is prioritized
+                    over `env_ids`.
+        `env_ids`: List of integer IDs of environments that will be reset.
+                   This argument is discarded in favour of `env_mask`.
     &#34;&#34;&#34;
-    reset_ids     = [ i for i,m in enumerate(env_mask) if m
-                    ] or env_ids or range(self.num_envs)
-    pool          = { i: self.ace_envs[i] for i in reset_ids }
-    random_sizing = ac.random_sizing_pool(pool)
-    results       = ac.evaluate_circuit_pool(pool, pool_params = random_sizing)
-    self.goal     = self.new_goal()
 
-    state         = filter_results(self.obs_filter, results)
-    achieved      = filter_results(self.goal_filter, results)
-    observation   = OrderedDict({ &#39;observation&#39;:   ( self.obs_scaler(state)
-                                                     if self.scale_observation
-                                                     else state )
-                                , &#39;achieved_goal&#39;: ( self.goal_scaler(achieved)
-                                                     if self.scale_observation
-                                                     else achieved )
-                                , &#39;desired_goal&#39;:  ( self.goal_scaler(self.goal)
-                                                     if self.scale_observation
-                                                     else self.goal ) })
+    previous              = ac.current_performance_pool(self.ace_envs)
+    prev_obs              = self.observation_dict(previous)
+    state                 = prev_obs[&#39;observation&#39;]
+    achieved              = prev_obs[&#39;achieved_goal&#39;]
+
+    reset_ids             = [ i for i,m in enumerate(env_mask) if m
+                            ] or env_ids or range(self.num_envs)
+
+    pool                  = { i: self.ace_envs[i] for i in reset_ids }
+    random_sizing         = ac.random_sizing_pool(pool)
+    results               = ac.evaluate_circuit_pool( pool
+                                                    , pool_params = random_sizing
+                                                    , )
+
+    observation           = self.observation_dict(results)
+
+    state[reset_ids]      = observation[&#39;observation&#39;]
+    achieved[reset_ids]   = observation[&#39;achieved_goal&#39;]
+
+    self.goal[reset_ids]  = self.new_goal()[reset_ids]
+
+    goal                  = ( self.goal_scaler(self.goal)
+                              if self.scale_observation else
+                              self.goal )
 
     self.steps[reset_ids] = 0
 
-    return observation</code></pre>
+    return OrderedDict({ &#39;observation&#39;:   state
+                       , &#39;achieved_goal&#39;: achieved
+                       , &#39;desired_goal&#39;:  goal })</code></pre>
 </details>
 </dd>
 <dt id="circus.circus.CircusGeom.seed"><code class="name flex">
@@ -1247,7 +1349,7 @@ under the hood.</p>
 <span>def <span class="ident">step_async</span></span>(<span>self, actions: numpy.ndarray) ‑> None</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Initiate a step in the Environment. </p>
+<div class="desc"><p>Initiate a step in the Environment.</p>
 <h2 id="arguments">Arguments</h2>
 <p><code>actions</code>: Take Action with shape [num_envs, action_space].</p></div>
 <details class="source">
@@ -1256,14 +1358,17 @@ under the hood.</p>
 </summary>
 <pre><code class="python">def step_async(self, actions: np.ndarray) -&gt; None:
     &#34;&#34;&#34;
-    Initiate a step in the Environment. 
+    Initiate a step in the Environment.
     Arguments:
         `actions`: Take Action with shape [num_envs, action_space].
     &#34;&#34;&#34;
-    unscaled    = list(self.unscale_action(actions))
+
+    unscaled    = self.act_unscaler(np.clip( actions
+                                           , self.action_space.low
+                                           , self.action_space.high ))
     params      = sorted(ac.sizing_identifiers(self.ace_envs[0]))
     self.sizing = { env_id: dict(zip(params, action.tolist()))
-                    for env_id,action in enumerate(unscaled)}</code></pre>
+                    for env_id,action in enumerate(list(unscaled))}</code></pre>
 </details>
 </dd>
 <dt id="circus.circus.CircusGeom.step_wait"><code class="name flex">
@@ -1282,18 +1387,7 @@ under the hood.</p>
     pool        = { i: self.ace_envs[i] for i in range(self.num_envs) }
     results     = ac.evaluate_circuit_pool(pool, pool_params = self.sizing)
 
-    state       = filter_results(self.obs_filter, results)
-    achieved    = filter_results(self.goal_filter, results)
-
-    observation = OrderedDict({ &#39;observation&#39;:   ( self.obs_scaler(state)
-                                                   if self.scale_observation
-                                                   else state )
-                              , &#39;achieved_goal&#39;: ( self.goal_scaler(achieved)
-                                                   if self.scale_observation
-                                                   else achieved )
-                              , &#39;desired_goal&#39;:  ( self.goal_scaler(self.goal)
-                                                   if self.scale_observation
-                                                   else self.goal ) })
+    observation = self.observation_dict(results)
 
     reward      = self.calculate_reward(observation)
 
@@ -1363,6 +1457,7 @@ under the hood.</p>
 <li><code><a title="circus.circus.CircusGeom.env_is_wrapped" href="#circus.circus.CircusGeom.env_is_wrapped">env_is_wrapped</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.env_method" href="#circus.circus.CircusGeom.env_method">env_method</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.get_attr" href="#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
+<li><code><a title="circus.circus.CircusGeom.observation_dict" href="#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.render" href="#circus.circus.CircusGeom.render">render</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.reset" href="#circus.circus.CircusGeom.reset">reset</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.seed" href="#circus.circus.CircusGeom.seed">seed</a></code></li>
@@ -1409,6 +1504,7 @@ under the hood.</p>
 <li><code><a title="circus.circus.CircusGeom.env_is_wrapped" href="#circus.circus.CircusGeom.env_is_wrapped">env_is_wrapped</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.env_method" href="#circus.circus.CircusGeom.env_method">env_method</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.get_attr" href="#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
+<li><code><a title="circus.circus.CircusGeom.observation_dict" href="#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.render" href="#circus.circus.CircusGeom.render">render</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.reset" href="#circus.circus.CircusGeom.reset">reset</a></code></li>
 <li><code><a title="circus.circus.CircusGeom.seed" href="#circus.circus.CircusGeom.seed">seed</a></code></li>

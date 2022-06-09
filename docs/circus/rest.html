@@ -32,6 +32,7 @@
 from argparse import ArgumentParser
 from collections import namedtuple
 
+import json
 import numpy as np
 import hace as ac
 import circus
@@ -39,7 +40,7 @@ import circus
 parser = ArgumentParser()
 parser.add_argument( &#39;--host&#39;, type = str, default = &#39;localhost&#39;
                    , help = &#39;Host address&#39;)
-parser.add_argument( &#39;-p&#39;, &#39;--port&#39;, type = int, default = &#39;6006&#39;
+parser.add_argument( &#39;-p&#39;, &#39;--port&#39;, type = int, default = &#39;6007&#39;
                    , help = &#39;Server Port&#39;)
 parser.add_argument( &#39;-e&#39;, &#39;--env&#39;, type = str, default = &#39;op2&#39;
                    , help = &#39;ACE Environment ID, see Circus doc for what\&#39;s available&#39;)
@@ -90,13 +91,31 @@ def restart(circ: CircusEnv) -&gt; CircusEnv:
     env, ace_id, backend, space, variant, num_envs = circ
     return make_env(ace_id, backend, space, variant, num_envs, env.num_steps)
 
-def reset( circ: CircusEnv, env_ids = [], restart_count = 0
+def reset( circ: CircusEnv, env_mask: list[bool] = [], env_ids: list[int] = []
          ) -&gt; dict[str, [[float]]]:
     &#34;&#34;&#34;
-    Reset Environment(s).
+    Reset (selected) Environment(s).
     &#34;&#34;&#34;
-    obs = circ.env.reset(env_ids = env_ids)
+    obs = circ.env.reset(env_mask = env_mask, env_ids = env_ids)
     return { p: o.tolist() for p,o in obs.items() }
+
+def restore( circ: CircusEnv, sizing: dict[str, dict[str, float]]
+           ) -&gt; dict[str, [[float]]]:
+    &#34;&#34;&#34;
+    Restore a given state.
+    &#34;&#34;&#34;
+    circ            = make_env( circ.env_id, circ.pdk, circ.space, circ.var
+                              , circ.num, circ.steps, circ.scale )
+    circ.env.reset()
+    circ.env.sizing = sizing
+    observation     = circ.env.step_wait()
+    return observation
+
+def restore_last(circ: CircusEnv) -&gt; dict[str, [[float]]]:
+    &#34;&#34;&#34;
+    Restore the last state.
+    &#34;&#34;&#34;
+    return restore(circ, circ.env.sizing)
 
 def step( circ: CircusEnv, action: dict[str, [[float]]]
         ) -&gt; dict[str, [[float]]]:
@@ -130,7 +149,10 @@ def reward( circ: CircusEnv, observation: dict[str, [[float]]]
     &#34;&#34;&#34;
     Calculate reward given an observation Dict.
     &#34;&#34;&#34;
-    obs = { k: np.array(v) for k,v in observation.items() if k != &#39;info&#39; }
+    obs = { k: np.array(v)
+            for k,v in observation.items()
+            if k in [&#39;observation&#39;, &#39;desired_goal&#39;, &#39;achieved_goal&#39;] }
+
     rew = circ.env.calculate_reward(obs).tolist()
     return {&#39;reward&#39;: rew}
 
@@ -419,20 +441,20 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.reset"><code class="name flex">
-<span>def <span class="ident">reset</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, env_ids=[], restart_count=0) ‑> dict</span>
+<span>def <span class="ident">reset</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, env_mask: list = [], env_ids: list = []) ‑> dict</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Reset Environment(s).</p></div>
+<div class="desc"><p>Reset (selected) Environment(s).</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def reset( circ: CircusEnv, env_ids = [], restart_count = 0
+<pre><code class="python">def reset( circ: CircusEnv, env_mask: list[bool] = [], env_ids: list[int] = []
          ) -&gt; dict[str, [[float]]]:
     &#34;&#34;&#34;
-    Reset Environment(s).
+    Reset (selected) Environment(s).
     &#34;&#34;&#34;
-    obs = circ.env.reset(env_ids = env_ids)
+    obs = circ.env.reset(env_mask = env_mask, env_ids = env_ids)
     return { p: o.tolist() for p,o in obs.items() }</code></pre>
 </details>
 </dd>
@@ -453,6 +475,44 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
     return make_env(ace_id, backend, space, variant, num_envs, env.num_steps)</code></pre>
 </details>
 </dd>
+<dt id="circus.rest.restore"><code class="name flex">
+<span>def <span class="ident">restore</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, sizing: dict) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Restore a given state.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def restore( circ: CircusEnv, sizing: dict[str, dict[str, float]]
+           ) -&gt; dict[str, [[float]]]:
+    &#34;&#34;&#34;
+    Restore a given state.
+    &#34;&#34;&#34;
+    circ            = make_env( circ.env_id, circ.pdk, circ.space, circ.var
+                              , circ.num, circ.steps, circ.scale )
+    circ.env.reset()
+    circ.env.sizing = sizing
+    observation     = circ.env.step_wait()
+    return observation</code></pre>
+</details>
+</dd>
+<dt id="circus.rest.restore_last"><code class="name flex">
+<span>def <span class="ident">restore_last</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Restore the last state.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def restore_last(circ: CircusEnv) -&gt; dict[str, [[float]]]:
+    &#34;&#34;&#34;
+    Restore the last state.
+    &#34;&#34;&#34;
+    return restore(circ, circ.env.sizing)</code></pre>
+</details>
+</dd>
 <dt id="circus.rest.reward"><code class="name flex">
 <span>def <span class="ident">reward</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, observation: dict) ‑> dict</span>
 </code></dt>
@@ -467,7 +527,10 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
     &#34;&#34;&#34;
     Calculate reward given an observation Dict.
     &#34;&#34;&#34;
-    obs = { k: np.array(v) for k,v in observation.items() if k != &#39;info&#39; }
+    obs = { k: np.array(v)
+            for k,v in observation.items()
+            if k in [&#39;observation&#39;, &#39;desired_goal&#39;, &#39;achieved_goal&#39;] }
+
     rew = circ.env.calculate_reward(obs).tolist()
     return {&#39;reward&#39;: rew}</code></pre>
 </details>
@@ -568,6 +631,8 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 <li><code><a title="circus.rest.random_step" href="#circus.rest.random_step">random_step</a></code></li>
 <li><code><a title="circus.rest.reset" href="#circus.rest.reset">reset</a></code></li>
 <li><code><a title="circus.rest.restart" href="#circus.rest.restart">restart</a></code></li>
+<li><code><a title="circus.rest.restore" href="#circus.rest.restore">restore</a></code></li>
+<li><code><a title="circus.rest.restore_last" href="#circus.rest.restore_last">restore_last</a></code></li>
 <li><code><a title="circus.rest.reward" href="#circus.rest.reward">reward</a></code></li>
 <li><code><a title="circus.rest.step" href="#circus.rest.step">step</a></code></li>
 </ul>

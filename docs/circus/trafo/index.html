@@ -61,10 +61,11 @@ def electric_unscaler(ace_id: str, ace_backend: str) -&gt; Callable:
                            , }.get(ace_id, NotImplementedError(err_msg))
 
     def unscale(x: np.ndarray) -&gt; np.ndarray:
-        y_ = x_min + (((x + 1.0) / 2.0) * (x_max - x_min))
-        y  = (y_ * gm) \
-           + np.log10(y_ * fm, where = (y_ * fm) &gt; 0.0) \
-           + (y_ * im * 1e-6)
+        y_ = np.clip( x_min + (((x + 1.0) / 2.0) * (x_max - x_min))
+                    , x_min, x_max )
+
+        y = (y_ * gm) + ((10.0 ** (y_ * fm)) * fm) + (y_ * 1.0e-6 * im)
+
         return y
 
     return unscale
@@ -138,10 +139,11 @@ def performance_scale( ace_id: str, ace_backend: str, constraints: dict
                            , }.get(ace_id, NotImplementedError(err_msg))
 
     def unscale(x: np.ndarray) -&gt; np.ndarray:
-        y_ = x_min + (((x + 1.0) / 2.0) * (x_max - x_min))
-        y  = (y_ * gm) \
-           + np.log10(y_ * fm, where = (y_ * fm) &gt; 0.0) \
-           + (y_ * im * 1e-6)
+        y_ = np.clip( x_min + (((x + 1.0) / 2.0) * (x_max - x_min))
+                    , x_min, x_max )
+
+        y = (y_ * gm) + ((10.0 ** (y_ * fm)) * fm) + (y_ * 1.0e-6 * im)
+
         return y
 
     return unscale</code></pre>

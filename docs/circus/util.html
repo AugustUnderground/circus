@@ -36,7 +36,7 @@ from .trafo import *
 
 def add_noise(x: np.array, η: float = 0.01) -&gt; np.array:
     &#34;&#34;&#34;Add some gaussian noise
-    Arguments: 
+    Arguments:
         `x`: Input
         `η`: Standard Deviation
     Returns:
@@ -73,7 +73,7 @@ def goal_generator( kind: str, reference: np.ndarray, num_envs: int = 1
              if kind == &#39;fix&#39; else
              NotImplementedError(f&#39;Goal kind {kind} not implemented.&#39;) )
 
-def filter_results( filter_ids: [str], results: dict[int, dict[str, float]]
+def filter_results( filter_ids: list[str], results: dict[int, dict[str, float]]
                   ) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Filter a set of keys from nested dict. Intended to filter observations and
@@ -84,7 +84,7 @@ def filter_results( filter_ids: [str], results: dict[int, dict[str, float]]
                        for i in sorted(list(results.keys())) ])
 
 def geometric_unscaler(constraints: dict) -&gt; Callable:
-    &#34;&#34;&#34; 
+    &#34;&#34;&#34;
     Unscale action ∈ [-1.0;1.0] into real widths and lengths given
     constraints obtained from ACE.
     Returns a scaler function: `scaler :: np.ndarray -&gt; np.ndarray`
@@ -103,7 +103,7 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
     &#34;&#34;&#34;
     Scale/Unsclae performance obtained from ACE as specified in the
     corresponding `trafo` module, s.t. ∈ [-1.0;1.0].
-    Returns a scaler and unscaler funciton: 
+    Returns a scaler and unscaler funciton:
         `scaler   :: np.ndarray -&gt; np.ndarray`
         `unscaler :: np.ndarray -&gt; np.ndarray`
     **Note**: Since the scaling uses log10, it&#39;s a destructive operation,
@@ -133,21 +133,21 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
                                      if  pp in x_max_d.keys() ])
 
     def scaler(x: np.ndarray) -&gt; np.ndarray:
-        a            = np.abs(x * abs_msk) + (x * ~abs_msk)
-        l            = np.log10( a * log_msk
-                               , where = (a * log_msk) &gt; 0.0
-                               ) + (a * ~log_msk)
-        y_           = 2.0 * (l[:,scl_msk] - x_min) / (x_max - x_min) - 1.0
+        a            = (np.abs(x) * abs_msk) + (x * ~abs_msk)
+        l            = (np.log10(a, where = (a * log_msk) &gt; 0.0) * log_msk
+                       ) + (a * ~log_msk)
+        x_           = np.clip(l[:,scl_msk], x_min, x_max)
+        y_           = 2.0 * (x_ - x_min) / (x_max - x_min) - 1.0
         y            = x.copy()
         y[:,scl_msk] = y_
+
         return y
 
     def unscaler(y: np.ndarray) -&gt; np.ndarray:
         x_            = y.copy()
         x_[:,scl_msk] = ((y[:,scl_msk] + 1.0) / 2.0) * (x_max - x_min) + x_min
-        x             = np.power( 10.0, x_ * log_msk
-                                , where = (x_ * log_msk) &gt; 0.0
-                                ) + (x_ * ~log_msk)
+        x = (10 ** (x_ * log_msk)) * log_msk + (x_ * ~log_msk)
+
         return x
 
     return (scaler, unscaler)</code></pre>
@@ -164,9 +164,9 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
 <span>def <span class="ident">add_noise</span></span>(<span>x: <built-in function array>, η: float = 0.01) ‑> <built-in function array></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Add some gaussian noise
-Arguments:
-<code>x</code>: Input
+<div class="desc"><p>Add some gaussian noise</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>x</code>: Input
 <code>η</code>: Standard Deviation</p>
 <h2 id="returns">Returns</h2>
 <p><code>y</code>: <code>x</code> with noise <code>η</code></p></div>
@@ -176,7 +176,7 @@ Arguments:
 </summary>
 <pre><code class="python">def add_noise(x: np.array, η: float = 0.01) -&gt; np.array:
     &#34;&#34;&#34;Add some gaussian noise
-    Arguments: 
+    Arguments:
         `x`: Input
         `η`: Standard Deviation
     Returns:
@@ -190,7 +190,7 @@ Arguments:
 </details>
 </dd>
 <dt id="circus.util.filter_results"><code class="name flex">
-<span>def <span class="ident">filter_results</span></span>(<span>filter_ids: [<class 'str'>], results: dict) ‑> numpy.ndarray</span>
+<span>def <span class="ident">filter_results</span></span>(<span>filter_ids: list, results: dict) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Filter a set of keys from nested dict. Intended to filter observations and
@@ -200,7 +200,7 @@ the number of environments and the 1st dimension is <code>len(filter_ids)</code>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def filter_results( filter_ids: [str], results: dict[int, dict[str, float]]
+<pre><code class="python">def filter_results( filter_ids: list[str], results: dict[int, dict[str, float]]
                   ) -&gt; np.ndarray:
     &#34;&#34;&#34;
     Filter a set of keys from nested dict. Intended to filter observations and
@@ -223,7 +223,7 @@ Returns a scaler function: <code>scaler :: np.ndarray -&gt; np.ndarray</code></p
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def geometric_unscaler(constraints: dict) -&gt; Callable:
-    &#34;&#34;&#34; 
+    &#34;&#34;&#34;
     Unscale action ∈ [-1.0;1.0] into real widths and lengths given
     constraints obtained from ACE.
     Returns a scaler function: `scaler :: np.ndarray -&gt; np.ndarray`
@@ -303,7 +303,7 @@ unscaling won't work.</p></div>
     &#34;&#34;&#34;
     Scale/Unsclae performance obtained from ACE as specified in the
     corresponding `trafo` module, s.t. ∈ [-1.0;1.0].
-    Returns a scaler and unscaler funciton: 
+    Returns a scaler and unscaler funciton:
         `scaler   :: np.ndarray -&gt; np.ndarray`
         `unscaler :: np.ndarray -&gt; np.ndarray`
     **Note**: Since the scaling uses log10, it&#39;s a destructive operation,
@@ -333,21 +333,21 @@ unscaling won't work.</p></div>
                                      if  pp in x_max_d.keys() ])
 
     def scaler(x: np.ndarray) -&gt; np.ndarray:
-        a            = np.abs(x * abs_msk) + (x * ~abs_msk)
-        l            = np.log10( a * log_msk
-                               , where = (a * log_msk) &gt; 0.0
-                               ) + (a * ~log_msk)
-        y_           = 2.0 * (l[:,scl_msk] - x_min) / (x_max - x_min) - 1.0
+        a            = (np.abs(x) * abs_msk) + (x * ~abs_msk)
+        l            = (np.log10(a, where = (a * log_msk) &gt; 0.0) * log_msk
+                       ) + (a * ~log_msk)
+        x_           = np.clip(l[:,scl_msk], x_min, x_max)
+        y_           = 2.0 * (x_ - x_min) / (x_max - x_min) - 1.0
         y            = x.copy()
         y[:,scl_msk] = y_
+
         return y
 
     def unscaler(y: np.ndarray) -&gt; np.ndarray:
         x_            = y.copy()
         x_[:,scl_msk] = ((y[:,scl_msk] + 1.0) / 2.0) * (x_max - x_min) + x_min
-        x             = np.power( 10.0, x_ * log_msk
-                                , where = (x_ * log_msk) &gt; 0.0
-                                ) + (x_ * ~log_msk)
+        x = (10 ** (x_ * log_msk)) * log_msk + (x_ * ~log_msk)
+
         return x
 
     return (scaler, unscaler)</code></pre>

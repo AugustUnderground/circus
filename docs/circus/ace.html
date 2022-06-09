@@ -46,13 +46,13 @@ def backend_id(pdk: str) -&gt; str:
 def goal_predicate(ps: [str] = []) -&gt; [Callable]:
     &#34;&#34;&#34;
     List of default predicates for achived / desired goal comparison:
-        Takes the form: state operator goal
+        lambda achived desired: ...
     &#34;&#34;&#34;
     preds = { &#39;A&#39;:           operator.le # Area
             , &#39;a_0&#39;:         operator.ge # Gain
             , &#39;cmrr&#39;:        operator.ge # Common Mode Rejection Ration
             , &#39;cof&#39;:         operator.ge # Cross over Frequency
-            , &#39;gm&#39;:          operator.le # Gain Margin
+            , &#39;gm&#39;:          operator.ge # Gain Margin
             , &#39;i_out_max&#39;:   operator.ge # Maximum Output Current
             , &#39;i_out_min&#39;:   operator.ge # Minimum Output Current
             , &#39;idd&#39;:         operator.le # Current Consumption
@@ -63,7 +63,7 @@ def goal_predicate(ps: [str] = []) -&gt; [Callable]:
             , &#39;psrr_n&#39;:      operator.ge # Power Supply Rejection Ratio -
             , &#39;psrr_p&#39;:      operator.ge # Power Supply Rejection Ratio +
             , &#39;sr_f&#39;:        operator.le # Slew Rate Falling
-            , &#39;sr_r&#39;:        operator.ge # Slew Rate Rising
+            , &#39;sr_r&#39;:        operator.le # Slew Rate Rising
             , &#39;ugbw&#39;:        operator.ge # Unity Gain Bandwidth Product
             , &#39;v_ih&#39;:        operator.ge # Input Voltage High
             , &#39;v_il&#39;:        operator.ge # Input Voltage Low
@@ -75,7 +75,7 @@ def goal_predicate(ps: [str] = []) -&gt; [Callable]:
             , &#39;vn_10kHz&#39;:    operator.le # Output-referred noise density @ 10kHz
             , &#39;vn_1Hz&#39;:      operator.le # Output-referred noise density @ 1Hz
             , &#39;vn_1kHz&#39;:     operator.le # Output-referred noise density @ 1kHz
-            , &#39;voff_stat&#39;:   operator.ge # Statistical Offset
+            , &#39;voff_stat&#39;:   operator.le # Statistical Offset
             , &#39;voff_sys&#39;:    operator.le # Systematic Offset
             , }
 
@@ -116,7 +116,7 @@ def goal_predicate(ps: [str] = []) -&gt; [Callable]:
 </code></dt>
 <dd>
 <div class="desc"><p>List of default predicates for achived / desired goal comparison:
-Takes the form: state operator goal</p></div>
+lambda achived desired: &hellip;</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -124,13 +124,13 @@ Takes the form: state operator goal</p></div>
 <pre><code class="python">def goal_predicate(ps: [str] = []) -&gt; [Callable]:
     &#34;&#34;&#34;
     List of default predicates for achived / desired goal comparison:
-        Takes the form: state operator goal
+        lambda achived desired: ...
     &#34;&#34;&#34;
     preds = { &#39;A&#39;:           operator.le # Area
             , &#39;a_0&#39;:         operator.ge # Gain
             , &#39;cmrr&#39;:        operator.ge # Common Mode Rejection Ration
             , &#39;cof&#39;:         operator.ge # Cross over Frequency
-            , &#39;gm&#39;:          operator.le # Gain Margin
+            , &#39;gm&#39;:          operator.ge # Gain Margin
             , &#39;i_out_max&#39;:   operator.ge # Maximum Output Current
             , &#39;i_out_min&#39;:   operator.ge # Minimum Output Current
             , &#39;idd&#39;:         operator.le # Current Consumption
@@ -141,7 +141,7 @@ Takes the form: state operator goal</p></div>
             , &#39;psrr_n&#39;:      operator.ge # Power Supply Rejection Ratio -
             , &#39;psrr_p&#39;:      operator.ge # Power Supply Rejection Ratio +
             , &#39;sr_f&#39;:        operator.le # Slew Rate Falling
-            , &#39;sr_r&#39;:        operator.ge # Slew Rate Rising
+            , &#39;sr_r&#39;:        operator.le # Slew Rate Rising
             , &#39;ugbw&#39;:        operator.ge # Unity Gain Bandwidth Product
             , &#39;v_ih&#39;:        operator.ge # Input Voltage High
             , &#39;v_il&#39;:        operator.ge # Input Voltage Low
@@ -153,7 +153,7 @@ Takes the form: state operator goal</p></div>
             , &#39;vn_10kHz&#39;:    operator.le # Output-referred noise density @ 10kHz
             , &#39;vn_1Hz&#39;:      operator.le # Output-referred noise density @ 1Hz
             , &#39;vn_1kHz&#39;:     operator.le # Output-referred noise density @ 1kHz
-            , &#39;voff_stat&#39;:   operator.ge # Statistical Offset
+            , &#39;voff_stat&#39;:   operator.le # Statistical Offset
             , &#39;voff_sys&#39;:    operator.le # Systematic Offset
             , }
 
