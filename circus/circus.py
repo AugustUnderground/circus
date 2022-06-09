@@ -273,11 +273,12 @@ class CircusGeom(GoalEnv, VecEnv):
 
         done        = (reward == 0) | (self.steps >= self.num_steps)
 
-        info        = [{ 'outputs': self.obs_filter
-                       , 'goal':    self.goal_filter
-                       , 'inputs':  self.input_parameters
-                       , 'is_success': reward == 0
-                       , }] * self.num_envs
+        info_dict   = { 'outputs': self.obs_filter
+                      , 'goal':    self.goal_filter
+                      , 'inputs':  self.input_parameters
+                      , }
+
+        info        = [ info_dict | {'is_success': d} for d in done.tolist() ]
 
         return (observation, reward, done, info)
 
