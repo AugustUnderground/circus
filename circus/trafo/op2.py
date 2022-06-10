@@ -34,10 +34,10 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Mcm31   = constraints.get('Mcm31', {}).get('init', 2)
     Mcm32   = constraints.get('Mcm32', {}).get('init', 2)
 
-    cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.0),       0.0 ]])
-    cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.0),       0.0 ]])
-    cm3_in  = np.array([[gmid_cm3, fug_cm3,  (vdd / 4.0),       0.0 ]])
-    dp1_in  = np.array([[gmid_dp1, fug_dp1,  (vdd / 3.0), -(vdd/4.0)]])
+    cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.0),         0.0 ]])
+    cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.0),         0.0 ]])
+    cm3_in  = np.array([[gmid_cm3, fug_cm3,  (vdd / 4.0),         0.0 ]])
+    dp1_in  = np.array([[gmid_dp1, fug_dp1,  (vdd / 3.0), -(vdd / 4.0)]])
 
     cm1_out = nmos.predict(cm1_in)[0]
     cm2_out = pmos.predict(cm2_in)[0]
