@@ -1,5 +1,6 @@
 """ REST API """
 
+from typing import Any, List, Optional, Type, Union, Callable, Mapping
 from argparse import ArgumentParser
 from collections import namedtuple
 
@@ -27,29 +28,29 @@ parser.add_argument( '-c', '--scale', default = True, action = 'store_true'
                    , help = 'Circus Action Space, see Circus doc for what\'s available')
 parser.add_argument( '--pdk', type = str, default = 'xh035'
                    , help = 'ACE backend, see Circus doc for what\'s available')
+parser.add_argument( '-gn', '--goals', nargs = '+', default = []
+                   , help = 'List of goal parameters.')
+parser.add_argument( '-o', '--states', nargs = '+', default = []
+                   , help = 'List of observation / state parameters.')
 
 CircusEnv = namedtuple('Environment', 'env ace_id backend space variant num_envs')
 
 def make_env( ace_id: str, backend: str, space: str, variant: int
             , num_envs: int, num_steps: int = 50, scale: bool = True
+            , obs_filter: Union[str, list[str]] = 'perf'
+            , goal_filter: Union[str, list[str]] = 'perf'
             ) -> CircusEnv:
     """
     Construct a Circus Environment wrapper for HTTP Access.
     """
-    state_filter  = [ 'A', 'a_0', 'cmrr', 'cof', 'gm', 'i_out_max', 'i_out_min'
-                    , 'idd', 'iss', 'overshoot_f', 'overshoot_r', 'pm'
-                    , 'psrr_n', 'psrr_p', 'sr_f', 'sr_r', 'ugbw', 'v_ih'
-                    , 'v_il', 'v_oh', 'v_ol', 'voff_stat', 'voff_sys' ]
-
-    target_filter = ['a_0', 'ugbw', 'pm', 'voff_stat', 'cmrr', 'psrr_p', 'A']
 
     env_name      = f'circus:{ace_id}-{backend}-{space}-v{variant}'
 
     env           = circus.make( env_name
                                , n_envs            = num_envs
                                , num_steps         = num_steps
-                               , goal_filter       = target_filter
-                               , obs_filter        = state_filter
+                               , goal_filter       = goal_filter
+                               , obs_filter        = obs_filter
                                , scale_observation = scale
                                , )
 

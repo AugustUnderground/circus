@@ -26,17 +26,22 @@ def carnival():
     """
     Defines Flask Routes.
     """
-    args = rest.parser.parse_args()
-    env_id, pdk, space, var, num, steps, host, port, scale = \
+    args   = rest.parser.parse_args()
+
+    env_id, pdk, space, var, num, steps, host, port, scale, states, goals = \
             [ getattr(args, a) for a in
               [ 'env', 'pdk', 'space', 'var', 'num', 'step'
-              , 'host', 'port', 'scale'] ]
+              , 'host', 'port', 'scale', 'states', 'goals' ] ]
 
-    circ = rest.make_env(env_id, pdk, space, var, num, steps, scale)
+    goals  = goals  or None
+    states = states or 'perf'
 
-    route = f'{env_id}-{pdk}-{space}-v{var}'
+    circ   = rest.make_env( env_id, pdk, space, var, num
+                          , steps, scale, states, goals )
 
-    app = Flask('__main__')
+    route  = f'{env_id}-{pdk}-{space}-v{var}'
+
+    app    = Flask('__main__')
 
     @app.route(f'/{route}/num_envs', methods=['GET'])
     def num_envs():
