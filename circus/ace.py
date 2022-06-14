@@ -14,7 +14,7 @@ def backend_id(pdk: str) -> str:
             pdk + '-1V8' if pdk == 'sky130' else
             NotImplementedError(err_msg))
 
-def goal_predicate(ps: [str] = []) -> [Callable]:
+def goal_predicate(parameters: list[str]) -> list[Callable]:
     """
     List of default predicates for achived / desired goal comparison:
         lambda achived desired: ...
@@ -49,6 +49,4 @@ def goal_predicate(ps: [str] = []) -> [Callable]:
             , 'voff_stat':   operator.le # Statistical Offset
             , 'voff_sys':    operator.le # Systematic Offset
             , }
-
-    return ( [p for k,p in preds.items() if k in ps] if ps else
-             [p for _,p in sorted( preds.items() , key = lambda kv: kv[0])])
+    return [preds[p] for p in parameters]
