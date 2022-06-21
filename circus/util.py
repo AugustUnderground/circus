@@ -93,7 +93,7 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
                                 , 'sr_f', 'sr_r', 'ugbw', 'voff_stat'
                                 , 'voff_sys', 'vn_1Hz', 'vn_10Hz', 'vn_100Hz'
                                 , 'vn_1kHz', 'vn_10kHz', 'vn_100kHz'
-                                , 'idd', 'iss'])
+                                , 'idd', 'iss' ])
                           for pp in performance_ids ])
 
     scl_msk = np.array([pp in list(x_min_d.keys()) for pp in performance_ids])
