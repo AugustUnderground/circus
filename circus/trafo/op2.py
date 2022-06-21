@@ -6,9 +6,9 @@ import numpy as np
 
 from ..prim import PrimitiveDevice
 
-INPUTS: [str] = [ 'MNCM11:gmoverid', 'MPCM221:gmoverid', 'MNCM31:gmoverid', 'MND11:gmoverid'
-                , 'MNCM11:fug',      'MPCM221:fug',      'MNCM31:fug',      'MND11:fug'
-                , 'MNCM12:id',       'MNCM32:id' ]
+INPUTS: list[str] = [ 'MNCM11:gmoverid', 'MPCM221:gmoverid', 'MNCM31:gmoverid', 'MND11:gmoverid'
+                    , 'MNCM11:fug',      'MPCM221:fug',      'MNCM31:fug',      'MND11:fug'
+                    , 'MNCM12:id',       'MNCM32:id' ]
 
 def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
              , gmid_cm1: float, gmid_cm2: float, gmid_cm3: float, gmid_dp1: float
@@ -66,7 +66,7 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
                                        , np.ndarray, np.ndarray]:
     """ Unscale function for a given PDK """
     x_min = np.array([5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 1.0,  3.0])
-    x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 6.0, 15.0])
+    x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
     gm    = np.array([(i in range(0,4))  for i in range(10)])
     fm    = np.array([(i in range(4,8))  for i in range(10)])
     im    = np.array([(i in range(8,10)) for i in range(10)])
@@ -74,6 +74,7 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
 
 def output_scale( constraints: dict, ace_backend: str
                 ) -> tuple[dict[str, float], dict[str,float]]:
+    """ Extimated Min/Max values for scaling 'perf' """
     vdd   = constraints.get('vsup', {}).get('init', 3.3)
     x_min = { 'a_0'         : 25.0
             , 'ugbw'        : 5.0
