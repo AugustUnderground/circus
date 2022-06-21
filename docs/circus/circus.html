@@ -63,6 +63,7 @@ class CircusGeom(GoalEnv, VecEnv):
                 , goal_init: Union[str,np.ndarray] = &#39;noisy&#39;
                 , reward_fn: Callable              = None
                 , scale_observation: bool          = True
+                , auto_reset: bool                 = False
                 , ):
         &#34;&#34;&#34;
         Construct a Geometric Sizing Goal Environment
@@ -86,11 +87,14 @@ class CircusGeom(GoalEnv, VecEnv):
                                  (num_envs, len(goal_filter))
             `reward_fn`:         Optional reward function that takes an observation dict.
             `scale_observation`: Scale the observations and goals as specified in trafo
+            `auto_reset`:        Automatically reset environemt when done.
         &#34;&#34;&#34;
 
         self.ace_id: str       = ace_id
         self.ace_backend: str  = ace_backend
         self.num_envs: int     = num_envs
+
+        self.auto_reset: bool  = auto_reset
 
         self.num_steps: int    = num_steps
         self.steps: np.array   = np.zeros(num_envs)
@@ -302,10 +306,12 @@ class CircusGeom(GoalEnv, VecEnv):
 
         done        = (reward == 0) | (self.steps &gt;= self.num_steps)
 
-        info        = [{ &#39;outputs&#39;: self.obs_filter
-                       , &#39;goal&#39;:    self.goal_filter
-                       , &#39;inputs&#39;:  self.input_parameters
-                       , }] * self.num_envs
+        info_dict   = { &#39;outputs&#39;: self.obs_filter
+                      , &#39;goal&#39;:    self.goal_filter
+                      , &#39;inputs&#39;:  self.input_parameters
+                      , }
+
+        info        = [ info_dict | {&#39;is_success&#39;: s} for s in (reward == 0).tolist() ]
 
         return (observation, reward, done, info)
 
@@ -682,7 +688,7 @@ def make( env_id: str, n_envs: int = 1, **kwargs
 </dd>
 <dt id="circus.circus.CircusGeom"><code class="flex name class">
 <span>class <span class="ident">CircusGeom</span></span>
-<span>(</span><span>ace_id: str, ace_backend: str, num_envs: int = 1, num_steps: int = 50, seed: int = 666, obs_filter: Union[str, List[str]] = 'perf', goal_filter: list = None, goal_preds: list = None, goal_init: Union[str, numpy.ndarray] = 'noisy', reward_fn: Callable = None, scale_observation: bool = True)</span>
+<span>(</span><span>ace_id: str, ace_backend: str, num_envs: int = 1, num_steps: int = 50, seed: int = 666, obs_filter: Union[str, List[str]] = 'perf', goal_filter: list = None, goal_preds: list = None, goal_init: Union[str, numpy.ndarray] = 'noisy', reward_fn: Callable = None, scale_observation: bool = True, auto_reset: bool = False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Geometric Sizing Goal Environment </p>
@@ -716,7 +722,9 @@ np.ndarray: A specific goal of shape
 (num_envs, len(goal_filter))
 <code>reward_fn</code>:
 Optional reward function that takes an observation dict.
-<code>scale_observation</code>: Scale the observations and goals as specified in trafo</p></div>
+<code>scale_observation</code>: Scale the observations and goals as specified in trafo
+<code>auto_reset</code>:
+Automatically reset environemt when done.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -735,6 +743,7 @@ Optional reward function that takes an observation dict.
                 , goal_init: Union[str,np.ndarray] = &#39;noisy&#39;
                 , reward_fn: Callable              = None
                 , scale_observation: bool          = True
+                , auto_reset: bool                 = False
                 , ):
         &#34;&#34;&#34;
         Construct a Geometric Sizing Goal Environment
@@ -758,11 +767,14 @@ Optional reward function that takes an observation dict.
                                  (num_envs, len(goal_filter))
             `reward_fn`:         Optional reward function that takes an observation dict.
             `scale_observation`: Scale the observations and goals as specified in trafo
+            `auto_reset`:        Automatically reset environemt when done.
         &#34;&#34;&#34;
 
         self.ace_id: str       = ace_id
         self.ace_backend: str  = ace_backend
         self.num_envs: int     = num_envs
+
+        self.auto_reset: bool  = auto_reset
 
         self.num_steps: int    = num_steps
         self.steps: np.array   = np.zeros(num_envs)
@@ -974,10 +986,12 @@ Optional reward function that takes an observation dict.
 
         done        = (reward == 0) | (self.steps &gt;= self.num_steps)
 
-        info        = [{ &#39;outputs&#39;: self.obs_filter
-                       , &#39;goal&#39;:    self.goal_filter
-                       , &#39;inputs&#39;:  self.input_parameters
-                       , }] * self.num_envs
+        info_dict   = { &#39;outputs&#39;: self.obs_filter
+                      , &#39;goal&#39;:    self.goal_filter
+                      , &#39;inputs&#39;:  self.input_parameters
+                      , }
+
+        info        = [ info_dict | {&#39;is_success&#39;: s} for s in (reward == 0).tolist() ]
 
         return (observation, reward, done, info)
 
@@ -1395,10 +1409,12 @@ under the hood.</p>
 
     done        = (reward == 0) | (self.steps &gt;= self.num_steps)
 
-    info        = [{ &#39;outputs&#39;: self.obs_filter
-                   , &#39;goal&#39;:    self.goal_filter
-                   , &#39;inputs&#39;:  self.input_parameters
-                   , }] * self.num_envs
+    info_dict   = { &#39;outputs&#39;: self.obs_filter
+                  , &#39;goal&#39;:    self.goal_filter
+                  , &#39;inputs&#39;:  self.input_parameters
+                  , }
+
+    info        = [ info_dict | {&#39;is_success&#39;: s} for s in (reward == 0).tolist() ]
 
     return (observation, reward, done, info)</code></pre>
 </details>

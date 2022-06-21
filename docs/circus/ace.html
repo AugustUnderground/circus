@@ -43,7 +43,7 @@ def backend_id(pdk: str) -&gt; str:
             pdk + &#39;-1V8&#39; if pdk == &#39;sky130&#39; else
             NotImplementedError(err_msg))
 
-def goal_predicate(ps: [str] = []) -&gt; [Callable]:
+def goal_predicate(parameters: list[str]) -&gt; list[Callable]:
     &#34;&#34;&#34;
     List of default predicates for achived / desired goal comparison:
         lambda achived desired: ...
@@ -78,9 +78,7 @@ def goal_predicate(ps: [str] = []) -&gt; [Callable]:
             , &#39;voff_stat&#39;:   operator.le # Statistical Offset
             , &#39;voff_sys&#39;:    operator.le # Systematic Offset
             , }
-
-    return ( [p for k,p in preds.items() if k in ps] if ps else
-             [p for _,p in sorted( preds.items() , key = lambda kv: kv[0])])</code></pre>
+    return [preds[p] for p in parameters]</code></pre>
 </details>
 </section>
 <section>
@@ -112,7 +110,7 @@ def goal_predicate(ps: [str] = []) -&gt; [Callable]:
 </details>
 </dd>
 <dt id="circus.ace.goal_predicate"><code class="name flex">
-<span>def <span class="ident">goal_predicate</span></span>(<span>ps: [<class 'str'>] = []) ‑> [typing.Callable]</span>
+<span>def <span class="ident">goal_predicate</span></span>(<span>parameters: list) ‑> list</span>
 </code></dt>
 <dd>
 <div class="desc"><p>List of default predicates for achived / desired goal comparison:
@@ -121,7 +119,7 @@ lambda achived desired: &hellip;</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def goal_predicate(ps: [str] = []) -&gt; [Callable]:
+<pre><code class="python">def goal_predicate(parameters: list[str]) -&gt; list[Callable]:
     &#34;&#34;&#34;
     List of default predicates for achived / desired goal comparison:
         lambda achived desired: ...
@@ -156,9 +154,7 @@ lambda achived desired: &hellip;</p></div>
             , &#39;voff_stat&#39;:   operator.le # Statistical Offset
             , &#39;voff_sys&#39;:    operator.le # Systematic Offset
             , }
-
-    return ( [p for k,p in preds.items() if k in ps] if ps else
-             [p for _,p in sorted( preds.items() , key = lambda kv: kv[0])])</code></pre>
+    return [preds[p] for p in parameters]</code></pre>
 </details>
 </dd>
 </dl>

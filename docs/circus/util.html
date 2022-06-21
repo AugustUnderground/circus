@@ -122,7 +122,7 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
                                 , &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39;, &#39;voff_stat&#39;
                                 , &#39;voff_sys&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39;, &#39;vn_100Hz&#39;
                                 , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;
-                                , &#39;idd&#39;, &#39;iss&#39;])
+                                , &#39;idd&#39;, &#39;iss&#39; ])
                           for pp in performance_ids ])
 
     scl_msk = np.array([pp in list(x_min_d.keys()) for pp in performance_ids])
@@ -322,7 +322,7 @@ unscaling won't work.</p></div>
                                 , &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39;, &#39;voff_stat&#39;
                                 , &#39;voff_sys&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39;, &#39;vn_100Hz&#39;
                                 , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;
-                                , &#39;idd&#39;, &#39;iss&#39;])
+                                , &#39;idd&#39;, &#39;iss&#39; ])
                           for pp in performance_ids ])
 
     scl_msk = np.array([pp in list(x_min_d.keys()) for pp in performance_ids])

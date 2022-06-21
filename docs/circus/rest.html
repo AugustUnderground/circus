@@ -29,6 +29,7 @@
 </summary>
 <pre><code class="python">&#34;&#34;&#34; REST API &#34;&#34;&#34;
 
+from typing import Any, List, Optional, Type, Union, Callable, Mapping
 from argparse import ArgumentParser
 from collections import namedtuple
 
@@ -56,29 +57,29 @@ parser.add_argument( &#39;-c&#39;, &#39;--scale&#39;, default = True, action = &
                    , help = &#39;Circus Action Space, see Circus doc for what\&#39;s available&#39;)
 parser.add_argument( &#39;--pdk&#39;, type = str, default = &#39;xh035&#39;
                    , help = &#39;ACE backend, see Circus doc for what\&#39;s available&#39;)
+parser.add_argument( &#39;-gn&#39;, &#39;--goals&#39;, nargs = &#39;+&#39;, default = []
+                   , help = &#39;List of goal parameters.&#39;)
+parser.add_argument( &#39;-o&#39;, &#39;--states&#39;, nargs = &#39;+&#39;, default = []
+                   , help = &#39;List of observation / state parameters.&#39;)
 
 CircusEnv = namedtuple(&#39;Environment&#39;, &#39;env ace_id backend space variant num_envs&#39;)
 
 def make_env( ace_id: str, backend: str, space: str, variant: int
             , num_envs: int, num_steps: int = 50, scale: bool = True
+            , obs_filter: Union[str, list[str]] = &#39;perf&#39;
+            , goal_filter: Union[str, list[str]] = &#39;perf&#39;
             ) -&gt; CircusEnv:
     &#34;&#34;&#34;
     Construct a Circus Environment wrapper for HTTP Access.
     &#34;&#34;&#34;
-    state_filter  = [ &#39;A&#39;, &#39;a_0&#39;, &#39;cmrr&#39;, &#39;cof&#39;, &#39;gm&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
-                    , &#39;idd&#39;, &#39;iss&#39;, &#39;overshoot_f&#39;, &#39;overshoot_r&#39;, &#39;pm&#39;
-                    , &#39;psrr_n&#39;, &#39;psrr_p&#39;, &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39;, &#39;v_ih&#39;
-                    , &#39;v_il&#39;, &#39;v_oh&#39;, &#39;v_ol&#39;, &#39;voff_stat&#39;, &#39;voff_sys&#39; ]
-
-    target_filter = [&#39;a_0&#39;, &#39;ugbw&#39;, &#39;pm&#39;, &#39;voff_stat&#39;, &#39;cmrr&#39;, &#39;psrr_p&#39;, &#39;A&#39;]
 
     env_name      = f&#39;circus:{ace_id}-{backend}-{space}-v{variant}&#39;
 
     env           = circus.make( env_name
                                , n_envs            = num_envs
                                , num_steps         = num_steps
-                               , goal_filter       = target_filter
-                               , obs_filter        = state_filter
+                               , goal_filter       = goal_filter
+                               , obs_filter        = obs_filter
                                , scale_observation = scale
                                , )
 
@@ -340,7 +341,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.make_env"><code class="name flex">
-<span>def <span class="ident">make_env</span></span>(<span>ace_id: str, backend: str, space: str, variant: int, num_envs: int, num_steps: int = 50, scale: bool = True) ‑> <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a></span>
+<span>def <span class="ident">make_env</span></span>(<span>ace_id: str, backend: str, space: str, variant: int, num_envs: int, num_steps: int = 50, scale: bool = True, obs_filter: Union[str, list[str]] = 'perf', goal_filter: Union[str, list[str]] = 'perf') ‑> <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Construct a Circus Environment wrapper for HTTP Access.</p></div>
@@ -350,24 +351,20 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </summary>
 <pre><code class="python">def make_env( ace_id: str, backend: str, space: str, variant: int
             , num_envs: int, num_steps: int = 50, scale: bool = True
+            , obs_filter: Union[str, list[str]] = &#39;perf&#39;
+            , goal_filter: Union[str, list[str]] = &#39;perf&#39;
             ) -&gt; CircusEnv:
     &#34;&#34;&#34;
     Construct a Circus Environment wrapper for HTTP Access.
     &#34;&#34;&#34;
-    state_filter  = [ &#39;A&#39;, &#39;a_0&#39;, &#39;cmrr&#39;, &#39;cof&#39;, &#39;gm&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
-                    , &#39;idd&#39;, &#39;iss&#39;, &#39;overshoot_f&#39;, &#39;overshoot_r&#39;, &#39;pm&#39;
-                    , &#39;psrr_n&#39;, &#39;psrr_p&#39;, &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39;, &#39;v_ih&#39;
-                    , &#39;v_il&#39;, &#39;v_oh&#39;, &#39;v_ol&#39;, &#39;voff_stat&#39;, &#39;voff_sys&#39; ]
-
-    target_filter = [&#39;a_0&#39;, &#39;ugbw&#39;, &#39;pm&#39;, &#39;voff_stat&#39;, &#39;cmrr&#39;, &#39;psrr_p&#39;, &#39;A&#39;]
 
     env_name      = f&#39;circus:{ace_id}-{backend}-{space}-v{variant}&#39;
 
     env           = circus.make( env_name
                                , n_envs            = num_envs
                                , num_steps         = num_steps
-                               , goal_filter       = target_filter
-                               , obs_filter        = state_filter
+                               , goal_filter       = goal_filter
+                               , obs_filter        = obs_filter
                                , scale_observation = scale
                                , )
 
