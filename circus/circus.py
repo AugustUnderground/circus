@@ -34,6 +34,7 @@ class CircusGeom(GoalEnv, VecEnv):
                 , goal_init: Union[str,np.ndarray] = 'noisy'
                 , reward_fn: Callable              = None
                 , scale_observation: bool          = True
+                , auto_reset: bool                 = False
                 , ):
         """
         Construct a Geometric Sizing Goal Environment
@@ -57,11 +58,14 @@ class CircusGeom(GoalEnv, VecEnv):
                                  (num_envs, len(goal_filter))
             `reward_fn`:         Optional reward function that takes an observation dict.
             `scale_observation`: Scale the observations and goals as specified in trafo
+            `auto_reset`:        Automatically reset environemt when done.
         """
 
         self.ace_id: str       = ace_id
         self.ace_backend: str  = ace_backend
         self.num_envs: int     = num_envs
+
+        self.auto_reset: bool  = auto_reset
 
         self.num_steps: int    = num_steps
         self.steps: np.array   = np.zeros(num_envs)
