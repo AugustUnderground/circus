@@ -35,6 +35,7 @@ env = circus.make( 'circus:op2-xh035-elec-v0'
                  , goal_preds: [Callable]           = None    # Goal predicates
                  , reward_fn: Callable              = binary_reward | dummy_reward # A custom reward function
                  , scale_observation: bool          = True    # Scale observations ∈ [-1.0; 1.0]
+                 , auto_reset: bool                 = False   # Automatically Reset when done
                  , )
 ```
 
