@@ -1,5 +1,6 @@
 A collection of [gym](https://gym.openai.com/) environments for analog 
-integrated circuit design, based on [AC²E](https://github.com/matthschw/ace) /
+integrated circuit design, based on
+[AC²E](https://github.com/electronics-and-drives/ace) /
 [HAC²E](https://github.com/AugustUnderground/hace).
 
 ## Availability Matrix
