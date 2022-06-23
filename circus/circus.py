@@ -293,6 +293,12 @@ class CircusGeom(GoalEnv, VecEnv):
 
         info        = [ info_dict | {'is_success': s} for s in (reward == 0).tolist() ]
 
+        if self.auto_reset and done.any():
+            for i in range(len(info)):
+                info[i]["terminal_obs"] = observation["observation"][i]
+                info[i]["target"] = observation["desired_goal"][i]
+            observation = self.reset(done)
+
         return (observation, reward, done, info)
 
     def compute_reward( self, achieved_goal: object, desired_goal: object
