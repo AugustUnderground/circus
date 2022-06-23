@@ -76,6 +76,15 @@ class CircusGeom(GoalEnv, VecEnv):
 
         self.constraints       = ac.parameter_dict(self.ace_envs[0])
 
+        const_params           = { k: v['init']
+                                   for k,v in self.constraints.items()
+                                   if not v['sizing'] }
+
+        ac.set_parameters_pool( self.ace_envs
+                              , { i: const_params
+                                  for i in range(self.num_envs) }
+                              , )
+
         perf_ids               = sorted(ac.performance_identifiers(self.ace_envs[0]))
         self.obs_filter        = ( perf_ids if obs_filter == 'all' else
                                    [p for p in perf_ids
