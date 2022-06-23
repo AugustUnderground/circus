@@ -65,8 +65,13 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
 def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
                                        , np.ndarray, np.ndarray]:
     """ Unscale function for a given PDK """
-    x_min = np.array([5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 1.0,  3.0])
-    x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
+    err   = f'No Input Scale for {ace_backend} available'
+    x_min = { 'xh035-3V3': np.array([5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 1.0,  3.0])
+            , 'xh018-1V8': np.array([5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 1.0,  3.0])
+            , }.get(ace_backend, NotImplementedError(err))
+    x_max = { 'xh035-3V3': np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
+            , 'xh018-1V8': np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
+            , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,4))  for i in range(10)])
     fm    = np.array([(i in range(4,8))  for i in range(10)])
     im    = np.array([(i in range(8,10)) for i in range(10)])
@@ -75,65 +80,128 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
 def output_scale( constraints: dict, ace_backend: str
                 ) -> tuple[dict[str, float], dict[str,float]]:
     """ Extimated Min/Max values for scaling 'perf' """
+    err   = f'No Performance Scale for {ace_backend} available'
     vdd   = constraints.get('vsup', {}).get('init', 3.3)
-    x_min = { 'a_0'         : 25.0
-            , 'ugbw'        : 5.0
-            , 'pm'          : 0.0
-            , 'gm'          : 0.0
-            , 'sr_r'        : 4.0
-            , 'sr_f'        : 4.0
-            , 'vn_1Hz'      : -10.0
-            , 'vn_10Hz'     : -10.0
-            , 'vn_100Hz'    : -10.0
-            , 'vn_1kHz'     : -10.0
-            , 'vn_10kHz'    : -10.0
-            , 'vn_100kHz'   : -10.0
-            , 'cmrr'        : 70
-            , 'psrr_n'      : 30.0
-            , 'psrr_p'      : 40.0
-            , 'v_il'        : 0.0
-            , 'v_ih'        : 0.0
-            , 'v_ol'        : 0.0
-            , 'v_oh'        : 0.0
-            , 'i_out_min'   : -6.0
-            , 'i_out_max'   : -6.0
-            , 'idd'         : -6.0
-            , 'iss'         : -6.0
-            , 'overshoot_r' : 0.0
-            , 'overshoot_f' : 0.0
-            , 'cof'         : 5.0
-            , 'voff_stat'   : -5.0
-            , 'voff_sys'    : -5.0
-            , 'A'           : -15.0
-            , }
-    x_max = { 'a_0'         : 70.0
-            , 'ugbw'        : 10.0
-            , 'pm'          : 120.0
-            , 'gm'          : 80.0
-            , 'sr_r'        : 8.0
-            , 'sr_f'        : 8.0
-            , 'vn_1Hz'      : -4.0
-            , 'vn_10Hz'     : -4.0
-            , 'vn_100Hz'    : -4.0
-            , 'vn_1kHz'     : -4.0
-            , 'vn_10kHz'    : -4.0
-            , 'vn_100kHz'   : -4.0
-            , 'cmrr'        : 150.0
-            , 'psrr_n'      : 70.0
-            , 'psrr_p'      : 140.0
-            , 'v_il'        : (2.0 * vdd)
-            , 'v_ih'        : (2.0 * vdd)
-            , 'v_ol'        : (2.0 * vdd)
-            , 'v_oh'        : (2.0 * vdd)
-            , 'i_out_min'   : -3.0
-            , 'i_out_max'   : -3.0
-            , 'idd'         : -3.0
-            , 'iss'         : -3.0
-            , 'overshoot_r' : 130.0
-            , 'overshoot_f' : 130.0
-            , 'cof'         : 9.0
-            , 'voff_stat'   : 0.0
-            , 'voff_sys'    : 0.0
-            , 'A'           : -5.0
-            , }
+    x_min = { 'xh035-3V3': { 'a_0'         : 25.0
+                           , 'ugbw'        : 5.0
+                           , 'pm'          : 0.0
+                           , 'gm'          : 0.0
+                           , 'sr_r'        : 4.0
+                           , 'sr_f'        : 4.0
+                           , 'vn_1Hz'      : -10.0
+                           , 'vn_10Hz'     : -10.0
+                           , 'vn_100Hz'    : -10.0
+                           , 'vn_1kHz'     : -10.0
+                           , 'vn_10kHz'    : -10.0
+                           , 'vn_100kHz'   : -10.0
+                           , 'cmrr'        : 70
+                           , 'psrr_n'      : 30.0
+                           , 'psrr_p'      : 40.0
+                           , 'v_il'        : 0.0
+                           , 'v_ih'        : 0.0
+                           , 'v_ol'        : 0.0
+                           , 'v_oh'        : 0.0
+                           , 'i_out_min'   : -6.0
+                           , 'i_out_max'   : -6.0
+                           , 'idd'         : -6.0
+                           , 'iss'         : -6.0
+                           , 'overshoot_r' : 0.0
+                           , 'overshoot_f' : 0.0
+                           , 'cof'         : 5.0
+                           , 'voff_stat'   : -5.0
+                           , 'voff_sys'    : -5.0
+                           , 'A'           : -15.0
+                           , }
+            , 'xh018-1V8': { 'a_0'         : 25.0
+                           , 'ugbw'        : 5.0
+                           , 'pm'          : 0.0
+                           , 'gm'          : 0.0
+                           , 'sr_r'        : 4.0
+                           , 'sr_f'        : 4.0
+                           , 'vn_1Hz'      : -10.0
+                           , 'vn_10Hz'     : -10.0
+                           , 'vn_100Hz'    : -10.0
+                           , 'vn_1kHz'     : -10.0
+                           , 'vn_10kHz'    : -10.0
+                           , 'vn_100kHz'   : -10.0
+                           , 'cmrr'        : 70
+                           , 'psrr_n'      : 30.0
+                           , 'psrr_p'      : 40.0
+                           , 'v_il'        : 0.0
+                           , 'v_ih'        : 0.0
+                           , 'v_ol'        : 0.0
+                           , 'v_oh'        : 0.0
+                           , 'i_out_min'   : -6.0
+                           , 'i_out_max'   : -6.0
+                           , 'idd'         : -6.0
+                           , 'iss'         : -6.0
+                           , 'overshoot_r' : 0.0
+                           , 'overshoot_f' : 0.0
+                           , 'cof'         : 5.0
+                           , 'voff_stat'   : -5.0
+                           , 'voff_sys'    : -5.0
+                           , 'A'           : -15.0
+                           , }
+            , }.get(ace_backend, NotImplementedError(err))
+    x_max = { 'xh035-3V3': { 'a_0'         : 70.0
+                           , 'ugbw'        : 10.0
+                           , 'pm'          : 120.0
+                           , 'gm'          : 80.0
+                           , 'sr_r'        : 8.0
+                           , 'sr_f'        : 8.0
+                           , 'vn_1Hz'      : -4.0
+                           , 'vn_10Hz'     : -4.0
+                           , 'vn_100Hz'    : -4.0
+                           , 'vn_1kHz'     : -4.0
+                           , 'vn_10kHz'    : -4.0
+                           , 'vn_100kHz'   : -4.0
+                           , 'cmrr'        : 150.0
+                           , 'psrr_n'      : 70.0
+                           , 'psrr_p'      : 140.0
+                           , 'v_il'        : (2.0 * vdd)
+                           , 'v_ih'        : (2.0 * vdd)
+                           , 'v_ol'        : (2.0 * vdd)
+                           , 'v_oh'        : (2.0 * vdd)
+                           , 'i_out_min'   : -3.0
+                           , 'i_out_max'   : -3.0
+                           , 'idd'         : -3.0
+                           , 'iss'         : -3.0
+                           , 'overshoot_r' : 130.0
+                           , 'overshoot_f' : 130.0
+                           , 'cof'         : 9.0
+                           , 'voff_stat'   : 0.0
+                           , 'voff_sys'    : 0.0
+                           , 'A'           : -5.0
+                           , }
+            , 'xh018-1V8': { 'a_0'         : 70.0
+                           , 'ugbw'        : 10.0
+                           , 'pm'          : 120.0
+                           , 'gm'          : 80.0
+                           , 'sr_r'        : 8.0
+                           , 'sr_f'        : 8.0
+                           , 'vn_1Hz'      : -4.0
+                           , 'vn_10Hz'     : -4.0
+                           , 'vn_100Hz'    : -4.0
+                           , 'vn_1kHz'     : -4.0
+                           , 'vn_10kHz'    : -4.0
+                           , 'vn_100kHz'   : -4.0
+                           , 'cmrr'        : 150.0
+                           , 'psrr_n'      : 70.0
+                           , 'psrr_p'      : 140.0
+                           , 'v_il'        : (2.0 * vdd)
+                           , 'v_ih'        : (2.0 * vdd)
+                           , 'v_ol'        : (2.0 * vdd)
+                           , 'v_oh'        : (2.0 * vdd)
+                           , 'i_out_min'   : -3.0
+                           , 'i_out_max'   : -3.0
+                           , 'idd'         : -3.0
+                           , 'iss'         : -3.0
+                           , 'overshoot_r' : 130.0
+                           , 'overshoot_f' : 130.0
+                           , 'cof'         : 9.0
+                           , 'voff_stat'   : 0.0
+                           , 'voff_sys'    : 0.0
+                           , 'A'           : -5.0
+                           , }
+            , }.get(ace_backend, NotImplementedError(err))
     return (x_min, x_max)
