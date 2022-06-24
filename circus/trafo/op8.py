@@ -93,10 +93,10 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
     """ Unscale function for a given PDK """
     err   = f'No Input Scale for {ace_backend} available'
     x_min = { 'xh035-3V3': np.array([ 5.0, 5.0, 5.0, 5.0, 5.0, 5.0
-                                    , 6.0, 6.0, 6.0, 6.0, 6.0, 6.0
+                                    , 7.0, 7.0, 7.0, 7.0, 7.0, 7.0
                                     , 1.0, 4.0 ])
             , 'xh018-1V8': np.array([ 5.0, 5.0, 5.0, 5.0, 5.0, 5.0
-                                    , 6.0, 6.0, 6.0, 6.0, 6.0, 6.0
+                                    , 7.0, 7.0, 7.0, 7.0, 7.0, 7.0
                                     , 1.0, 4.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     x_max = { 'xh035-3V3': np.array([ 15.0, 15.0, 15.0, 15.0, 15.0, 15.0
