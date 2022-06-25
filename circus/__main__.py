@@ -26,6 +26,7 @@ def carnival():
     """
     Defines Flask Routes.
     """
+
     args   = rest.parser.parse_args()
 
     env_id, pdk, space, var, num, steps, host, port, scale, states, goals = \
