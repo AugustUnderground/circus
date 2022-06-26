@@ -114,17 +114,17 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
     err   = f'No Input Scale for {ace_backend} available'
     x_min = { 'xh035-3V3': np.array([ 5.0, 5.0, 5.0, 5.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 10.0, 40.0 ])
+                                    , 1.0, 40.0 ])
             , 'xh018-1V8': np.array([ 5.0, 5.0, 5.0, 5.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 10.0, 40.0 ])
+                                    , 1.0, 40.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     x_max = { 'xh035-3V3': np.array([ 15.0, 15.0, 15.0, 15.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 30.0, 80.0 ])
+                                    , 6.0, 80.0 ])
             , 'xh018-1V8': np.array([ 15.0, 15.0, 15.0, 15.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 30.0, 80.0 ])
+                                    , 6.0, 80.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,4))  for i in range(10)])
     fm    = np.array([(i in range(4,8))  for i in range(10)])
