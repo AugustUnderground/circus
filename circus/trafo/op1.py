@@ -3,7 +3,7 @@ Agnostic Design Space Transforation for OP1: Miller Operational Amplifier
 
 `INPUTS`
 -------
-Input parameters are 
+Input parameters are
 [ 'MNCM1R:gmoverid', 'MPCM2R:gmoverid', 'MPCS1:gmoverid', 'MND1A:gmoverid'
 , 'MNCM1R:fug',      'MPCM2R:fug',      'MPCS1:fug',      'MND1A:fug'
 , 'MNCM1A:id', 'MNCM1B:id' ]
@@ -71,11 +71,12 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Mcm11   = max(M1.numerator, 1)
     Mcm12   = max(M1.denominator, 1)
     Mcm13   = max((M1.numerator * M3.denominator) // max(M3.numerator, 1), 1)
+    Mcs1    = Mcm13
 
-    cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.0),         0.0 ]])
-    cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.0),         0.0 ]])
-    cs1_in  = np.array([[gmid_cs1, fug_cs1, -(vdd / 2.0),         0.0 ]])
-    dp1_in  = np.array([[gmid_dp1, fug_dp1,  (vdd / 3.0), -(vdd / 4.0)]])
+    cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.20),         0.00 ]])
+    cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.55),         0.00 ]])
+    cs1_in  = np.array([[gmid_cs1, fug_cs1, -(vdd / 2.00),         0.00 ]])
+    dp1_in  = np.array([[gmid_dp1, fug_dp1,  (vdd / 2.24), -(vdd / 4.25)]])
 
     cm1_out = nmos.predict(cm1_in)[0]
     cm2_out = pmos.predict(cm2_in)[0]
@@ -91,8 +92,8 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Wcm2    = i1 / 2.0 / cm2_out[0] / Mcm21
     Wdp1    = i1 / 2.0 / dp1_out[0] / Mdp1
 
-    Wcs     = i2       / cs1_out[0]
-    Mcs1    = np.ceil(Wcs / Wc_lim).item()
+    Wcs     = i2 / cs1_out[0]
+    #Mcs1    = np.ceil(Wcs / Wc_lim).item()
     Wcs1    = Wcs / Mcs1
 
     sizing  = { 'Ld': Ldp1, 'Lcm1':  Lcm1,  'Lcm2':  Lcm2,  'Lcs': Lcs1, 'Lres': Lres
@@ -112,17 +113,17 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
         `ace_backend`: PDK
     """
     err   = f'No Input Scale for {ace_backend} available'
-    x_min = { 'xh035-3V3': np.array([ 5.0, 5.0, 5.0, 5.0
+    x_min = { 'xh035-3V3': np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
                                     , 1.0, 40.0 ])
-            , 'xh018-1V8': np.array([ 5.0, 5.0, 5.0, 5.0
+            , 'xh018-1V8': np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
                                     , 1.0, 40.0 ])
             , }.get(ace_backend, NotImplementedError(err))
-    x_max = { 'xh035-3V3': np.array([ 15.0, 15.0, 15.0, 15.0
+    x_max = { 'xh035-3V3': np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
                                     , 6.0, 80.0 ])
-            , 'xh018-1V8': np.array([ 15.0, 15.0, 15.0, 15.0
+            , 'xh018-1V8': np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
                                     , 6.0, 80.0 ])
             , }.get(ace_backend, NotImplementedError(err))
