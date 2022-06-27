@@ -192,4 +192,4 @@ def num_steps(circ: CircusEnv) -> dict[int, float]:
     """
     Number of steps per environment.
     """
-    return dict(enumerate(circ.env.steps.tolist())
+    return dict(enumerate(circ.env.steps.tolist()))
