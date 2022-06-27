@@ -152,7 +152,7 @@ def current_sizing(circ: CircusEnv) -> dict[int, dict[str, float]]:
 
 def last_action(circ: CircusEnv) -> dict[int, dict[str, float]]:
     """
-    Get the last action that was taken. Will be same as sizing if 
+    Get the last action that was taken. Will be same as sizing if
     `space == 'geom'` otherwise it will be INPUTS.
     """
     return { i: { k: v for k,v in p.items() if k in circ.env.input_parameters }
