@@ -133,7 +133,9 @@ def current_performance(circ: CircusEnv) -> dict[int, dict[str, float]]:
     Get current performane from ACE.
     """
     perf = ac.current_performance_pool(circ.env.ace_envs)
-    return {i: {o: p[o] for o in circ.env.obs_filter} for i,p in perf.items()}
+    return { i: { o: np.nan_to_num(p[o], nan=0.0, posinf=0.0,neginf=0.0).item()
+                  for o in circ.env.obs_filter }
+             for i,p in perf.items() }
 
 def current_goal(circ: CircusEnv) -> dict[int, dict[str, float]]:
     """

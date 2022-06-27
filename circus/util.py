@@ -51,8 +51,11 @@ def filter_results( filter_ids: list[str], results: dict[int, dict[str, float]]
     goal states obtained from ACE. Returns a numpy array where 0th dimension is
     the number of environments and the 1st dimension is `len(filter_ids)`.
     """
-    return np.vstack([ np.array([ results[i][k] for k in filter_ids ])
-                       for i in sorted(list(results.keys())) ])
+    return np.nan_to_num( np.vstack([ np.array([ results[i][k]
+                                                 for k in filter_ids ])
+                                      for i in sorted(list(results.keys())) ])
+                        , nan = 0.0, posinf = 0.0, neginf = 0.0
+                        , )
 
 def geometric_unscaler(constraints: dict) -> Callable:
     """
