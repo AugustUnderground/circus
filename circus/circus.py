@@ -139,14 +139,14 @@ class CircusGeom(GoalEnv, VecEnv):
 
         self.rng_seed          = seed
 
-        if goal_init == 'noisy':
+        if isinstance(goal_init, str) and goal_init == 'noisy':
             self.goal_init     = goal_init
             pool               = { i: self.ace_envs[i]
                                    for i in range(self.num_envs) }
             initial_sizing     = ac.initial_sizing_pool(pool)
             results            = ac.evaluate_circuit_pool(pool, pool_params = initial_sizing)
             reference_goal     = filter_results(self.goal_filter, results)
-        elif goal_init == 'random':
+        elif isinstance(goal_init, str) and goal_init == 'random':
             self.goal_init     = goal_init
             x_min_d, x_max_d   = performance_scale( self.ace_id
                                                   , self.ace_backend
@@ -157,14 +157,17 @@ class CircusGeom(GoalEnv, VecEnv):
                                           ])
         elif isinstance(goal_init, np.ndarray):
             self.goal_init     = 'fix'
-            goal_shape         = (num_envs, len(goal_filter))
+            goal_shape         = (num_envs, len(self.goal_filter))
             reference_goal     = ( goal_init
                                    if goal_init.shape == goal_shape else
                                    np.repeat(goal_init[None], num_envs, axis = 0) )
         else:
             NotImplementedError(f'Goal initializer {goal_init} not available.')
 
-        self.new_goal          = goal_generator(goal_init, reference_goal, self.num_envs)
+        self.new_goal          = goal_generator( self.goal_init
+                                               , reference_goal
+                                               , self.num_envs
+                                               , )
         self.goal              = self.new_goal()
 
         self.act_unscaler      = geometric_unscaler(self.constraints)
