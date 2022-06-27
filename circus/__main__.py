@@ -135,6 +135,11 @@ def carnival():
         res = rest.goal_keys(circ)
         return handle_response(res)
 
+    @app.route(f'/{route}/num_steps', methods=['GET'])
+    def goal_keys():
+        res = rest.num_steps(circ)
+        return handle_response(res)
+
     print('Launching Circus Server.')
     print(f'\tURL: http://{host}:{port}/{route}/')
     return app.run(host = host, port = port)

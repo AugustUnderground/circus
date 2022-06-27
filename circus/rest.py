@@ -187,3 +187,9 @@ def goal_keys(circ: CircusEnv) -> dict[int, [str]]:
     Keys in goal vector.
     """
     return { 'goal': circ.env.goal_filter }
+
+def num_steps(circ: CircusEnv) -> dict[int, float]:
+    """
+    Number of steps per environment.
+    """
+    return dict(enumerate(circ.env.steps.tolist())
