@@ -136,7 +136,7 @@ def carnival():
         return handle_response(res)
 
     @app.route(f'/{route}/num_steps', methods=['GET'])
-    def goal_keys():
+    def num_steps():
         res = rest.num_steps(circ)
         return handle_response(res)
 
