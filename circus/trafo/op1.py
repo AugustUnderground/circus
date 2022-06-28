@@ -59,9 +59,10 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Mcm21   = constraints.get('Mcm21', {}).get('init', 2)
     Mcm22   = constraints.get('Mcm22', {}).get('init', 2)
     Mdp1    = constraints.get('Md',    {}).get('init', 2)
+    #Mcs1    = constraints.get('Mcs',   {}).get('init', 60)
 
-    M1_lim  = int(constraints.get('Mcm12', {}).get('max', 42))
-    M3_lim  = int(constraints.get('Mcm13', {}).get('max', 42))
+    M1_lim  = int(constraints.get('Mcm12', {}).get('max', 60)) // 10
+    M3_lim  = int(constraints.get('Mcm13', {}).get('max', 60))
 
     Wc_lim  = float(constraints.get('Wcs',   {}).get('max', 150e-6))
 
@@ -115,10 +116,10 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
     err   = f'No Input Scale for {ace_backend} available'
     x_min = { 'xh035-3V3': np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 1.0, 40.0 ])
+                                    , 3.0, 40.0 ])
             , 'xh018-1V8': np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 1.0, 40.0 ])
+                                    , 3.0, 40.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     x_max = { 'xh035-3V3': np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
