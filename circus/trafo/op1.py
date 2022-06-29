@@ -24,7 +24,8 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
              , gmid_cm1: float, gmid_cm2: float, gmid_cs1: float, gmid_dp1: float
              , fug_cm1: float,  fug_cm2: float,  fug_cs1: float,  fug_dp1: float
              #, res: float, cap: float
-             , i1: float, i2: float ) -> dict[str, float]:
+             , m1: float, m2: float ) -> dict[str, float]:
+             # , i1: float, i2: float ) -> dict[str, float]:
     """
     Transforation for OP1
     Arguments:
@@ -49,7 +50,6 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     #rc      = (1 / (gmid_cs1 * i2)) * ((cc + cl) / cc)
 
     i0      = constraints.get('i0',   {}).get('init', 3e-6)
-    i1      = i0
     vdd     = constraints.get('vsup', {}).get('init', 3.3)
 
     Wres    = constraints.get('Wres', {}).get('init', 2e-6)
@@ -60,30 +60,30 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Mcm21   = constraints.get('Mcm21', {}).get('init', 2)
     Mcm22   = constraints.get('Mcm22', {}).get('init', 2)
     Mdp1    = constraints.get('Md',    {}).get('init', 2)
-    #Mcs1    = constraints.get('Mcs',   {}).get('init', 40)
 
-    M1_lim  = int(constraints.get('Mcm12', {}).get('max', 40)) // 20
-    M3_lim  = int(constraints.get('Mcm13', {}).get('max', 40))
+    #M1_lim  = int(constraints.get('Mcm12', {}).get('max', 40))
+    #M3_lim  = int(constraints.get('Mcm13', {}).get('max', 40))
 
-    Wc_lim  = float(constraints.get('Wcs',   {}).get('max', 150e-6))
+    #M1      = Fraction(i0 / i1).limit_denominator(M1_lim)
+    #M3      = Fraction(i0 / i2).limit_denominator(M3_lim)
 
-    M1      = Fraction(i0 / i1).limit_denominator(M1_lim)
-    M3      = Fraction(i0 / i2).limit_denominator(M3_lim)
-
-    #Mcm11   = M3.numerator
-    #Mcm12   = Mcm11
-    #Mcm13   = M3.denominator
+    #Mcm11   = max(np.lcm(M1.numerator, M3.numerator), 1)
+    #Mcm12   = max(M1.denominator * Mcm11, 1)
+    #Mcm13   = max(M3.denominator * Mcm11, 1)
     #Mcs1    = Mcm13
-
-    Mcm11   = max(np.lcm(M1.numerator, M3.numerator), 1)
-    Mcm12   = max(M1.denominator * Mcm11, 1)
-    Mcm13   = max(M3.denominator * Mcm11, 1)
-    Mcs1    = Mcm13
 
     #Mcm11   = max(M1.numerator, 1)
     #Mcm12   = max(M1.denominator, 1)
     #Mcm13   = max((M1.numerator * M3.denominator) // max(M3.numerator, 1), 1)
     #Mcs1    = Mcm13
+
+    Mcm11   = 1
+    Mcm12   = round(m1 * 1e6)
+    Mcm13   = round(m2 * 1e6)
+    Mcs1    = round(m2 * 1e6)
+
+    i1      = i0 * Mcm12
+    i2      = i0 * Mcm13
 
     cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.20),         0.00 ]])
     cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.55),         0.00 ]])
@@ -103,9 +103,7 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Wcm1    = i0       / cm1_out[0] / Mcm11
     Wcm2    = i1 / 2.0 / cm2_out[0] / Mcm21
     Wdp1    = i1 / 2.0 / dp1_out[0] / Mdp1
-
-    Wcs     = i2 / cs1_out[0]
-    #Mcs1    = np.ceil(Wcs / Wc_lim).item()
+    Wcs     = i2       / cs1_out[0]
     Wcs1    = Wcs / Mcs1
 
     sizing  = { 'Ld': Ldp1, 'Lcm1':  Lcm1,  'Lcm2':  Lcm2,  'Lcs': Lcs1, 'Lres': Lres
@@ -127,17 +125,17 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
     err   = f'No Input Scale for {ace_backend} available'
     x_min = { 'xh035-3V3': np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 3.0, 40.0 ])
+                                    , 1.0, 15.0 ])
             , 'xh018-1V8': np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 3.0, 40.0 ])
+                                    , 1.0, 15.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     x_max = { 'xh035-3V3': np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 9.0, 80.0 ])
+                                    , 3.0, 30.0 ])
             , 'xh018-1V8': np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 9.0, 80.0 ])
+                                    , 3.0, 30.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,4))  for i in range(10)])
     fm    = np.array([(i in range(4,8))  for i in range(10)])
