@@ -105,6 +105,15 @@ class CircusGeom(GoalEnv, VecEnv):
 
         self.constraints       = ac.parameter_dict(self.ace_envs[0])
 
+        const_params           = { k: v[&#39;init&#39;]
+                                   for k,v in self.constraints.items()
+                                   if not v[&#39;sizing&#39;] }
+
+        ac.set_parameters_pool( self.ace_envs
+                              , { i: const_params
+                                  for i in range(self.num_envs) }
+                              , )
+
         perf_ids               = sorted(ac.performance_identifiers(self.ace_envs[0]))
         self.obs_filter        = ( perf_ids if obs_filter == &#39;all&#39; else
                                    [p for p in perf_ids
@@ -159,32 +168,40 @@ class CircusGeom(GoalEnv, VecEnv):
 
         self.rng_seed          = seed
 
-        if goal_init == &#39;noisy&#39;:
-            self.goal_init     = goal_init
-            pool               = { i: self.ace_envs[i]
-                                   for i in range(self.num_envs) }
-            initial_sizing     = ac.initial_sizing_pool(pool)
-            results            = ac.evaluate_circuit_pool(pool, pool_params = initial_sizing)
-            reference_goal     = filter_results(self.goal_filter, results)
-        elif goal_init == &#39;random&#39;:
-            self.goal_init     = goal_init
-            x_min_d, x_max_d   = performance_scale( self.ace_id
-                                                  , self.ace_backend
-                                                  , self.constraints
-                                                  , )
-            reference_goal     = np.array([ [x_min_d[gp] for gp in self.goal_filter]
-                                          , [x_max_d[gp] for gp in self.goal_filter]
-                                          ])
+        reference              = ac.evaluate_circuit_pool(self.ace_envs)[0]
+
+        if isinstance(goal_init, str) and goal_init == &#39;noisy&#39;:
+            self.goal_init      = goal_init
+            ref_goal_op         = reference_goal( self.ace_id, self.ace_backend
+                                                , self.constraints )
+            ref_goal            = { gf: ref_goal_op.get(gf, reference[gf])
+                                    for gf in self.goal_filter }
+            ref_goals           = { i: ref_goal for i in range(self.num_envs) }
+
+            self.reference_goal = filter_results( self.goal_filter
+                                                , ref_goals )
+        elif isinstance(goal_init, str) and goal_init == &#39;random&#39;:
+            self.goal_init      = goal_init
+            x_min_d, x_max_d    = performance_scale( self.ace_id
+                                                   , self.ace_backend
+                                                   , self.constraints
+                                                   , )
+            self.reference_goal = np.array([ [x_min_d[gp] for gp in self.goal_filter]
+                                           , [x_max_d[gp] for gp in self.goal_filter]
+                                           ])
         elif isinstance(goal_init, np.ndarray):
-            self.goal_init     = &#39;fix&#39;
-            goal_shape         = (num_envs, len(goal_filter))
-            reference_goal     = ( goal_init
-                                   if goal_init.shape == goal_shape else
-                                   np.repeat(goal_init[None], num_envs, axis = 0) )
+            self.goal_init      = &#39;fix&#39;
+            goal_shape          = (num_envs, len(self.goal_filter))
+            self.reference_goal = ( goal_init
+                                    if goal_init.shape == goal_shape else
+                                    np.repeat(goal_init[None], num_envs, axis = 0) )
         else:
             NotImplementedError(f&#39;Goal initializer {goal_init} not available.&#39;)
 
-        self.new_goal          = goal_generator(goal_init, reference_goal, self.num_envs)
+        self.new_goal          = goal_generator( self.goal_init
+                                               , self.reference_goal
+                                               , self.num_envs
+                                               , )
         self.goal              = self.new_goal()
 
         self.act_unscaler      = geometric_unscaler(self.constraints)
@@ -312,6 +329,12 @@ class CircusGeom(GoalEnv, VecEnv):
                       , }
 
         info        = [ info_dict | {&#39;is_success&#39;: s} for s in (reward == 0).tolist() ]
+
+        if self.auto_reset and done.any():
+            for i in range(len(info)):
+                info[i][&#34;terminal_obs&#34;] = observation[&#34;observation&#34;][i]
+                info[i][&#34;target&#34;] = observation[&#34;desired_goal&#34;][i]
+            observation = self.reset(done)
 
         return (observation, reward, done, info)
 
@@ -688,7 +711,7 @@ def make( env_id: str, n_envs: int = 1, **kwargs
 </dd>
 <dt id="circus.circus.CircusGeom"><code class="flex name class">
 <span>class <span class="ident">CircusGeom</span></span>
-<span>(</span><span>ace_id: str, ace_backend: str, num_envs: int = 1, num_steps: int = 50, seed: int = 666, obs_filter: Union[str, List[str]] = 'perf', goal_filter: list = None, goal_preds: list = None, goal_init: Union[str, numpy.ndarray] = 'noisy', reward_fn: Callable = None, scale_observation: bool = True, auto_reset: bool = False)</span>
+<span>(</span><span>ace_id: str, ace_backend: str, num_envs: int = 1, num_steps: int = 50, seed: int = 666, obs_filter: Union[str, List[str]] = 'perf', goal_filter: list[str] = None, goal_preds: list[typing.Callable] = None, goal_init: Union[str, numpy.ndarray] = 'noisy', reward_fn: Callable = None, scale_observation: bool = True, auto_reset: bool = False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Geometric Sizing Goal Environment </p>
@@ -785,6 +808,15 @@ Automatically reset environemt when done.</p></div>
 
         self.constraints       = ac.parameter_dict(self.ace_envs[0])
 
+        const_params           = { k: v[&#39;init&#39;]
+                                   for k,v in self.constraints.items()
+                                   if not v[&#39;sizing&#39;] }
+
+        ac.set_parameters_pool( self.ace_envs
+                              , { i: const_params
+                                  for i in range(self.num_envs) }
+                              , )
+
         perf_ids               = sorted(ac.performance_identifiers(self.ace_envs[0]))
         self.obs_filter        = ( perf_ids if obs_filter == &#39;all&#39; else
                                    [p for p in perf_ids
@@ -839,32 +871,40 @@ Automatically reset environemt when done.</p></div>
 
         self.rng_seed          = seed
 
-        if goal_init == &#39;noisy&#39;:
-            self.goal_init     = goal_init
-            pool               = { i: self.ace_envs[i]
-                                   for i in range(self.num_envs) }
-            initial_sizing     = ac.initial_sizing_pool(pool)
-            results            = ac.evaluate_circuit_pool(pool, pool_params = initial_sizing)
-            reference_goal     = filter_results(self.goal_filter, results)
-        elif goal_init == &#39;random&#39;:
-            self.goal_init     = goal_init
-            x_min_d, x_max_d   = performance_scale( self.ace_id
-                                                  , self.ace_backend
-                                                  , self.constraints
-                                                  , )
-            reference_goal     = np.array([ [x_min_d[gp] for gp in self.goal_filter]
-                                          , [x_max_d[gp] for gp in self.goal_filter]
-                                          ])
+        reference              = ac.evaluate_circuit_pool(self.ace_envs)[0]
+
+        if isinstance(goal_init, str) and goal_init == &#39;noisy&#39;:
+            self.goal_init      = goal_init
+            ref_goal_op         = reference_goal( self.ace_id, self.ace_backend
+                                                , self.constraints )
+            ref_goal            = { gf: ref_goal_op.get(gf, reference[gf])
+                                    for gf in self.goal_filter }
+            ref_goals           = { i: ref_goal for i in range(self.num_envs) }
+
+            self.reference_goal = filter_results( self.goal_filter
+                                                , ref_goals )
+        elif isinstance(goal_init, str) and goal_init == &#39;random&#39;:
+            self.goal_init      = goal_init
+            x_min_d, x_max_d    = performance_scale( self.ace_id
+                                                   , self.ace_backend
+                                                   , self.constraints
+                                                   , )
+            self.reference_goal = np.array([ [x_min_d[gp] for gp in self.goal_filter]
+                                           , [x_max_d[gp] for gp in self.goal_filter]
+                                           ])
         elif isinstance(goal_init, np.ndarray):
-            self.goal_init     = &#39;fix&#39;
-            goal_shape         = (num_envs, len(goal_filter))
-            reference_goal     = ( goal_init
-                                   if goal_init.shape == goal_shape else
-                                   np.repeat(goal_init[None], num_envs, axis = 0) )
+            self.goal_init      = &#39;fix&#39;
+            goal_shape          = (num_envs, len(self.goal_filter))
+            self.reference_goal = ( goal_init
+                                    if goal_init.shape == goal_shape else
+                                    np.repeat(goal_init[None], num_envs, axis = 0) )
         else:
             NotImplementedError(f&#39;Goal initializer {goal_init} not available.&#39;)
 
-        self.new_goal          = goal_generator(goal_init, reference_goal, self.num_envs)
+        self.new_goal          = goal_generator( self.goal_init
+                                               , self.reference_goal
+                                               , self.num_envs
+                                               , )
         self.goal              = self.new_goal()
 
         self.act_unscaler      = geometric_unscaler(self.constraints)
@@ -993,6 +1033,12 @@ Automatically reset environemt when done.</p></div>
 
         info        = [ info_dict | {&#39;is_success&#39;: s} for s in (reward == 0).tolist() ]
 
+        if self.auto_reset and done.any():
+            for i in range(len(info)):
+                info[i][&#34;terminal_obs&#34;] = observation[&#34;observation&#34;][i]
+                info[i][&#34;target&#34;] = observation[&#34;desired_goal&#34;][i]
+            observation = self.reset(done)
+
         return (observation, reward, done, info)
 
     def compute_reward( self, achieved_goal: object, desired_goal: object
@@ -1054,7 +1100,7 @@ Automatically reset environemt when done.</p></div>
 <h3>Methods</h3>
 <dl>
 <dt id="circus.circus.CircusGeom.close"><code class="name flex">
-<span>def <span class="ident">close</span></span>(<span>self, env_ids: list = None) ‑> None</span>
+<span>def <span class="ident">close</span></span>(<span>self, env_ids: list[int] = None) ‑> None</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Close all (parallel) ACE environment(s).</p>
@@ -1158,7 +1204,7 @@ Calls <code>self.calculate_reward</code> under the hood.</p></div>
 </details>
 </dd>
 <dt id="circus.circus.CircusGeom.observation_dict"><code class="name flex">
-<span>def <span class="ident">observation_dict</span></span>(<span>self, observation: dict) ‑> dict</span>
+<span>def <span class="ident">observation_dict</span></span>(<span>self, observation: dict[int, dict[str, float]]) ‑> dict[str, numpy.ndarray]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Takes an observation from a pooled ACE Environment and returns a
@@ -1235,7 +1281,7 @@ metadata = {'render.modes': ['human', 'rgb_array']}</p>
 </details>
 </dd>
 <dt id="circus.circus.CircusGeom.reset"><code class="name flex">
-<span>def <span class="ident">reset</span></span>(<span>self, env_mask: list = [], env_ids: list = [])</span>
+<span>def <span class="ident">reset</span></span>(<span>self, env_mask: list[bool] = [], env_ids: list[int] = [])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Reset all (parallel) environment(s).</p>
@@ -1415,6 +1461,12 @@ under the hood.</p>
                   , }
 
     info        = [ info_dict | {&#39;is_success&#39;: s} for s in (reward == 0).tolist() ]
+
+    if self.auto_reset and done.any():
+        for i in range(len(info)):
+            info[i][&#34;terminal_obs&#34;] = observation[&#34;observation&#34;][i]
+            info[i][&#34;target&#34;] = observation[&#34;desired_goal&#34;][i]
+        observation = self.reset(done)
 
     return (observation, reward, done, info)</code></pre>
 </details>

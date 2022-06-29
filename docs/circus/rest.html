@@ -162,7 +162,9 @@ def current_performance(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
     Get current performane from ACE.
     &#34;&#34;&#34;
     perf = ac.current_performance_pool(circ.env.ace_envs)
-    return {i: {o: p[o] for o in circ.env.obs_filter} for i,p in perf.items()}
+    return { i: { o: np.nan_to_num(p[o], nan=0.0, posinf=0.0,neginf=0.0).item()
+                  for o in circ.env.obs_filter }
+             for i,p in perf.items() }
 
 def current_goal(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
     &#34;&#34;&#34;
@@ -179,7 +181,7 @@ def current_sizing(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
 
 def last_action(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
     &#34;&#34;&#34;
-    Get the last action that was taken. Will be same as sizing if 
+    Get the last action that was taken. Will be same as sizing if
     `space == &#39;geom&#39;` otherwise it will be INPUTS.
     &#34;&#34;&#34;
     return { i: { k: v for k,v in p.items() if k in circ.env.input_parameters }
@@ -213,7 +215,13 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
     &#34;&#34;&#34;
     Keys in goal vector.
     &#34;&#34;&#34;
-    return { &#39;goal&#39;: circ.env.goal_filter }</code></pre>
+    return { &#39;goal&#39;: circ.env.goal_filter }
+
+def num_steps(circ: CircusEnv) -&gt; dict[int, float]:
+    &#34;&#34;&#34;
+    Number of steps per environment.
+    &#34;&#34;&#34;
+    return dict(enumerate(circ.env.steps.tolist()))</code></pre>
 </details>
 </section>
 <section>
@@ -224,7 +232,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="circus.rest.action_keys"><code class="name flex">
-<span>def <span class="ident">action_keys</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">action_keys</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[int, [<class 'str'>]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Keys in action vector.</p></div>
@@ -240,7 +248,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.action_space"><code class="name flex">
-<span>def <span class="ident">action_space</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">action_space</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[int, int]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Shape of action space.</p></div>
@@ -256,7 +264,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.current_goal"><code class="name flex">
-<span>def <span class="ident">current_goal</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">current_goal</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[int, dict[str, float]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get goals for the current episode.</p></div>
@@ -273,7 +281,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.current_performance"><code class="name flex">
-<span>def <span class="ident">current_performance</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">current_performance</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[int, dict[str, float]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get current performane from ACE.</p></div>
@@ -286,11 +294,13 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
     Get current performane from ACE.
     &#34;&#34;&#34;
     perf = ac.current_performance_pool(circ.env.ace_envs)
-    return {i: {o: p[o] for o in circ.env.obs_filter} for i,p in perf.items()}</code></pre>
+    return { i: { o: np.nan_to_num(p[o], nan=0.0, posinf=0.0,neginf=0.0).item()
+                  for o in circ.env.obs_filter }
+             for i,p in perf.items() }</code></pre>
 </details>
 </dd>
 <dt id="circus.rest.current_sizing"><code class="name flex">
-<span>def <span class="ident">current_sizing</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">current_sizing</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[int, dict[str, float]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get the current sizing from ACE.</p></div>
@@ -306,7 +316,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.goal_keys"><code class="name flex">
-<span>def <span class="ident">goal_keys</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">goal_keys</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[int, [<class 'str'>]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Keys in goal vector.</p></div>
@@ -322,7 +332,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.last_action"><code class="name flex">
-<span>def <span class="ident">last_action</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">last_action</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[int, dict[str, float]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get the last action that was taken. Will be same as sizing if
@@ -333,7 +343,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </summary>
 <pre><code class="python">def last_action(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
     &#34;&#34;&#34;
-    Get the last action that was taken. Will be same as sizing if 
+    Get the last action that was taken. Will be same as sizing if
     `space == &#39;geom&#39;` otherwise it will be INPUTS.
     &#34;&#34;&#34;
     return { i: { k: v for k,v in p.items() if k in circ.env.input_parameters }
@@ -371,8 +381,24 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
     return CircusEnv(env, ace_id, backend, space, variant, num_envs)</code></pre>
 </details>
 </dd>
+<dt id="circus.rest.num_steps"><code class="name flex">
+<span>def <span class="ident">num_steps</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[int, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Number of steps per environment.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def num_steps(circ: CircusEnv) -&gt; dict[int, float]:
+    &#34;&#34;&#34;
+    Number of steps per environment.
+    &#34;&#34;&#34;
+    return dict(enumerate(circ.env.steps.tolist()))</code></pre>
+</details>
+</dd>
 <dt id="circus.rest.observation_keys"><code class="name flex">
-<span>def <span class="ident">observation_keys</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">observation_keys</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[int, [<class 'str'>]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Keys in observation vector.</p></div>
@@ -388,7 +414,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.observation_space"><code class="name flex">
-<span>def <span class="ident">observation_space</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">observation_space</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[int, int]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Shape of observation space.</p></div>
@@ -404,7 +430,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.random_action"><code class="name flex">
-<span>def <span class="ident">random_action</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">random_action</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[str, [[<class 'float'>]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Sample a random action action in the environemt.</p></div>
@@ -422,7 +448,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.random_step"><code class="name flex">
-<span>def <span class="ident">random_step</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">random_step</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[str, [[<class 'float'>]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Take a random step in the environemt.</p></div>
@@ -438,7 +464,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.reset"><code class="name flex">
-<span>def <span class="ident">reset</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, env_mask: list = [], env_ids: list = []) ‑> dict</span>
+<span>def <span class="ident">reset</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, env_mask: list[bool] = [], env_ids: list[int] = []) ‑> dict[str, [[<class 'float'>]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Reset (selected) Environment(s).</p></div>
@@ -473,7 +499,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.restore"><code class="name flex">
-<span>def <span class="ident">restore</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, sizing: dict) ‑> dict</span>
+<span>def <span class="ident">restore</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, sizing: dict[str, dict[str, float]]) ‑> dict[str, [[<class 'float'>]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Restore a given state.</p></div>
@@ -495,7 +521,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.restore_last"><code class="name flex">
-<span>def <span class="ident">restore_last</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict</span>
+<span>def <span class="ident">restore_last</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> dict[str, [[<class 'float'>]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Restore the last state.</p></div>
@@ -511,7 +537,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.reward"><code class="name flex">
-<span>def <span class="ident">reward</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, observation: dict) ‑> dict</span>
+<span>def <span class="ident">reward</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, observation: dict[str, [[<class 'float'>]]]) ‑> dict[str, [<class 'float'>]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate reward given an observation Dict.</p></div>
@@ -533,7 +559,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 </details>
 </dd>
 <dt id="circus.rest.step"><code class="name flex">
-<span>def <span class="ident">step</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, action: dict) ‑> dict</span>
+<span>def <span class="ident">step</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>, action: dict[str, [[<class 'float'>]]]) ‑> dict[str, [[<class 'float'>]]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Take a step in the environemt.</p></div>
@@ -622,6 +648,7 @@ def goal_keys(circ: CircusEnv) -&gt; dict[int, [str]]:
 <li><code><a title="circus.rest.goal_keys" href="#circus.rest.goal_keys">goal_keys</a></code></li>
 <li><code><a title="circus.rest.last_action" href="#circus.rest.last_action">last_action</a></code></li>
 <li><code><a title="circus.rest.make_env" href="#circus.rest.make_env">make_env</a></code></li>
+<li><code><a title="circus.rest.num_steps" href="#circus.rest.num_steps">num_steps</a></code></li>
 <li><code><a title="circus.rest.observation_keys" href="#circus.rest.observation_keys">observation_keys</a></code></li>
 <li><code><a title="circus.rest.observation_space" href="#circus.rest.observation_space">observation_space</a></code></li>
 <li><code><a title="circus.rest.random_action" href="#circus.rest.random_action">random_action</a></code></li>

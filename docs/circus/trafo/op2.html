@@ -63,10 +63,10 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Mcm31   = constraints.get(&#39;Mcm31&#39;, {}).get(&#39;init&#39;, 2)
     Mcm32   = constraints.get(&#39;Mcm32&#39;, {}).get(&#39;init&#39;, 2)
 
-    cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.0),         0.0 ]])
-    cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.0),         0.0 ]])
-    cm3_in  = np.array([[gmid_cm3, fug_cm3,  (vdd / 4.0),         0.0 ]])
-    dp1_in  = np.array([[gmid_dp1, fug_dp1,  (vdd / 3.0), -(vdd / 4.0)]])
+    cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.25),         0.00 ]])
+    cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.15),         0.00 ]])
+    cm3_in  = np.array([[gmid_cm3, fug_cm3,  (vdd / 4.25),         0.00 ]])
+    dp1_in  = np.array([[gmid_dp1, fug_dp1,  (vdd / 2.10), -(vdd / 4.85)]])
 
     cm1_out = nmos.predict(cm1_in)[0]
     cm2_out = pmos.predict(cm2_in)[0]
@@ -94,77 +94,211 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
 def unscaler(ace_backend: str) -&gt; tuple[ np.ndarray, np.ndarray, np.ndarray
                                        , np.ndarray, np.ndarray]:
     &#34;&#34;&#34; Unscale function for a given PDK &#34;&#34;&#34;
-    x_min = np.array([5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 1.0,  3.0])
-    x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
+    err   = f&#39;No Input Scale for {ace_backend} available&#39;
+    x_min = { &#39;xh035-3V3&#39;: np.array([5.0,  5.0,  5.0,  5.0,  7.0, 7.0, 7.0, 7.0, 1.0,  6.0])
+            , &#39;xh018-1V8&#39;: np.array([5.0,  5.0,  5.0,  5.0,  7.0, 7.0, 7.0, 7.0, 1.0,  3.0])
+            , }.get(ace_backend, NotImplementedError(err))
+    x_max = { &#39;xh035-3V3&#39;: np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
+            , &#39;xh018-1V8&#39;: np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
+            , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,4))  for i in range(10)])
     fm    = np.array([(i in range(4,8))  for i in range(10)])
     im    = np.array([(i in range(8,10)) for i in range(10)])
     return (x_min, x_max, gm, fm, im)
 
+def reference_goal(constraints: dict, ace_backend: str) -&gt; np.ndarray:
+    &#34;&#34;&#34; Corated Referece Goal for OP2 &#34;&#34;&#34;
+    err   = f&#39;No Reference Goal for {ace_backend} available&#39;
+    vdd   = constraints.get(&#39;vsup&#39;, {}).get(&#39;init&#39;, 3.3)
+    return { &#39;xh035-3V3&#39;: { &#34;A&#34;:           5.0e-10      # 5.010925e-10
+                          , &#34;a_0&#34;:         55.0         # 54.962221293150016
+                          , &#34;ugbw&#34;:        3.5e6        # 3428563.930768671
+                          , &#34;sr_r&#34;:        3.5e6        # 3822408.8725046776
+                          , &#34;sr_f&#34;:        3.5e6        # -3846399.224656781
+                          , &#34;pm&#34;:          65.0         # 67.0570640439259
+                          , &#34;gm&#34;:          -30.0        # -32.298672913767724
+                          , &#34;cmrr&#34;:        100.0        # 101.52646998121247
+                          , &#34;psrr_n&#34;:      55.0         # 55.22058921101098
+                          , &#34;psrr_p&#34;:      90.0         # 91.50247601455912
+                          , &#34;idd&#34;:         3.0e-5       # 3.0211906622006625e-05
+                          , &#34;iss&#34;:         3.3e-5       # -3.3211921814583654e-05
+                          , &#34;vn_1Hz&#34;:      6.5e-6       # 6.216847362829546e-06
+                          , &#34;vn_10Hz&#34;:     2.0e-6       # 1.8361486757073514e-06
+                          , &#34;vn_100Hz&#34;:    5.5e-7       # 5.395284017023125e-07
+                          , &#34;vn_1kHz&#34;:     1.75e-7      # 1.6163236371474532e-07
+                          , &#34;vn_10kHz&#34;:    6.5e-8       # 6.295679831589233e-08
+                          , &#34;vn_100kHz&#34;:   4.5e-8       # 4.421652882505914e-08
+                          , &#34;cof&#34;:         35.0e6       # 34532197.91934585
+                          , &#34;overshoot_r&#34;: 2.5          # 2.6405786027522846
+                          , &#34;overshoot_f&#34;: 2.0          # 2.152491375598402
+                          , &#34;i_out_min&#34;:   -2.5e-5      # -2.34598447270796e-05
+                          , &#34;i_out_max&#34;:   2.5e-5       # 2.375395528802124e-05
+                          , &#34;v_ol&#34;:        (vdd * 0.50) # 1.6314814360399006
+                          , &#34;v_oh&#34;:        (vdd * 0.95) # 1.6685034539424761
+                          , &#34;v_il&#34;:        (vdd * 0.25) # 0.5688672464434619
+                          , &#34;v_ih&#34;:        (vdd * 0.95) # 3.3502486012612174
+                          , &#34;voff_stat&#34;:   3.0e-3       # 0.0031193237064727104
+                          , &#34;voff_sys&#34;:    -1.5e-3      # -0.0015180853180561346
+                          , }
+           , &#39;xh018-1V8&#39;: { &#34;A&#34;:           5.0e-10      # 5.010925e-10
+                          , &#34;a_0&#34;:         55.0         # 54.962221293150016
+                          , &#34;ugbw&#34;:        3.5e6        # 3428563.930768671
+                          , &#34;sr_r&#34;:        3.5e6        # 3822408.8725046776
+                          , &#34;sr_f&#34;:        3.5e6        # -3846399.224656781
+                          , &#34;pm&#34;:          65.0         # 67.0570640439259
+                          , &#34;gm&#34;:          -30.0        # -32.298672913767724
+                          , &#34;cmrr&#34;:        100.0        # 101.52646998121247
+                          , &#34;psrr_n&#34;:      55.0         # 55.22058921101098
+                          , &#34;psrr_p&#34;:      90.0         # 91.50247601455912
+                          , &#34;idd&#34;:         3.0e-5       # 3.0211906622006625e-05
+                          , &#34;iss&#34;:         3.3e-5       # -3.3211921814583654e-05
+                          , &#34;vn_1Hz&#34;:      6.5e-6       # 6.216847362829546e-06
+                          , &#34;vn_10Hz&#34;:     2.0e-6       # 1.8361486757073514e-06
+                          , &#34;vn_100Hz&#34;:    5.5e-7       # 5.395284017023125e-07
+                          , &#34;vn_1kHz&#34;:     1.75e-7      # 1.6163236371474532e-07
+                          , &#34;vn_10kHz&#34;:    6.5e-8       # 6.295679831589233e-08
+                          , &#34;vn_100kHz&#34;:   4.5e-8       # 4.421652882505914e-08
+                          , &#34;cof&#34;:         35.0e6       # 34532197.91934585
+                          , &#34;overshoot_r&#34;: 2.5          # 2.6405786027522846
+                          , &#34;overshoot_f&#34;: 2.0          # 2.152491375598402
+                          , &#34;i_out_min&#34;:   -2.5e-5      # -2.34598447270796e-05
+                          , &#34;i_out_max&#34;:   2.5e-5       # 2.375395528802124e-05
+                          , &#34;v_ol&#34;:        (vdd * 0.50) # 1.6314814360399006
+                          , &#34;v_oh&#34;:        (vdd * 0.95) # 1.6685034539424761
+                          , &#34;v_il&#34;:        (vdd * 0.25) # 0.5688672464434619
+                          , &#34;v_ih&#34;:        (vdd * 0.95) # 3.3502486012612174
+                          , &#34;voff_stat&#34;:   3.0e-3       # 0.0031193237064727104
+                          , &#34;voff_sys&#34;:    -1.5e-3      # -0.0015180853180561346
+                          , }
+           , }.get(ace_backend, NotImplementedError(err))
+
 def output_scale( constraints: dict, ace_backend: str
                 ) -&gt; tuple[dict[str, float], dict[str,float]]:
     &#34;&#34;&#34; Extimated Min/Max values for scaling &#39;perf&#39; &#34;&#34;&#34;
+    err   = f&#39;No Performance Scale for {ace_backend} available&#39;
     vdd   = constraints.get(&#39;vsup&#39;, {}).get(&#39;init&#39;, 3.3)
-    x_min = { &#39;a_0&#39;         : 25.0
-            , &#39;ugbw&#39;        : 5.0
-            , &#39;pm&#39;          : 0.0
-            , &#39;gm&#39;          : 0.0
-            , &#39;sr_r&#39;        : 4.0
-            , &#39;sr_f&#39;        : 4.0
-            , &#39;vn_1Hz&#39;      : -10.0
-            , &#39;vn_10Hz&#39;     : -10.0
-            , &#39;vn_100Hz&#39;    : -10.0
-            , &#39;vn_1kHz&#39;     : -10.0
-            , &#39;vn_10kHz&#39;    : -10.0
-            , &#39;vn_100kHz&#39;   : -10.0
-            , &#39;cmrr&#39;        : 70
-            , &#39;psrr_n&#39;      : 30.0
-            , &#39;psrr_p&#39;      : 40.0
-            , &#39;v_il&#39;        : 0.0
-            , &#39;v_ih&#39;        : 0.0
-            , &#39;v_ol&#39;        : 0.0
-            , &#39;v_oh&#39;        : 0.0
-            , &#39;i_out_min&#39;   : -6.0
-            , &#39;i_out_max&#39;   : -6.0
-            , &#39;idd&#39;         : -6.0
-            , &#39;iss&#39;         : -6.0
-            , &#39;overshoot_r&#39; : 0.0
-            , &#39;overshoot_f&#39; : 0.0
-            , &#39;cof&#39;         : 5.0
-            , &#39;voff_stat&#39;   : -5.0
-            , &#39;voff_sys&#39;    : -5.0
-            , &#39;A&#39;           : -15.0
-            , }
-    x_max = { &#39;a_0&#39;         : 70.0
-            , &#39;ugbw&#39;        : 10.0
-            , &#39;pm&#39;          : 120.0
-            , &#39;gm&#39;          : 80.0
-            , &#39;sr_r&#39;        : 8.0
-            , &#39;sr_f&#39;        : 8.0
-            , &#39;vn_1Hz&#39;      : -4.0
-            , &#39;vn_10Hz&#39;     : -4.0
-            , &#39;vn_100Hz&#39;    : -4.0
-            , &#39;vn_1kHz&#39;     : -4.0
-            , &#39;vn_10kHz&#39;    : -4.0
-            , &#39;vn_100kHz&#39;   : -4.0
-            , &#39;cmrr&#39;        : 150.0
-            , &#39;psrr_n&#39;      : 70.0
-            , &#39;psrr_p&#39;      : 140.0
-            , &#39;v_il&#39;        : (2.0 * vdd)
-            , &#39;v_ih&#39;        : (2.0 * vdd)
-            , &#39;v_ol&#39;        : (2.0 * vdd)
-            , &#39;v_oh&#39;        : (2.0 * vdd)
-            , &#39;i_out_min&#39;   : -3.0
-            , &#39;i_out_max&#39;   : -3.0
-            , &#39;idd&#39;         : -3.0
-            , &#39;iss&#39;         : -3.0
-            , &#39;overshoot_r&#39; : 130.0
-            , &#39;overshoot_f&#39; : 130.0
-            , &#39;cof&#39;         : 9.0
-            , &#39;voff_stat&#39;   : 0.0
-            , &#39;voff_sys&#39;    : 0.0
-            , &#39;A&#39;           : -5.0
-            , }
+    x_min = { &#39;xh035-3V3&#39;: { &#39;a_0&#39;         : 25.0
+                           , &#39;ugbw&#39;        : 5.0
+                           , &#39;pm&#39;          : 0.0
+                           , &#39;gm&#39;          : 0.0
+                           , &#39;sr_r&#39;        : 4.0
+                           , &#39;sr_f&#39;        : 4.0
+                           , &#39;vn_1Hz&#39;      : -10.0
+                           , &#39;vn_10Hz&#39;     : -10.0
+                           , &#39;vn_100Hz&#39;    : -10.0
+                           , &#39;vn_1kHz&#39;     : -10.0
+                           , &#39;vn_10kHz&#39;    : -10.0
+                           , &#39;vn_100kHz&#39;   : -10.0
+                           , &#39;cmrr&#39;        : 70
+                           , &#39;psrr_n&#39;      : 30.0
+                           , &#39;psrr_p&#39;      : 40.0
+                           , &#39;v_il&#39;        : 0.0
+                           , &#39;v_ih&#39;        : 0.0
+                           , &#39;v_ol&#39;        : 0.0
+                           , &#39;v_oh&#39;        : 0.0
+                           , &#39;i_out_min&#39;   : -6.0
+                           , &#39;i_out_max&#39;   : -6.0
+                           , &#39;idd&#39;         : -6.0
+                           , &#39;iss&#39;         : -6.0
+                           , &#39;overshoot_r&#39; : 0.0
+                           , &#39;overshoot_f&#39; : 0.0
+                           , &#39;cof&#39;         : 5.0
+                           , &#39;voff_stat&#39;   : -5.0
+                           , &#39;voff_sys&#39;    : -5.0
+                           , &#39;A&#39;           : -15.0
+                           , }
+            , &#39;xh018-1V8&#39;: { &#39;a_0&#39;         : 25.0
+                           , &#39;ugbw&#39;        : 5.0
+                           , &#39;pm&#39;          : 0.0
+                           , &#39;gm&#39;          : 0.0
+                           , &#39;sr_r&#39;        : 4.0
+                           , &#39;sr_f&#39;        : 4.0
+                           , &#39;vn_1Hz&#39;      : -10.0
+                           , &#39;vn_10Hz&#39;     : -10.0
+                           , &#39;vn_100Hz&#39;    : -10.0
+                           , &#39;vn_1kHz&#39;     : -10.0
+                           , &#39;vn_10kHz&#39;    : -10.0
+                           , &#39;vn_100kHz&#39;   : -10.0
+                           , &#39;cmrr&#39;        : 70
+                           , &#39;psrr_n&#39;      : 30.0
+                           , &#39;psrr_p&#39;      : 40.0
+                           , &#39;v_il&#39;        : 0.0
+                           , &#39;v_ih&#39;        : 0.0
+                           , &#39;v_ol&#39;        : 0.0
+                           , &#39;v_oh&#39;        : 0.0
+                           , &#39;i_out_min&#39;   : -6.0
+                           , &#39;i_out_max&#39;   : -6.0
+                           , &#39;idd&#39;         : -6.0
+                           , &#39;iss&#39;         : -6.0
+                           , &#39;overshoot_r&#39; : 0.0
+                           , &#39;overshoot_f&#39; : 0.0
+                           , &#39;cof&#39;         : 5.0
+                           , &#39;voff_stat&#39;   : -5.0
+                           , &#39;voff_sys&#39;    : -5.0
+                           , &#39;A&#39;           : -15.0
+                           , }
+            , }.get(ace_backend, NotImplementedError(err))
+    x_max = { &#39;xh035-3V3&#39;: { &#39;a_0&#39;         : 70.0
+                           , &#39;ugbw&#39;        : 10.0
+                           , &#39;pm&#39;          : 120.0
+                           , &#39;gm&#39;          : 80.0
+                           , &#39;sr_r&#39;        : 8.0
+                           , &#39;sr_f&#39;        : 8.0
+                           , &#39;vn_1Hz&#39;      : -4.0
+                           , &#39;vn_10Hz&#39;     : -4.0
+                           , &#39;vn_100Hz&#39;    : -4.0
+                           , &#39;vn_1kHz&#39;     : -4.0
+                           , &#39;vn_10kHz&#39;    : -4.0
+                           , &#39;vn_100kHz&#39;   : -4.0
+                           , &#39;cmrr&#39;        : 150.0
+                           , &#39;psrr_n&#39;      : 70.0
+                           , &#39;psrr_p&#39;      : 140.0
+                           , &#39;v_il&#39;        : (2.0 * vdd)
+                           , &#39;v_ih&#39;        : (2.0 * vdd)
+                           , &#39;v_ol&#39;        : (2.0 * vdd)
+                           , &#39;v_oh&#39;        : (2.0 * vdd)
+                           , &#39;i_out_min&#39;   : -3.0
+                           , &#39;i_out_max&#39;   : -3.0
+                           , &#39;idd&#39;         : -3.0
+                           , &#39;iss&#39;         : -3.0
+                           , &#39;overshoot_r&#39; : 130.0
+                           , &#39;overshoot_f&#39; : 130.0
+                           , &#39;cof&#39;         : 9.0
+                           , &#39;voff_stat&#39;   : 0.0
+                           , &#39;voff_sys&#39;    : 0.0
+                           , &#39;A&#39;           : -5.0
+                           , }
+            , &#39;xh018-1V8&#39;: { &#39;a_0&#39;         : 70.0
+                           , &#39;ugbw&#39;        : 10.0
+                           , &#39;pm&#39;          : 120.0
+                           , &#39;gm&#39;          : 80.0
+                           , &#39;sr_r&#39;        : 8.0
+                           , &#39;sr_f&#39;        : 8.0
+                           , &#39;vn_1Hz&#39;      : -4.0
+                           , &#39;vn_10Hz&#39;     : -4.0
+                           , &#39;vn_100Hz&#39;    : -4.0
+                           , &#39;vn_1kHz&#39;     : -4.0
+                           , &#39;vn_10kHz&#39;    : -4.0
+                           , &#39;vn_100kHz&#39;   : -4.0
+                           , &#39;cmrr&#39;        : 150.0
+                           , &#39;psrr_n&#39;      : 70.0
+                           , &#39;psrr_p&#39;      : 140.0
+                           , &#39;v_il&#39;        : (2.0 * vdd)
+                           , &#39;v_ih&#39;        : (2.0 * vdd)
+                           , &#39;v_ol&#39;        : (2.0 * vdd)
+                           , &#39;v_oh&#39;        : (2.0 * vdd)
+                           , &#39;i_out_min&#39;   : -3.0
+                           , &#39;i_out_max&#39;   : -3.0
+                           , &#39;idd&#39;         : -3.0
+                           , &#39;iss&#39;         : -3.0
+                           , &#39;overshoot_r&#39; : 130.0
+                           , &#39;overshoot_f&#39; : 130.0
+                           , &#39;cof&#39;         : 9.0
+                           , &#39;voff_stat&#39;   : 0.0
+                           , &#39;voff_sys&#39;    : 0.0
+                           , &#39;A&#39;           : -5.0
+                           , }
+            , }.get(ace_backend, NotImplementedError(err))
     return (x_min, x_max)</code></pre>
 </details>
 </section>
@@ -176,7 +310,7 @@ def output_scale( constraints: dict, ace_backend: str
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="circus.trafo.op2.output_scale"><code class="name flex">
-<span>def <span class="ident">output_scale</span></span>(<span>constraints: dict, ace_backend: str) ‑> tuple</span>
+<span>def <span class="ident">output_scale</span></span>(<span>constraints: dict, ace_backend: str) ‑> tuple[dict[str, float], dict[str, float]]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Extimated Min/Max values for scaling 'perf'</p></div>
@@ -187,72 +321,211 @@ def output_scale( constraints: dict, ace_backend: str
 <pre><code class="python">def output_scale( constraints: dict, ace_backend: str
                 ) -&gt; tuple[dict[str, float], dict[str,float]]:
     &#34;&#34;&#34; Extimated Min/Max values for scaling &#39;perf&#39; &#34;&#34;&#34;
+    err   = f&#39;No Performance Scale for {ace_backend} available&#39;
     vdd   = constraints.get(&#39;vsup&#39;, {}).get(&#39;init&#39;, 3.3)
-    x_min = { &#39;a_0&#39;         : 25.0
-            , &#39;ugbw&#39;        : 5.0
-            , &#39;pm&#39;          : 0.0
-            , &#39;gm&#39;          : 0.0
-            , &#39;sr_r&#39;        : 4.0
-            , &#39;sr_f&#39;        : 4.0
-            , &#39;vn_1Hz&#39;      : -10.0
-            , &#39;vn_10Hz&#39;     : -10.0
-            , &#39;vn_100Hz&#39;    : -10.0
-            , &#39;vn_1kHz&#39;     : -10.0
-            , &#39;vn_10kHz&#39;    : -10.0
-            , &#39;vn_100kHz&#39;   : -10.0
-            , &#39;cmrr&#39;        : 70
-            , &#39;psrr_n&#39;      : 30.0
-            , &#39;psrr_p&#39;      : 40.0
-            , &#39;v_il&#39;        : 0.0
-            , &#39;v_ih&#39;        : 0.0
-            , &#39;v_ol&#39;        : 0.0
-            , &#39;v_oh&#39;        : 0.0
-            , &#39;i_out_min&#39;   : -6.0
-            , &#39;i_out_max&#39;   : -6.0
-            , &#39;idd&#39;         : -6.0
-            , &#39;iss&#39;         : -6.0
-            , &#39;overshoot_r&#39; : 0.0
-            , &#39;overshoot_f&#39; : 0.0
-            , &#39;cof&#39;         : 5.0
-            , &#39;voff_stat&#39;   : -5.0
-            , &#39;voff_sys&#39;    : -5.0
-            , &#39;A&#39;           : -15.0
-            , }
-    x_max = { &#39;a_0&#39;         : 70.0
-            , &#39;ugbw&#39;        : 10.0
-            , &#39;pm&#39;          : 120.0
-            , &#39;gm&#39;          : 80.0
-            , &#39;sr_r&#39;        : 8.0
-            , &#39;sr_f&#39;        : 8.0
-            , &#39;vn_1Hz&#39;      : -4.0
-            , &#39;vn_10Hz&#39;     : -4.0
-            , &#39;vn_100Hz&#39;    : -4.0
-            , &#39;vn_1kHz&#39;     : -4.0
-            , &#39;vn_10kHz&#39;    : -4.0
-            , &#39;vn_100kHz&#39;   : -4.0
-            , &#39;cmrr&#39;        : 150.0
-            , &#39;psrr_n&#39;      : 70.0
-            , &#39;psrr_p&#39;      : 140.0
-            , &#39;v_il&#39;        : (2.0 * vdd)
-            , &#39;v_ih&#39;        : (2.0 * vdd)
-            , &#39;v_ol&#39;        : (2.0 * vdd)
-            , &#39;v_oh&#39;        : (2.0 * vdd)
-            , &#39;i_out_min&#39;   : -3.0
-            , &#39;i_out_max&#39;   : -3.0
-            , &#39;idd&#39;         : -3.0
-            , &#39;iss&#39;         : -3.0
-            , &#39;overshoot_r&#39; : 130.0
-            , &#39;overshoot_f&#39; : 130.0
-            , &#39;cof&#39;         : 9.0
-            , &#39;voff_stat&#39;   : 0.0
-            , &#39;voff_sys&#39;    : 0.0
-            , &#39;A&#39;           : -5.0
-            , }
+    x_min = { &#39;xh035-3V3&#39;: { &#39;a_0&#39;         : 25.0
+                           , &#39;ugbw&#39;        : 5.0
+                           , &#39;pm&#39;          : 0.0
+                           , &#39;gm&#39;          : 0.0
+                           , &#39;sr_r&#39;        : 4.0
+                           , &#39;sr_f&#39;        : 4.0
+                           , &#39;vn_1Hz&#39;      : -10.0
+                           , &#39;vn_10Hz&#39;     : -10.0
+                           , &#39;vn_100Hz&#39;    : -10.0
+                           , &#39;vn_1kHz&#39;     : -10.0
+                           , &#39;vn_10kHz&#39;    : -10.0
+                           , &#39;vn_100kHz&#39;   : -10.0
+                           , &#39;cmrr&#39;        : 70
+                           , &#39;psrr_n&#39;      : 30.0
+                           , &#39;psrr_p&#39;      : 40.0
+                           , &#39;v_il&#39;        : 0.0
+                           , &#39;v_ih&#39;        : 0.0
+                           , &#39;v_ol&#39;        : 0.0
+                           , &#39;v_oh&#39;        : 0.0
+                           , &#39;i_out_min&#39;   : -6.0
+                           , &#39;i_out_max&#39;   : -6.0
+                           , &#39;idd&#39;         : -6.0
+                           , &#39;iss&#39;         : -6.0
+                           , &#39;overshoot_r&#39; : 0.0
+                           , &#39;overshoot_f&#39; : 0.0
+                           , &#39;cof&#39;         : 5.0
+                           , &#39;voff_stat&#39;   : -5.0
+                           , &#39;voff_sys&#39;    : -5.0
+                           , &#39;A&#39;           : -15.0
+                           , }
+            , &#39;xh018-1V8&#39;: { &#39;a_0&#39;         : 25.0
+                           , &#39;ugbw&#39;        : 5.0
+                           , &#39;pm&#39;          : 0.0
+                           , &#39;gm&#39;          : 0.0
+                           , &#39;sr_r&#39;        : 4.0
+                           , &#39;sr_f&#39;        : 4.0
+                           , &#39;vn_1Hz&#39;      : -10.0
+                           , &#39;vn_10Hz&#39;     : -10.0
+                           , &#39;vn_100Hz&#39;    : -10.0
+                           , &#39;vn_1kHz&#39;     : -10.0
+                           , &#39;vn_10kHz&#39;    : -10.0
+                           , &#39;vn_100kHz&#39;   : -10.0
+                           , &#39;cmrr&#39;        : 70
+                           , &#39;psrr_n&#39;      : 30.0
+                           , &#39;psrr_p&#39;      : 40.0
+                           , &#39;v_il&#39;        : 0.0
+                           , &#39;v_ih&#39;        : 0.0
+                           , &#39;v_ol&#39;        : 0.0
+                           , &#39;v_oh&#39;        : 0.0
+                           , &#39;i_out_min&#39;   : -6.0
+                           , &#39;i_out_max&#39;   : -6.0
+                           , &#39;idd&#39;         : -6.0
+                           , &#39;iss&#39;         : -6.0
+                           , &#39;overshoot_r&#39; : 0.0
+                           , &#39;overshoot_f&#39; : 0.0
+                           , &#39;cof&#39;         : 5.0
+                           , &#39;voff_stat&#39;   : -5.0
+                           , &#39;voff_sys&#39;    : -5.0
+                           , &#39;A&#39;           : -15.0
+                           , }
+            , }.get(ace_backend, NotImplementedError(err))
+    x_max = { &#39;xh035-3V3&#39;: { &#39;a_0&#39;         : 70.0
+                           , &#39;ugbw&#39;        : 10.0
+                           , &#39;pm&#39;          : 120.0
+                           , &#39;gm&#39;          : 80.0
+                           , &#39;sr_r&#39;        : 8.0
+                           , &#39;sr_f&#39;        : 8.0
+                           , &#39;vn_1Hz&#39;      : -4.0
+                           , &#39;vn_10Hz&#39;     : -4.0
+                           , &#39;vn_100Hz&#39;    : -4.0
+                           , &#39;vn_1kHz&#39;     : -4.0
+                           , &#39;vn_10kHz&#39;    : -4.0
+                           , &#39;vn_100kHz&#39;   : -4.0
+                           , &#39;cmrr&#39;        : 150.0
+                           , &#39;psrr_n&#39;      : 70.0
+                           , &#39;psrr_p&#39;      : 140.0
+                           , &#39;v_il&#39;        : (2.0 * vdd)
+                           , &#39;v_ih&#39;        : (2.0 * vdd)
+                           , &#39;v_ol&#39;        : (2.0 * vdd)
+                           , &#39;v_oh&#39;        : (2.0 * vdd)
+                           , &#39;i_out_min&#39;   : -3.0
+                           , &#39;i_out_max&#39;   : -3.0
+                           , &#39;idd&#39;         : -3.0
+                           , &#39;iss&#39;         : -3.0
+                           , &#39;overshoot_r&#39; : 130.0
+                           , &#39;overshoot_f&#39; : 130.0
+                           , &#39;cof&#39;         : 9.0
+                           , &#39;voff_stat&#39;   : 0.0
+                           , &#39;voff_sys&#39;    : 0.0
+                           , &#39;A&#39;           : -5.0
+                           , }
+            , &#39;xh018-1V8&#39;: { &#39;a_0&#39;         : 70.0
+                           , &#39;ugbw&#39;        : 10.0
+                           , &#39;pm&#39;          : 120.0
+                           , &#39;gm&#39;          : 80.0
+                           , &#39;sr_r&#39;        : 8.0
+                           , &#39;sr_f&#39;        : 8.0
+                           , &#39;vn_1Hz&#39;      : -4.0
+                           , &#39;vn_10Hz&#39;     : -4.0
+                           , &#39;vn_100Hz&#39;    : -4.0
+                           , &#39;vn_1kHz&#39;     : -4.0
+                           , &#39;vn_10kHz&#39;    : -4.0
+                           , &#39;vn_100kHz&#39;   : -4.0
+                           , &#39;cmrr&#39;        : 150.0
+                           , &#39;psrr_n&#39;      : 70.0
+                           , &#39;psrr_p&#39;      : 140.0
+                           , &#39;v_il&#39;        : (2.0 * vdd)
+                           , &#39;v_ih&#39;        : (2.0 * vdd)
+                           , &#39;v_ol&#39;        : (2.0 * vdd)
+                           , &#39;v_oh&#39;        : (2.0 * vdd)
+                           , &#39;i_out_min&#39;   : -3.0
+                           , &#39;i_out_max&#39;   : -3.0
+                           , &#39;idd&#39;         : -3.0
+                           , &#39;iss&#39;         : -3.0
+                           , &#39;overshoot_r&#39; : 130.0
+                           , &#39;overshoot_f&#39; : 130.0
+                           , &#39;cof&#39;         : 9.0
+                           , &#39;voff_stat&#39;   : 0.0
+                           , &#39;voff_sys&#39;    : 0.0
+                           , &#39;A&#39;           : -5.0
+                           , }
+            , }.get(ace_backend, NotImplementedError(err))
     return (x_min, x_max)</code></pre>
 </details>
 </dd>
+<dt id="circus.trafo.op2.reference_goal"><code class="name flex">
+<span>def <span class="ident">reference_goal</span></span>(<span>constraints: dict, ace_backend: str) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Corated Referece Goal for OP2</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reference_goal(constraints: dict, ace_backend: str) -&gt; np.ndarray:
+    &#34;&#34;&#34; Corated Referece Goal for OP2 &#34;&#34;&#34;
+    err   = f&#39;No Reference Goal for {ace_backend} available&#39;
+    vdd   = constraints.get(&#39;vsup&#39;, {}).get(&#39;init&#39;, 3.3)
+    return { &#39;xh035-3V3&#39;: { &#34;A&#34;:           5.0e-10      # 5.010925e-10
+                          , &#34;a_0&#34;:         55.0         # 54.962221293150016
+                          , &#34;ugbw&#34;:        3.5e6        # 3428563.930768671
+                          , &#34;sr_r&#34;:        3.5e6        # 3822408.8725046776
+                          , &#34;sr_f&#34;:        3.5e6        # -3846399.224656781
+                          , &#34;pm&#34;:          65.0         # 67.0570640439259
+                          , &#34;gm&#34;:          -30.0        # -32.298672913767724
+                          , &#34;cmrr&#34;:        100.0        # 101.52646998121247
+                          , &#34;psrr_n&#34;:      55.0         # 55.22058921101098
+                          , &#34;psrr_p&#34;:      90.0         # 91.50247601455912
+                          , &#34;idd&#34;:         3.0e-5       # 3.0211906622006625e-05
+                          , &#34;iss&#34;:         3.3e-5       # -3.3211921814583654e-05
+                          , &#34;vn_1Hz&#34;:      6.5e-6       # 6.216847362829546e-06
+                          , &#34;vn_10Hz&#34;:     2.0e-6       # 1.8361486757073514e-06
+                          , &#34;vn_100Hz&#34;:    5.5e-7       # 5.395284017023125e-07
+                          , &#34;vn_1kHz&#34;:     1.75e-7      # 1.6163236371474532e-07
+                          , &#34;vn_10kHz&#34;:    6.5e-8       # 6.295679831589233e-08
+                          , &#34;vn_100kHz&#34;:   4.5e-8       # 4.421652882505914e-08
+                          , &#34;cof&#34;:         35.0e6       # 34532197.91934585
+                          , &#34;overshoot_r&#34;: 2.5          # 2.6405786027522846
+                          , &#34;overshoot_f&#34;: 2.0          # 2.152491375598402
+                          , &#34;i_out_min&#34;:   -2.5e-5      # -2.34598447270796e-05
+                          , &#34;i_out_max&#34;:   2.5e-5       # 2.375395528802124e-05
+                          , &#34;v_ol&#34;:        (vdd * 0.50) # 1.6314814360399006
+                          , &#34;v_oh&#34;:        (vdd * 0.95) # 1.6685034539424761
+                          , &#34;v_il&#34;:        (vdd * 0.25) # 0.5688672464434619
+                          , &#34;v_ih&#34;:        (vdd * 0.95) # 3.3502486012612174
+                          , &#34;voff_stat&#34;:   3.0e-3       # 0.0031193237064727104
+                          , &#34;voff_sys&#34;:    -1.5e-3      # -0.0015180853180561346
+                          , }
+           , &#39;xh018-1V8&#39;: { &#34;A&#34;:           5.0e-10      # 5.010925e-10
+                          , &#34;a_0&#34;:         55.0         # 54.962221293150016
+                          , &#34;ugbw&#34;:        3.5e6        # 3428563.930768671
+                          , &#34;sr_r&#34;:        3.5e6        # 3822408.8725046776
+                          , &#34;sr_f&#34;:        3.5e6        # -3846399.224656781
+                          , &#34;pm&#34;:          65.0         # 67.0570640439259
+                          , &#34;gm&#34;:          -30.0        # -32.298672913767724
+                          , &#34;cmrr&#34;:        100.0        # 101.52646998121247
+                          , &#34;psrr_n&#34;:      55.0         # 55.22058921101098
+                          , &#34;psrr_p&#34;:      90.0         # 91.50247601455912
+                          , &#34;idd&#34;:         3.0e-5       # 3.0211906622006625e-05
+                          , &#34;iss&#34;:         3.3e-5       # -3.3211921814583654e-05
+                          , &#34;vn_1Hz&#34;:      6.5e-6       # 6.216847362829546e-06
+                          , &#34;vn_10Hz&#34;:     2.0e-6       # 1.8361486757073514e-06
+                          , &#34;vn_100Hz&#34;:    5.5e-7       # 5.395284017023125e-07
+                          , &#34;vn_1kHz&#34;:     1.75e-7      # 1.6163236371474532e-07
+                          , &#34;vn_10kHz&#34;:    6.5e-8       # 6.295679831589233e-08
+                          , &#34;vn_100kHz&#34;:   4.5e-8       # 4.421652882505914e-08
+                          , &#34;cof&#34;:         35.0e6       # 34532197.91934585
+                          , &#34;overshoot_r&#34;: 2.5          # 2.6405786027522846
+                          , &#34;overshoot_f&#34;: 2.0          # 2.152491375598402
+                          , &#34;i_out_min&#34;:   -2.5e-5      # -2.34598447270796e-05
+                          , &#34;i_out_max&#34;:   2.5e-5       # 2.375395528802124e-05
+                          , &#34;v_ol&#34;:        (vdd * 0.50) # 1.6314814360399006
+                          , &#34;v_oh&#34;:        (vdd * 0.95) # 1.6685034539424761
+                          , &#34;v_il&#34;:        (vdd * 0.25) # 0.5688672464434619
+                          , &#34;v_ih&#34;:        (vdd * 0.95) # 3.3502486012612174
+                          , &#34;voff_stat&#34;:   3.0e-3       # 0.0031193237064727104
+                          , &#34;voff_sys&#34;:    -1.5e-3      # -0.0015180853180561346
+                          , }
+           , }.get(ace_backend, NotImplementedError(err))</code></pre>
+</details>
+</dd>
 <dt id="circus.trafo.op2.transform"><code class="name flex">
-<span>def <span class="ident">transform</span></span>(<span>constraints: dict, nmos: <a title="circus.prim.PrimitiveDevice" href="../prim.html#circus.prim.PrimitiveDevice">PrimitiveDevice</a>, pmos: <a title="circus.prim.PrimitiveDevice" href="../prim.html#circus.prim.PrimitiveDevice">PrimitiveDevice</a>, gmid_cm1: float, gmid_cm2: float, gmid_cm3: float, gmid_dp1: float, fug_cm1: float, fug_cm2: float, fug_cm3: float, fug_dp1: float, i1: float, i2: float) ‑> dict</span>
+<span>def <span class="ident">transform</span></span>(<span>constraints: dict, nmos: <a title="circus.prim.PrimitiveDevice" href="../prim.html#circus.prim.PrimitiveDevice">PrimitiveDevice</a>, pmos: <a title="circus.prim.PrimitiveDevice" href="../prim.html#circus.prim.PrimitiveDevice">PrimitiveDevice</a>, gmid_cm1: float, gmid_cm2: float, gmid_cm3: float, gmid_dp1: float, fug_cm1: float, fug_cm2: float, fug_cm3: float, fug_dp1: float, i1: float, i2: float) ‑> dict[str, float]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Transforation for OP2</p></div>
@@ -284,10 +557,10 @@ def output_scale( constraints: dict, ace_backend: str
     Mcm31   = constraints.get(&#39;Mcm31&#39;, {}).get(&#39;init&#39;, 2)
     Mcm32   = constraints.get(&#39;Mcm32&#39;, {}).get(&#39;init&#39;, 2)
 
-    cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.0),         0.0 ]])
-    cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.0),         0.0 ]])
-    cm3_in  = np.array([[gmid_cm3, fug_cm3,  (vdd / 4.0),         0.0 ]])
-    dp1_in  = np.array([[gmid_dp1, fug_dp1,  (vdd / 3.0), -(vdd / 4.0)]])
+    cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.25),         0.00 ]])
+    cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.15),         0.00 ]])
+    cm3_in  = np.array([[gmid_cm3, fug_cm3,  (vdd / 4.25),         0.00 ]])
+    dp1_in  = np.array([[gmid_dp1, fug_dp1,  (vdd / 2.10), -(vdd / 4.85)]])
 
     cm1_out = nmos.predict(cm1_in)[0]
     cm2_out = pmos.predict(cm2_in)[0]
@@ -314,7 +587,7 @@ def output_scale( constraints: dict, ace_backend: str
 </details>
 </dd>
 <dt id="circus.trafo.op2.unscaler"><code class="name flex">
-<span>def <span class="ident">unscaler</span></span>(<span>ace_backend: str) ‑> tuple</span>
+<span>def <span class="ident">unscaler</span></span>(<span>ace_backend: str) ‑> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Unscale function for a given PDK</p></div>
@@ -325,8 +598,13 @@ def output_scale( constraints: dict, ace_backend: str
 <pre><code class="python">def unscaler(ace_backend: str) -&gt; tuple[ np.ndarray, np.ndarray, np.ndarray
                                        , np.ndarray, np.ndarray]:
     &#34;&#34;&#34; Unscale function for a given PDK &#34;&#34;&#34;
-    x_min = np.array([5.0,  5.0,  5.0,  5.0,  6.0, 6.0, 6.0, 6.0, 1.0,  3.0])
-    x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
+    err   = f&#39;No Input Scale for {ace_backend} available&#39;
+    x_min = { &#39;xh035-3V3&#39;: np.array([5.0,  5.0,  5.0,  5.0,  7.0, 7.0, 7.0, 7.0, 1.0,  6.0])
+            , &#39;xh018-1V8&#39;: np.array([5.0,  5.0,  5.0,  5.0,  7.0, 7.0, 7.0, 7.0, 1.0,  3.0])
+            , }.get(ace_backend, NotImplementedError(err))
+    x_max = { &#39;xh035-3V3&#39;: np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
+            , &#39;xh018-1V8&#39;: np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
+            , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,4))  for i in range(10)])
     fm    = np.array([(i in range(4,8))  for i in range(10)])
     im    = np.array([(i in range(8,10)) for i in range(10)])
@@ -352,6 +630,7 @@ def output_scale( constraints: dict, ace_backend: str
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="circus.trafo.op2.output_scale" href="#circus.trafo.op2.output_scale">output_scale</a></code></li>
+<li><code><a title="circus.trafo.op2.reference_goal" href="#circus.trafo.op2.reference_goal">reference_goal</a></code></li>
 <li><code><a title="circus.trafo.op2.transform" href="#circus.trafo.op2.transform">transform</a></code></li>
 <li><code><a title="circus.trafo.op2.unscaler" href="#circus.trafo.op2.unscaler">unscaler</a></code></li>
 </ul>

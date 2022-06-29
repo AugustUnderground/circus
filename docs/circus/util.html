@@ -80,8 +80,11 @@ def filter_results( filter_ids: list[str], results: dict[int, dict[str, float]]
     goal states obtained from ACE. Returns a numpy array where 0th dimension is
     the number of environments and the 1st dimension is `len(filter_ids)`.
     &#34;&#34;&#34;
-    return np.vstack([ np.array([ results[i][k] for k in filter_ids ])
-                       for i in sorted(list(results.keys())) ])
+    return np.nan_to_num( np.vstack([ np.array([ results[i][k]
+                                                 for k in filter_ids ])
+                                      for i in sorted(list(results.keys())) ])
+                        , nan = 0.0, posinf = 0.0, neginf = 0.0
+                        , )
 
 def geometric_unscaler(constraints: dict) -&gt; Callable:
     &#34;&#34;&#34;
@@ -190,7 +193,7 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
 </details>
 </dd>
 <dt id="circus.util.filter_results"><code class="name flex">
-<span>def <span class="ident">filter_results</span></span>(<span>filter_ids: list, results: dict) ‑> numpy.ndarray</span>
+<span>def <span class="ident">filter_results</span></span>(<span>filter_ids: list[str], results: dict[int, dict[str, float]]) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Filter a set of keys from nested dict. Intended to filter observations and
@@ -207,8 +210,11 @@ the number of environments and the 1st dimension is <code>len(filter_ids)</code>
     goal states obtained from ACE. Returns a numpy array where 0th dimension is
     the number of environments and the 1st dimension is `len(filter_ids)`.
     &#34;&#34;&#34;
-    return np.vstack([ np.array([ results[i][k] for k in filter_ids ])
-                       for i in sorted(list(results.keys())) ])</code></pre>
+    return np.nan_to_num( np.vstack([ np.array([ results[i][k]
+                                                 for k in filter_ids ])
+                                      for i in sorted(list(results.keys())) ])
+                        , nan = 0.0, posinf = 0.0, neginf = 0.0
+                        , )</code></pre>
 </details>
 </dd>
 <dt id="circus.util.geometric_unscaler"><code class="name flex">

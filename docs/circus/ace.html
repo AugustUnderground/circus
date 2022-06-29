@@ -62,13 +62,13 @@ def goal_predicate(parameters: list[str]) -&gt; list[Callable]:
             , &#39;pm&#39;:          operator.ge # Phase Margin
             , &#39;psrr_n&#39;:      operator.ge # Power Supply Rejection Ratio -
             , &#39;psrr_p&#39;:      operator.ge # Power Supply Rejection Ratio +
-            , &#39;sr_f&#39;:        operator.le # Slew Rate Falling
-            , &#39;sr_r&#39;:        operator.le # Slew Rate Rising
+            , &#39;sr_f&#39;:        operator.ge # Slew Rate Falling
+            , &#39;sr_r&#39;:        operator.ge # Slew Rate Rising
             , &#39;ugbw&#39;:        operator.ge # Unity Gain Bandwidth Product
             , &#39;v_ih&#39;:        operator.ge # Input Voltage High
-            , &#39;v_il&#39;:        operator.ge # Input Voltage Low
+            , &#39;v_il&#39;:        operator.le # Input Voltage Low
             , &#39;v_oh&#39;:        operator.ge # Ouput Voltage High
-            , &#39;v_ol&#39;:        operator.ge # Ouput Voltage Low
+            , &#39;v_ol&#39;:        operator.le # Ouput Voltage Low
             , &#39;vn_100Hz&#39;:    operator.le # Output-referred noise density @ 100Hz
             , &#39;vn_100kHz&#39;:   operator.le # Output-referred noise density @ 100kHz
             , &#39;vn_10Hz&#39;:     operator.le # Output-referred noise density @ 10Hz
@@ -110,7 +110,7 @@ def goal_predicate(parameters: list[str]) -&gt; list[Callable]:
 </details>
 </dd>
 <dt id="circus.ace.goal_predicate"><code class="name flex">
-<span>def <span class="ident">goal_predicate</span></span>(<span>parameters: list) ‑> list</span>
+<span>def <span class="ident">goal_predicate</span></span>(<span>parameters: list[str]) ‑> list[typing.Callable]</span>
 </code></dt>
 <dd>
 <div class="desc"><p>List of default predicates for achived / desired goal comparison:
@@ -138,13 +138,13 @@ lambda achived desired: &hellip;</p></div>
             , &#39;pm&#39;:          operator.ge # Phase Margin
             , &#39;psrr_n&#39;:      operator.ge # Power Supply Rejection Ratio -
             , &#39;psrr_p&#39;:      operator.ge # Power Supply Rejection Ratio +
-            , &#39;sr_f&#39;:        operator.le # Slew Rate Falling
-            , &#39;sr_r&#39;:        operator.le # Slew Rate Rising
+            , &#39;sr_f&#39;:        operator.ge # Slew Rate Falling
+            , &#39;sr_r&#39;:        operator.ge # Slew Rate Rising
             , &#39;ugbw&#39;:        operator.ge # Unity Gain Bandwidth Product
             , &#39;v_ih&#39;:        operator.ge # Input Voltage High
-            , &#39;v_il&#39;:        operator.ge # Input Voltage Low
+            , &#39;v_il&#39;:        operator.le # Input Voltage Low
             , &#39;v_oh&#39;:        operator.ge # Ouput Voltage High
-            , &#39;v_ol&#39;:        operator.ge # Ouput Voltage Low
+            , &#39;v_ol&#39;:        operator.le # Ouput Voltage Low
             , &#39;vn_100Hz&#39;:    operator.le # Output-referred noise density @ 100Hz
             , &#39;vn_100kHz&#39;:   operator.le # Output-referred noise density @ 100kHz
             , &#39;vn_10Hz&#39;:     operator.le # Output-referred noise density @ 10Hz

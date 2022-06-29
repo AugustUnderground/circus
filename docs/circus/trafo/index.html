@@ -78,7 +78,17 @@ def performance_scale( ace_id: str, ace_backend: str, constraints: dict
            , &#39;op2&#39;: op2.output_scale
            , &#39;op8&#39;: op8.output_scale
            , }.get( ace_id, NotImplementedError(err_msg)
-                  )(constraints, ace_backend)</code></pre>
+                  )(constraints, ace_backend)
+
+def reference_goal( ace_id: str, ace_backend: str, constraints: dict
+                  ) -&gt; dict[str, float]:
+    &#34;&#34;&#34; Curated Refernce goal for OP &#34;&#34;&#34;
+    err_msg = f&#39;No Reference Goal for {ace_id} available&#39;
+    return { &#39;op1&#39;: op1.reference_goal
+           , &#39;op2&#39;: op2.reference_goal
+           , &#39;op8&#39;: op8.reference_goal
+           , }.get(ace_id, NotImplementedError(err_msg)
+                 )(constraints, ace_backend)</code></pre>
 </details>
 </section>
 <section>
@@ -169,6 +179,26 @@ def performance_scale( ace_id: str, ace_backend: str, constraints: dict
                   )(constraints, ace_backend)</code></pre>
 </details>
 </dd>
+<dt id="circus.trafo.reference_goal"><code class="name flex">
+<span>def <span class="ident">reference_goal</span></span>(<span>ace_id: str, ace_backend: str, constraints: dict) ‑> dict[str, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Curated Refernce goal for OP</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reference_goal( ace_id: str, ace_backend: str, constraints: dict
+                  ) -&gt; dict[str, float]:
+    &#34;&#34;&#34; Curated Refernce goal for OP &#34;&#34;&#34;
+    err_msg = f&#39;No Reference Goal for {ace_id} available&#39;
+    return { &#39;op1&#39;: op1.reference_goal
+           , &#39;op2&#39;: op2.reference_goal
+           , &#39;op8&#39;: op8.reference_goal
+           , }.get(ace_id, NotImplementedError(err_msg)
+                 )(constraints, ace_backend)</code></pre>
+</details>
+</dd>
 <dt id="circus.trafo.transformation"><code class="name flex">
 <span>def <span class="ident">transformation</span></span>(<span>ace_id: str) ‑> Callable</span>
 </code></dt>
@@ -215,6 +245,7 @@ def performance_scale( ace_id: str, ace_backend: str, constraints: dict
 <li><code><a title="circus.trafo.electric_identifiers" href="#circus.trafo.electric_identifiers">electric_identifiers</a></code></li>
 <li><code><a title="circus.trafo.electric_unscaler" href="#circus.trafo.electric_unscaler">electric_unscaler</a></code></li>
 <li><code><a title="circus.trafo.performance_scale" href="#circus.trafo.performance_scale">performance_scale</a></code></li>
+<li><code><a title="circus.trafo.reference_goal" href="#circus.trafo.reference_goal">reference_goal</a></code></li>
 <li><code><a title="circus.trafo.transformation" href="#circus.trafo.transformation">transformation</a></code></li>
 </ul>
 </li>
