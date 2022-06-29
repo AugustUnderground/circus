@@ -48,7 +48,7 @@ def performance_scale( ace_id: str, ace_backend: str, constraints: dict
     return { 'op1': op1.output_scale
            , 'op2': op2.output_scale
            , 'op8': op8.output_scale
-           , }.get( ace_id, NotImplementedError(err_msg)
+           , }.get(ace_id, NotImplementedError(err_msg)
                   )(constraints, ace_backend)
 
 def reference_goal( ace_id: str, ace_backend: str, constraints: dict
@@ -59,4 +59,4 @@ def reference_goal( ace_id: str, ace_backend: str, constraints: dict
            , 'op2': op2.reference_goal
            , 'op8': op8.reference_goal
            , }.get(ace_id, NotImplementedError(err_msg)
-                 )(constraints, ace_backend)
+                  )(constraints, ace_backend)
