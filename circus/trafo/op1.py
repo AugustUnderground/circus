@@ -24,8 +24,7 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
              , gmid_cm1: float, gmid_cm2: float, gmid_cs1: float, gmid_dp1: float
              , fug_cm1: float,  fug_cm2: float,  fug_cs1: float,  fug_dp1: float
              #, res: float, cap: float
-             , m1: float, m2: float ) -> dict[str, float]:
-             # , i1: float, i2: float ) -> dict[str, float]:
+             , i1: float, i2: float ) -> dict[str, float]:
     """
     Transforation for OP1
     Arguments:
@@ -61,29 +60,13 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Mcm22   = constraints.get('Mcm22', {}).get('init', 2)
     Mdp1    = constraints.get('Md',    {}).get('init', 2)
 
-    #M1_lim  = int(constraints.get('Mcm12', {}).get('max', 40))
-    #M3_lim  = int(constraints.get('Mcm13', {}).get('max', 40))
-
-    #M1      = Fraction(i0 / i1).limit_denominator(M1_lim)
-    #M3      = Fraction(i0 / i2).limit_denominator(M3_lim)
-
-    #Mcm11   = max(np.lcm(M1.numerator, M3.numerator), 1)
-    #Mcm12   = max(M1.denominator * Mcm11, 1)
-    #Mcm13   = max(M3.denominator * Mcm11, 1)
-    #Mcs1    = Mcm13
-
-    #Mcm11   = max(M1.numerator, 1)
-    #Mcm12   = max(M1.denominator, 1)
-    #Mcm13   = max((M1.numerator * M3.denominator) // max(M3.numerator, 1), 1)
-    #Mcs1    = Mcm13
+    M1_lim  = int(constraints.get('Mcm12', {}).get('max', 40))
+    M2_lim  = int(constraints.get('Mcm13', {}).get('max', 40))
 
     Mcm11   = 1
-    Mcm12   = round(m1 * 1e6)
-    Mcm13   = round(m2 * 1e6)
-    Mcs1    = round(m2 * 1e6)
-
-    i1      = i0 * Mcm12
-    i2      = i0 * Mcm13
+    Mcm12   = max(min(round(i1 / i0), M1_lim), 1)
+    Mcm13   = max(min(round(i2 / i0), M1_lim), 1)
+    Mcs1    = Mcm13
 
     cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.20),         0.00 ]])
     cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.55),         0.00 ]])
@@ -125,17 +108,17 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
     err   = f'No Input Scale for {ace_backend} available'
     x_min = { 'xh035-3V3': np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 1.0, 15.0 ])
+                                    , 3.0, 45.0 ])
             , 'xh018-1V8': np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 1.0, 15.0 ])
+                                    , 3.0, 45.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     x_max = { 'xh035-3V3': np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 3.0, 30.0 ])
+                                    , 9.0, 75.0 ])
             , 'xh018-1V8': np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 3.0, 30.0 ])
+                                    , 9.0, 75.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,4))  for i in range(10)])
     fm    = np.array([(i in range(4,8))  for i in range(10)])
@@ -149,8 +132,8 @@ def reference_goal(constraints: dict, ace_backend: str) -> np.ndarray:
     return { 'xh035-3V3': { "A":           5.5e-9         # 5.38162e-09
                           , "a_0":         100.0          # 104.83873351808626
                           , "ugbw":        1.0e6          # 1007672.6892557623
-                          , "sr_r":        600.0e3        # 643626.640626512
-                          , "sr_f":        -600.0e3       # -635172.5669242825
+                          , "sr_r":        1.0e6          # 643626.640626512
+                          , "sr_f":        -1.0e6         # -635172.5669242825
                           , "pm":          90.0           # 92.46348312601351
                           , "gm":          -90.0          # -94.0228120184453
                           , "cmrr":        120.0          # 121.41787866754784
@@ -179,8 +162,8 @@ def reference_goal(constraints: dict, ace_backend: str) -> np.ndarray:
            , 'xh018-1V8': { "A":           5.5e-9         # 5.38162e-09
                           , "a_0":         100.0          # 104.83873351808626
                           , "ugbw":        1.0e6          # 1007672.6892557623
-                          , "sr_r":        600.0e3        # 643626.640626512
-                          , "sr_f":        -600.0e3       # -635172.5669242825
+                          , "sr_r":        1.0e6          # 643626.640626512
+                          , "sr_f":        -1.0e6         # -635172.5669242825
                           , "pm":          90.0           # 92.46348312601351
                           , "gm":          -90.0          # -94.0228120184453
                           , "cmrr":        120.0          # 121.41787866754784
