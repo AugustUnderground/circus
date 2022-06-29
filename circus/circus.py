@@ -139,35 +139,38 @@ class CircusGeom(GoalEnv, VecEnv):
 
         self.rng_seed          = seed
 
+        reference              = ac.evaluate_circuit_pool(self.ace_envs)[0]
+
         if isinstance(goal_init, str) and goal_init == 'noisy':
-            self.goal_init     = goal_init
-            initial_sizing     = ac.initial_sizing_pool(self.ace_envs)
-            results            = ac.evaluate_circuit_pool( self.ace_envs
-                                                         , pool_params = initial_sizing
-                                                         , )
-            reference_goal     = filter_results(self.goal_filter, results)
+            self.goal_init      = goal_init
+            ref_goal_op         = reference_goal( self.ace_id, self.ace_backend
+                                                , self.constraints )
+            ref_goal            = { gf: ref_goal_op.get(gf, reference[gf])
+                                    for gf in self.goal_filter }
+            ref_goals           = { i: ref_goal for i in range(self.num_envs) }
+
+            self.reference_goal = filter_results( self.goal_filter
+                                                , ref_goals )
         elif isinstance(goal_init, str) and goal_init == 'random':
-            self.goal_init     = goal_init
-            x_min_d, x_max_d   = performance_scale( self.ace_id
-                                                  , self.ace_backend
-                                                  , self.constraints
-                                                  , )
-            _                  = ac.evaluate_circuit_pool(self.ace_envs)
-            reference_goal     = np.array([ [x_min_d[gp] for gp in self.goal_filter]
-                                          , [x_max_d[gp] for gp in self.goal_filter]
-                                          ])
+            self.goal_init      = goal_init
+            x_min_d, x_max_d    = performance_scale( self.ace_id
+                                                   , self.ace_backend
+                                                   , self.constraints
+                                                   , )
+            self.reference_goal = np.array([ [x_min_d[gp] for gp in self.goal_filter]
+                                           , [x_max_d[gp] for gp in self.goal_filter]
+                                           ])
         elif isinstance(goal_init, np.ndarray):
-            self.goal_init     = 'fix'
-            goal_shape         = (num_envs, len(self.goal_filter))
-            _                  = ac.evaluate_circuit_pool(self.ace_envs)
-            reference_goal     = ( goal_init
-                                   if goal_init.shape == goal_shape else
-                                   np.repeat(goal_init[None], num_envs, axis = 0) )
+            self.goal_init      = 'fix'
+            goal_shape          = (num_envs, len(self.goal_filter))
+            self.reference_goal = ( goal_init
+                                    if goal_init.shape == goal_shape else
+                                    np.repeat(goal_init[None], num_envs, axis = 0) )
         else:
             NotImplementedError(f'Goal initializer {goal_init} not available.')
 
         self.new_goal          = goal_generator( self.goal_init
-                                               , reference_goal
+                                               , self.reference_goal
                                                , self.num_envs
                                                , )
         self.goal              = self.new_goal()

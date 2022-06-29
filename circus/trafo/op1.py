@@ -49,6 +49,7 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     #rc      = (1 / (gmid_cs1 * i2)) * ((cc + cl) / cc)
 
     i0      = constraints.get('i0',   {}).get('init', 3e-6)
+    i1      = i0
     vdd     = constraints.get('vsup', {}).get('init', 3.3)
 
     Wres    = constraints.get('Wres', {}).get('init', 2e-6)
@@ -59,20 +60,30 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Mcm21   = constraints.get('Mcm21', {}).get('init', 2)
     Mcm22   = constraints.get('Mcm22', {}).get('init', 2)
     Mdp1    = constraints.get('Md',    {}).get('init', 2)
-    #Mcs1    = constraints.get('Mcs',   {}).get('init', 60)
+    #Mcs1    = constraints.get('Mcs',   {}).get('init', 40)
 
-    M1_lim  = int(constraints.get('Mcm12', {}).get('max', 60)) // 10
-    M3_lim  = int(constraints.get('Mcm13', {}).get('max', 60))
+    M1_lim  = int(constraints.get('Mcm12', {}).get('max', 40)) // 20
+    M3_lim  = int(constraints.get('Mcm13', {}).get('max', 40))
 
     Wc_lim  = float(constraints.get('Wcs',   {}).get('max', 150e-6))
 
     M1      = Fraction(i0 / i1).limit_denominator(M1_lim)
     M3      = Fraction(i0 / i2).limit_denominator(M3_lim)
 
-    Mcm11   = max(M1.numerator, 1)
-    Mcm12   = max(M1.denominator, 1)
-    Mcm13   = max((M1.numerator * M3.denominator) // max(M3.numerator, 1), 1)
+    #Mcm11   = M3.numerator
+    #Mcm12   = Mcm11
+    #Mcm13   = M3.denominator
+    #Mcs1    = Mcm13
+
+    Mcm11   = max(np.lcm(M1.numerator, M3.numerator), 1)
+    Mcm12   = max(M1.denominator * Mcm11, 1)
+    Mcm13   = max(M3.denominator * Mcm11, 1)
     Mcs1    = Mcm13
+
+    #Mcm11   = max(M1.numerator, 1)
+    #Mcm12   = max(M1.denominator, 1)
+    #Mcm13   = max((M1.numerator * M3.denominator) // max(M3.numerator, 1), 1)
+    #Mcs1    = Mcm13
 
     cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.20),         0.00 ]])
     cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.55),         0.00 ]])
@@ -116,22 +127,88 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
     err   = f'No Input Scale for {ace_backend} available'
     x_min = { 'xh035-3V3': np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 3.0, 40.0 ])
+                                    , 3.0, 50.0 ])
             , 'xh018-1V8': np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 3.0, 40.0 ])
+                                    , 3.0, 50.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     x_max = { 'xh035-3V3': np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 6.0, 80.0 ])
+                                    , 6.0, 70.0 ])
             , 'xh018-1V8': np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 6.0, 80.0 ])
+                                    , 6.0, 70.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,4))  for i in range(10)])
     fm    = np.array([(i in range(4,8))  for i in range(10)])
     im    = np.array([(i in range(8,10)) for i in range(10)])
     return (x_min, x_max, gm, fm, im)
+
+def reference_goal(constraints: dict, ace_backend: str) -> np.ndarray:
+    """ Corated Referece Goal for OP1 """
+    err   = f'No Reference Goal for {ace_backend} available'
+    vdd   = constraints.get('vsup', {}).get('init', 3.3)
+    return { 'xh035-3V3': { "A":           5.5e-9         # 5.38162e-09
+                          , "a_0":         100.0          # 104.83873351808626
+                          , "ugbw":        1.0e6          # 1007672.6892557623
+                          , "sr_r":        600.0e3        # 643626.640626512
+                          , "sr_f":        -600.0e3       # -635172.5669242825
+                          , "pm":          90.0           # 92.46348312601351
+                          , "gm":          -90.0          # -94.0228120184453
+                          , "cmrr":        120.0          # 121.41787866754784
+                          , "psrr_n":      100.0          # 108.88639881084693
+                          , "psrr_p":      100.0          # 109.58280488887551
+                          , "idd":         7.0e-5         # 6.945603045871478e-05
+                          , "iss":         -7.5e-5        # -7.245603283577388e-05
+                          , "vn_1Hz":      5.0e-6         # 5.083454785444561e-06
+                          , "vn_10Hz":     1.5e-6         # 1.4998955809756694e-06
+                          , "vn_100Hz":    4.5e-7         # 4.4048325646935895e-07
+                          , "vn_1kHz":     1.5e-5         # 1.3244013240248254e-07
+                          , "vn_10kHz":    5.5e-8         # 5.297534060968821e-08
+                          , "vn_100kHz":   4.0e-8         # 3.831101172886542e-08
+                          , "cof":         2.0e9          # 2127642604.233062
+                          , "overshoot_r": 0.5e-3         # 0.0005518141734703779
+                          , "overshoot_f": 0.5e-3         # 0.00047131508580914634
+                          , "i_out_min":   -5.0e-3        # -0.003998561000759212
+                          , "i_out_max":   7.0e-5         # 6.795110367221515e-05
+                          , "v_ol":        (vdd * 0.0333) # 0.1189121584287387
+                          , "v_oh":        (vdd * 0.82)   # 3.142843762405591
+                          , "v_il":        (vdd * 0.25)   # 0.7159757161850907
+                          , "v_ih":        (vdd * 0.82)   # 3.140097305913386
+                          , "voff_stat":   3.0e-3         # 0.002987252118372549
+                          , "voff_sys":    -250.0e-6      # -0.0002386325463920591
+                          , }
+           , 'xh018-1V8': { "A":           5.5e-9         # 5.38162e-09
+                          , "a_0":         100.0          # 104.83873351808626
+                          , "ugbw":        1.0e6          # 1007672.6892557623
+                          , "sr_r":        600.0e3        # 643626.640626512
+                          , "sr_f":        -600.0e3       # -635172.5669242825
+                          , "pm":          90.0           # 92.46348312601351
+                          , "gm":          -90.0          # -94.0228120184453
+                          , "cmrr":        120.0          # 121.41787866754784
+                          , "psrr_n":      100.0          # 108.88639881084693
+                          , "psrr_p":      100.0          # 109.58280488887551
+                          , "idd":         7.0e-5         # 6.945603045871478e-05
+                          , "iss":         -7.5e-5        # -7.245603283577388e-05
+                          , "vn_1Hz":      5.0e-6         # 5.083454785444561e-06
+                          , "vn_10Hz":     1.5e-6         # 1.4998955809756694e-06
+                          , "vn_100Hz":    4.5e-7         # 4.4048325646935895e-07
+                          , "vn_1kHz":     1.5e-5         # 1.3244013240248254e-07
+                          , "vn_10kHz":    5.5e-8         # 5.297534060968821e-08
+                          , "vn_100kHz":   4.0e-8         # 3.831101172886542e-08
+                          , "cof":         2.0e9          # 2127642604.233062
+                          , "overshoot_r": 0.5e-3         # 0.0005518141734703779
+                          , "overshoot_f": 0.5e-3         # 0.00047131508580914634
+                          , "i_out_min":   -5.0e-3        # -0.003998561000759212
+                          , "i_out_max":   7.0e-5         # 6.795110367221515e-05
+                          , "v_ol":        (vdd * 0.0333) # 0.1189121584287387
+                          , "v_oh":        (vdd * 0.82)   # 3.142843762405591
+                          , "v_il":        (vdd * 0.25)   # 0.7159757161850907
+                          , "v_ih":        (vdd * 0.82)   # 3.140097305913386
+                          , "voff_stat":   3.0e-3         # 0.002987252118372549
+                          , "voff_sys":    -250.0e-6      # -0.0002386325463920591
+                          , }
+           , }.get(ace_backend, NotImplementedError(err))
 
 def output_scale( constraints: dict, ace_backend: str
                 ) -> tuple[dict[str, float], dict[str, float]]:

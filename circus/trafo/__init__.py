@@ -50,3 +50,13 @@ def performance_scale( ace_id: str, ace_backend: str, constraints: dict
            , 'op8': op8.output_scale
            , }.get( ace_id, NotImplementedError(err_msg)
                   )(constraints, ace_backend)
+
+def reference_goal( ace_id: str, ace_backend: str, constraints: dict
+                  ) -> dict[str, float]:
+    """ Curated Refernce goal for OP """
+    err_msg = f'No Reference Goal for {ace_id} available'
+    return { 'op1': op1.reference_goal
+           , 'op2': op2.reference_goal
+           , 'op8': op8.reference_goal
+           , }.get(ace_id, NotImplementedError(err_msg)
+                 )(constraints, ace_backend)
