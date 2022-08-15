@@ -116,6 +116,35 @@ class OP8XH035ElecV1(OPElecV1):
     def __init__(self, **kwargs):
         super().__init__( ace_id = &#34;op8&#34;
                         , ace_backend = &#34;xh035-3V3&#34;
+                        , **kwargs )
+
+# AC²E: OP11 - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
+class OP11XH035GeomV0(OPGeomV0):
+    &#34;&#34;&#34;OP11: Symmetrical Amplifier Goal Env&#34;&#34;&#34;
+    def __init__(self, **kwargs):
+        super().__init__( ace_id = &#34;op11&#34;
+                        , ace_backend = &#34;xh035-3V3&#34;
+                        , **kwargs )
+
+class OP11XH035GeomV1(OPGeomV1):
+    &#34;&#34;&#34;OP11: Symmetrical Amplifier Non-Goal Env&#34;&#34;&#34;
+    def __init__(self, **kwargs):
+        super().__init__( ace_id = &#34;op11&#34;
+                        , ace_backend = &#34;xh035-3V3&#34;
+                        , **kwargs )
+
+class OP11XH035ElecV0(OPElecV0):
+    &#34;&#34;&#34;OP11: Symmetrical Amplifier Goal Env&#34;&#34;&#34;
+    def __init__(self, **kwargs):
+        super().__init__( ace_id = &#34;op11&#34;
+                        , ace_backend = &#34;xh035-3V3&#34;
+                        , **kwargs )
+
+class OP11XH035ElecV1(OPElecV1):
+    &#34;&#34;&#34;OP11: Symmetrical Amplifier Non-Goal Env&#34;&#34;&#34;
+    def __init__(self, **kwargs):
+        super().__init__( ace_id = &#34;op11&#34;
+                        , ace_backend = &#34;xh035-3V3&#34;
                         , **kwargs )</code></pre>
 </details>
 </section>
@@ -128,6 +157,237 @@ class OP8XH035ElecV1(OPElecV1):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
+<dt id="circus.gym.xh035.OP11XH035ElecV0"><code class="flex name class">
+<span>class <span class="ident">OP11XH035ElecV0</span></span>
+<span>(</span><span>**kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>OP11: Symmetrical Amplifier Goal Env</p>
+<p>Construct Electric Sizing Goal Environment. Same Arguments as
+<code>CircusGeom</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class OP11XH035ElecV0(OPElecV0):
+    &#34;&#34;&#34;OP11: Symmetrical Amplifier Goal Env&#34;&#34;&#34;
+    def __init__(self, **kwargs):
+        super().__init__( ace_id = &#34;op11&#34;
+                        , ace_backend = &#34;xh035-3V3&#34;
+                        , **kwargs )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="circus.gym.op.OPElecV0" href="op.html#circus.gym.op.OPElecV0">OPElecV0</a></li>
+<li><a title="circus.circus.CircusElec" href="../circus.html#circus.circus.CircusElec">CircusElec</a></li>
+<li><a title="circus.circus.CircusGeom" href="../circus.html#circus.circus.CircusGeom">CircusGeom</a></li>
+<li>gym.core.GoalEnv</li>
+<li>gym.core.Env</li>
+<li>stable_baselines3.common.vec_env.base_vec_env.VecEnv</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="circus.gym.op.OPElecV0" href="op.html#circus.gym.op.OPElecV0">OPElecV0</a></b></code>:
+<ul class="hlist">
+<li><code><a title="circus.gym.op.OPElecV0.close" href="../circus.html#circus.circus.CircusGeom.close">close</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.compute_reward" href="../circus.html#circus.circus.CircusGeom.compute_reward">compute_reward</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.env_is_wrapped" href="../circus.html#circus.circus.CircusGeom.env_is_wrapped">env_is_wrapped</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.env_method" href="../circus.html#circus.circus.CircusGeom.env_method">env_method</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="circus.gym.xh035.OP11XH035ElecV1"><code class="flex name class">
+<span>class <span class="ident">OP11XH035ElecV1</span></span>
+<span>(</span><span>**kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>OP11: Symmetrical Amplifier Non-Goal Env</p>
+<p>Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+<code>CircusElec</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class OP11XH035ElecV1(OPElecV1):
+    &#34;&#34;&#34;OP11: Symmetrical Amplifier Non-Goal Env&#34;&#34;&#34;
+    def __init__(self, **kwargs):
+        super().__init__( ace_id = &#34;op11&#34;
+                        , ace_backend = &#34;xh035-3V3&#34;
+                        , **kwargs )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="circus.gym.op.OPElecV1" href="op.html#circus.gym.op.OPElecV1">OPElecV1</a></li>
+<li><a title="circus.circus.CircusElecVec" href="../circus.html#circus.circus.CircusElecVec">CircusElecVec</a></li>
+<li><a title="circus.circus.CircusElec" href="../circus.html#circus.circus.CircusElec">CircusElec</a></li>
+<li><a title="circus.circus.CircusGeom" href="../circus.html#circus.circus.CircusGeom">CircusGeom</a></li>
+<li>gym.core.GoalEnv</li>
+<li>gym.core.Env</li>
+<li>stable_baselines3.common.vec_env.base_vec_env.VecEnv</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="circus.gym.op.OPElecV1" href="op.html#circus.gym.op.OPElecV1">OPElecV1</a></b></code>:
+<ul class="hlist">
+<li><code><a title="circus.gym.op.OPElecV1.close" href="../circus.html#circus.circus.CircusGeom.close">close</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.compute_reward" href="../circus.html#circus.circus.CircusGeom.compute_reward">compute_reward</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.env_is_wrapped" href="../circus.html#circus.circus.CircusGeom.env_is_wrapped">env_is_wrapped</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.env_method" href="../circus.html#circus.circus.CircusGeom.env_method">env_method</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="circus.gym.xh035.OP11XH035GeomV0"><code class="flex name class">
+<span>class <span class="ident">OP11XH035GeomV0</span></span>
+<span>(</span><span>**kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>OP11: Symmetrical Amplifier Goal Env</p>
+<p>Construct a Geometric Sizing Goal Environment</p>
+<h2 id="arguments">Arguments</h2>
+<p><code>ace_id</code>:
+ID of the form 'op#', see ACE Documentation for further
+details.
+<code>ace_backend</code>:
+PDK, available are 'xh035' and 'xh018'.
+<code>num_envs</code>:
+Numer of Parallel Environments ∈ [ 1 .. <code>nproc</code> ]
+<code>num_steps</code>:
+Number of steps per Episode.
+<code>seed</code>:
+Random Seed
+<code>obs_filter</code>:
+Filter Performance dict obtained from ACE:
+'perf': Only performance paramters (default)
+'all': All parameters from ACE
+[str]: List of parameters
+<code>goal_filter</code>:
+List of parameters
+<code>goal_preds</code>:
+Binary comparison operator
+<code>goal_init</code>:
+How to initialize new goals on reset:
+'noisy': Put some noise on a reference goal (default)
+'random': Choose a point in goal space
+np.ndarray: A specific goal of shape
+(num_envs, len(goal_filter))
+<code>reward_fn</code>:
+Optional reward function that takes an observation dict.
+<code>scale_observation</code>: Scale the observations and goals as specified in trafo
+<code>auto_reset</code>:
+Automatically reset environemt when done.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class OP11XH035GeomV0(OPGeomV0):
+    &#34;&#34;&#34;OP11: Symmetrical Amplifier Goal Env&#34;&#34;&#34;
+    def __init__(self, **kwargs):
+        super().__init__( ace_id = &#34;op11&#34;
+                        , ace_backend = &#34;xh035-3V3&#34;
+                        , **kwargs )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="circus.gym.op.OPGeomV0" href="op.html#circus.gym.op.OPGeomV0">OPGeomV0</a></li>
+<li><a title="circus.circus.CircusGeom" href="../circus.html#circus.circus.CircusGeom">CircusGeom</a></li>
+<li>gym.core.GoalEnv</li>
+<li>gym.core.Env</li>
+<li>stable_baselines3.common.vec_env.base_vec_env.VecEnv</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="circus.gym.op.OPGeomV0" href="op.html#circus.gym.op.OPGeomV0">OPGeomV0</a></b></code>:
+<ul class="hlist">
+<li><code><a title="circus.gym.op.OPGeomV0.close" href="../circus.html#circus.circus.CircusGeom.close">close</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.compute_reward" href="../circus.html#circus.circus.CircusGeom.compute_reward">compute_reward</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.env_is_wrapped" href="../circus.html#circus.circus.CircusGeom.env_is_wrapped">env_is_wrapped</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.env_method" href="../circus.html#circus.circus.CircusGeom.env_method">env_method</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV0.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="circus.gym.xh035.OP11XH035GeomV1"><code class="flex name class">
+<span>class <span class="ident">OP11XH035GeomV1</span></span>
+<span>(</span><span>**kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>OP11: Symmetrical Amplifier Non-Goal Env</p>
+<p>Construct Geometric Sizing Non-Goal Environment. Same Arguments as
+<code>CircusGeom</code> but different default <code>reward_fn</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class OP11XH035GeomV1(OPGeomV1):
+    &#34;&#34;&#34;OP11: Symmetrical Amplifier Non-Goal Env&#34;&#34;&#34;
+    def __init__(self, **kwargs):
+        super().__init__( ace_id = &#34;op11&#34;
+                        , ace_backend = &#34;xh035-3V3&#34;
+                        , **kwargs )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="circus.gym.op.OPGeomV1" href="op.html#circus.gym.op.OPGeomV1">OPGeomV1</a></li>
+<li><a title="circus.circus.CircusGeomVec" href="../circus.html#circus.circus.CircusGeomVec">CircusGeomVec</a></li>
+<li><a title="circus.circus.CircusGeom" href="../circus.html#circus.circus.CircusGeom">CircusGeom</a></li>
+<li>gym.core.GoalEnv</li>
+<li>gym.core.Env</li>
+<li>stable_baselines3.common.vec_env.base_vec_env.VecEnv</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="circus.gym.op.OPGeomV1" href="op.html#circus.gym.op.OPGeomV1">OPGeomV1</a></b></code>:
+<ul class="hlist">
+<li><code><a title="circus.gym.op.OPGeomV1.close" href="../circus.html#circus.circus.CircusGeom.close">close</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.compute_reward" href="../circus.html#circus.circus.CircusGeom.compute_reward">compute_reward</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.env_is_wrapped" href="../circus.html#circus.circus.CircusGeom.env_is_wrapped">env_is_wrapped</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.env_method" href="../circus.html#circus.circus.CircusGeom.env_method">env_method</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
 <dt id="circus.gym.xh035.OP1XH035ElecV0"><code class="flex name class">
 <span>class <span class="ident">OP1XH035ElecV0</span></span>
 <span>(</span><span>**kwargs)</span>
@@ -837,6 +1097,18 @@ Automatically reset environemt when done.</p></div>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
+<li>
+<h4><code><a title="circus.gym.xh035.OP11XH035ElecV0" href="#circus.gym.xh035.OP11XH035ElecV0">OP11XH035ElecV0</a></code></h4>
+</li>
+<li>
+<h4><code><a title="circus.gym.xh035.OP11XH035ElecV1" href="#circus.gym.xh035.OP11XH035ElecV1">OP11XH035ElecV1</a></code></h4>
+</li>
+<li>
+<h4><code><a title="circus.gym.xh035.OP11XH035GeomV0" href="#circus.gym.xh035.OP11XH035GeomV0">OP11XH035GeomV0</a></code></h4>
+</li>
+<li>
+<h4><code><a title="circus.gym.xh035.OP11XH035GeomV1" href="#circus.gym.xh035.OP11XH035GeomV1">OP11XH035GeomV1</a></code></h4>
+</li>
 <li>
 <h4><code><a title="circus.gym.xh035.OP1XH035ElecV0" href="#circus.gym.xh035.OP1XH035ElecV0">OP1XH035ElecV0</a></code></h4>
 </li>

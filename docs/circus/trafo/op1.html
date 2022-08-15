@@ -86,7 +86,6 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     #rc      = (1 / (gmid_cs1 * i2)) * ((cc + cl) / cc)
 
     i0      = constraints.get(&#39;i0&#39;,   {}).get(&#39;init&#39;, 3e-6)
-    i1      = i0
     vdd     = constraints.get(&#39;vsup&#39;, {}).get(&#39;init&#39;, 3.3)
 
     Wres    = constraints.get(&#39;Wres&#39;, {}).get(&#39;init&#39;, 2e-6)
@@ -97,30 +96,14 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Mcm21   = constraints.get(&#39;Mcm21&#39;, {}).get(&#39;init&#39;, 2)
     Mcm22   = constraints.get(&#39;Mcm22&#39;, {}).get(&#39;init&#39;, 2)
     Mdp1    = constraints.get(&#39;Md&#39;,    {}).get(&#39;init&#39;, 2)
-    #Mcs1    = constraints.get(&#39;Mcs&#39;,   {}).get(&#39;init&#39;, 40)
 
-    M1_lim  = int(constraints.get(&#39;Mcm12&#39;, {}).get(&#39;max&#39;, 40)) // 20
-    M3_lim  = int(constraints.get(&#39;Mcm13&#39;, {}).get(&#39;max&#39;, 40))
+    M1_lim  = int(constraints.get(&#39;Mcm12&#39;, {}).get(&#39;max&#39;, 40))
+    M2_lim  = int(constraints.get(&#39;Mcm13&#39;, {}).get(&#39;max&#39;, 40))
 
-    Wc_lim  = float(constraints.get(&#39;Wcs&#39;,   {}).get(&#39;max&#39;, 150e-6))
-
-    M1      = Fraction(i0 / i1).limit_denominator(M1_lim)
-    M3      = Fraction(i0 / i2).limit_denominator(M3_lim)
-
-    #Mcm11   = M3.numerator
-    #Mcm12   = Mcm11
-    #Mcm13   = M3.denominator
-    #Mcs1    = Mcm13
-
-    Mcm11   = max(np.lcm(M1.numerator, M3.numerator), 1)
-    Mcm12   = max(M1.denominator * Mcm11, 1)
-    Mcm13   = max(M3.denominator * Mcm11, 1)
+    Mcm11   = 1
+    Mcm12   = max(min(round(i1 / i0), M1_lim), 1)
+    Mcm13   = max(min(round(i2 / i0), M1_lim), 1)
     Mcs1    = Mcm13
-
-    #Mcm11   = max(M1.numerator, 1)
-    #Mcm12   = max(M1.denominator, 1)
-    #Mcm13   = max((M1.numerator * M3.denominator) // max(M3.numerator, 1), 1)
-    #Mcs1    = Mcm13
 
     cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.20),         0.00 ]])
     cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.55),         0.00 ]])
@@ -140,9 +123,7 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Wcm1    = i0       / cm1_out[0] / Mcm11
     Wcm2    = i1 / 2.0 / cm2_out[0] / Mcm21
     Wdp1    = i1 / 2.0 / dp1_out[0] / Mdp1
-
-    Wcs     = i2 / cs1_out[0]
-    #Mcs1    = np.ceil(Wcs / Wc_lim).item()
+    Wcs     = i2       / cs1_out[0]
     Wcs1    = Wcs / Mcs1
 
     sizing  = { &#39;Ld&#39;: Ldp1, &#39;Lcm1&#39;:  Lcm1,  &#39;Lcm2&#39;:  Lcm2,  &#39;Lcs&#39;: Lcs1, &#39;Lres&#39;: Lres
@@ -164,17 +145,17 @@ def unscaler(ace_backend: str) -&gt; tuple[ np.ndarray, np.ndarray, np.ndarray
     err   = f&#39;No Input Scale for {ace_backend} available&#39;
     x_min = { &#39;xh035-3V3&#39;: np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 3.0, 40.0 ])
+                                    , 3.0, 45.0 ])
             , &#39;xh018-1V8&#39;: np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 3.0, 40.0 ])
+                                    , 3.0, 45.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     x_max = { &#39;xh035-3V3&#39;: np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 9.0, 80.0 ])
+                                    , 9.0, 75.0 ])
             , &#39;xh018-1V8&#39;: np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 9.0, 80.0 ])
+                                    , 9.0, 75.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,4))  for i in range(10)])
     fm    = np.array([(i in range(4,8))  for i in range(10)])
@@ -188,8 +169,8 @@ def reference_goal(constraints: dict, ace_backend: str) -&gt; np.ndarray:
     return { &#39;xh035-3V3&#39;: { &#34;A&#34;:           5.5e-9         # 5.38162e-09
                           , &#34;a_0&#34;:         100.0          # 104.83873351808626
                           , &#34;ugbw&#34;:        1.0e6          # 1007672.6892557623
-                          , &#34;sr_r&#34;:        600.0e3        # 643626.640626512
-                          , &#34;sr_f&#34;:        -600.0e3       # -635172.5669242825
+                          , &#34;sr_r&#34;:        1.0e6          # 643626.640626512
+                          , &#34;sr_f&#34;:        -1.0e6         # -635172.5669242825
                           , &#34;pm&#34;:          90.0           # 92.46348312601351
                           , &#34;gm&#34;:          -90.0          # -94.0228120184453
                           , &#34;cmrr&#34;:        120.0          # 121.41787866754784
@@ -218,8 +199,8 @@ def reference_goal(constraints: dict, ace_backend: str) -&gt; np.ndarray:
            , &#39;xh018-1V8&#39;: { &#34;A&#34;:           5.5e-9         # 5.38162e-09
                           , &#34;a_0&#34;:         100.0          # 104.83873351808626
                           , &#34;ugbw&#34;:        1.0e6          # 1007672.6892557623
-                          , &#34;sr_r&#34;:        600.0e3        # 643626.640626512
-                          , &#34;sr_f&#34;:        -600.0e3       # -635172.5669242825
+                          , &#34;sr_r&#34;:        1.0e6          # 643626.640626512
+                          , &#34;sr_f&#34;:        -1.0e6         # -635172.5669242825
                           , &#34;pm&#34;:          90.0           # 92.46348312601351
                           , &#34;gm&#34;:          -90.0          # -94.0228120184453
                           , &#34;cmrr&#34;:        120.0          # 121.41787866754784
@@ -552,8 +533,8 @@ def output_scale( constraints: dict, ace_backend: str
     return { &#39;xh035-3V3&#39;: { &#34;A&#34;:           5.5e-9         # 5.38162e-09
                           , &#34;a_0&#34;:         100.0          # 104.83873351808626
                           , &#34;ugbw&#34;:        1.0e6          # 1007672.6892557623
-                          , &#34;sr_r&#34;:        600.0e3        # 643626.640626512
-                          , &#34;sr_f&#34;:        -600.0e3       # -635172.5669242825
+                          , &#34;sr_r&#34;:        1.0e6          # 643626.640626512
+                          , &#34;sr_f&#34;:        -1.0e6         # -635172.5669242825
                           , &#34;pm&#34;:          90.0           # 92.46348312601351
                           , &#34;gm&#34;:          -90.0          # -94.0228120184453
                           , &#34;cmrr&#34;:        120.0          # 121.41787866754784
@@ -582,8 +563,8 @@ def output_scale( constraints: dict, ace_backend: str
            , &#39;xh018-1V8&#39;: { &#34;A&#34;:           5.5e-9         # 5.38162e-09
                           , &#34;a_0&#34;:         100.0          # 104.83873351808626
                           , &#34;ugbw&#34;:        1.0e6          # 1007672.6892557623
-                          , &#34;sr_r&#34;:        600.0e3        # 643626.640626512
-                          , &#34;sr_f&#34;:        -600.0e3       # -635172.5669242825
+                          , &#34;sr_r&#34;:        1.0e6          # 643626.640626512
+                          , &#34;sr_f&#34;:        -1.0e6         # -635172.5669242825
                           , &#34;pm&#34;:          90.0           # 92.46348312601351
                           , &#34;gm&#34;:          -90.0          # -94.0228120184453
                           , &#34;cmrr&#34;:        120.0          # 121.41787866754784
@@ -672,7 +653,6 @@ MNCM1B:id</p></div>
     #rc      = (1 / (gmid_cs1 * i2)) * ((cc + cl) / cc)
 
     i0      = constraints.get(&#39;i0&#39;,   {}).get(&#39;init&#39;, 3e-6)
-    i1      = i0
     vdd     = constraints.get(&#39;vsup&#39;, {}).get(&#39;init&#39;, 3.3)
 
     Wres    = constraints.get(&#39;Wres&#39;, {}).get(&#39;init&#39;, 2e-6)
@@ -683,30 +663,14 @@ MNCM1B:id</p></div>
     Mcm21   = constraints.get(&#39;Mcm21&#39;, {}).get(&#39;init&#39;, 2)
     Mcm22   = constraints.get(&#39;Mcm22&#39;, {}).get(&#39;init&#39;, 2)
     Mdp1    = constraints.get(&#39;Md&#39;,    {}).get(&#39;init&#39;, 2)
-    #Mcs1    = constraints.get(&#39;Mcs&#39;,   {}).get(&#39;init&#39;, 40)
 
-    M1_lim  = int(constraints.get(&#39;Mcm12&#39;, {}).get(&#39;max&#39;, 40)) // 20
-    M3_lim  = int(constraints.get(&#39;Mcm13&#39;, {}).get(&#39;max&#39;, 40))
+    M1_lim  = int(constraints.get(&#39;Mcm12&#39;, {}).get(&#39;max&#39;, 40))
+    M2_lim  = int(constraints.get(&#39;Mcm13&#39;, {}).get(&#39;max&#39;, 40))
 
-    Wc_lim  = float(constraints.get(&#39;Wcs&#39;,   {}).get(&#39;max&#39;, 150e-6))
-
-    M1      = Fraction(i0 / i1).limit_denominator(M1_lim)
-    M3      = Fraction(i0 / i2).limit_denominator(M3_lim)
-
-    #Mcm11   = M3.numerator
-    #Mcm12   = Mcm11
-    #Mcm13   = M3.denominator
-    #Mcs1    = Mcm13
-
-    Mcm11   = max(np.lcm(M1.numerator, M3.numerator), 1)
-    Mcm12   = max(M1.denominator * Mcm11, 1)
-    Mcm13   = max(M3.denominator * Mcm11, 1)
+    Mcm11   = 1
+    Mcm12   = max(min(round(i1 / i0), M1_lim), 1)
+    Mcm13   = max(min(round(i2 / i0), M1_lim), 1)
     Mcs1    = Mcm13
-
-    #Mcm11   = max(M1.numerator, 1)
-    #Mcm12   = max(M1.denominator, 1)
-    #Mcm13   = max((M1.numerator * M3.denominator) // max(M3.numerator, 1), 1)
-    #Mcs1    = Mcm13
 
     cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 4.20),         0.00 ]])
     cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 3.55),         0.00 ]])
@@ -726,9 +690,7 @@ MNCM1B:id</p></div>
     Wcm1    = i0       / cm1_out[0] / Mcm11
     Wcm2    = i1 / 2.0 / cm2_out[0] / Mcm21
     Wdp1    = i1 / 2.0 / dp1_out[0] / Mdp1
-
-    Wcs     = i2 / cs1_out[0]
-    #Mcs1    = np.ceil(Wcs / Wc_lim).item()
+    Wcs     = i2       / cs1_out[0]
     Wcs1    = Wcs / Mcs1
 
     sizing  = { &#39;Ld&#39;: Ldp1, &#39;Lcm1&#39;:  Lcm1,  &#39;Lcm2&#39;:  Lcm2,  &#39;Lcs&#39;: Lcs1, &#39;Lres&#39;: Lres
@@ -762,17 +724,17 @@ MNCM1B:id</p></div>
     err   = f&#39;No Input Scale for {ace_backend} available&#39;
     x_min = { &#39;xh035-3V3&#39;: np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 3.0, 40.0 ])
+                                    , 3.0, 45.0 ])
             , &#39;xh018-1V8&#39;: np.array([ 5.0, 10.0, 5.0, 10.0
                                     , 7.0, 7.0, 7.0, 7.0
-                                    , 3.0, 40.0 ])
+                                    , 3.0, 45.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     x_max = { &#39;xh035-3V3&#39;: np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 9.0, 80.0 ])
+                                    , 9.0, 75.0 ])
             , &#39;xh018-1V8&#39;: np.array([ 15.0, 20.0, 15.0, 20.0
                                     , 9.0, 9.0, 9.0, 9.0
-                                    , 9.0, 80.0 ])
+                                    , 9.0, 75.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,4))  for i in range(10)])
     fm    = np.array([(i in range(4,8))  for i in range(10)])

@@ -35,6 +35,7 @@ import numpy as np
 from circus.trafo import op1
 from circus.trafo import op2
 from circus.trafo import op8
+from circus.trafo import op11
 
 def transformation(ace_id: str) -&gt; Callable:
     &#34;&#34;&#34; Get transformation function for a given ace id &#34;&#34;&#34;
@@ -42,6 +43,7 @@ def transformation(ace_id: str) -&gt; Callable:
     return { &#39;op1&#39;: op1.transform
            , &#39;op2&#39;: op2.transform
            , &#39;op8&#39;: op8.transform
+           , &#39;op11&#39;: op11.transform
            , }.get(ace_id, NotImplementedError(err_msg))
 
 def electric_identifiers(ace_id: str) -&gt; [str]:
@@ -50,6 +52,7 @@ def electric_identifiers(ace_id: str) -&gt; [str]:
     return { &#39;op1&#39;: op1.INPUTS
            , &#39;op2&#39;: op2.INPUTS
            , &#39;op8&#39;: op8.INPUTS
+           , &#39;op11&#39;: op11.INPUTS
            , }.get(ace_id, NotImplementedError(err_msg))
 
 def electric_unscaler(ace_id: str, ace_backend: str) -&gt; Callable:
@@ -58,6 +61,7 @@ def electric_unscaler(ace_id: str, ace_backend: str) -&gt; Callable:
     x_min,x_max,gm,fm,im = { &#39;op1&#39;: op1.unscaler(ace_backend)
                            , &#39;op2&#39;: op2.unscaler(ace_backend)
                            , &#39;op8&#39;: op8.unscaler(ace_backend)
+                           , &#39;op11&#39;: op11.unscaler(ace_backend)
                            , }.get(ace_id, NotImplementedError(err_msg))
 
     def unscale(x: np.ndarray) -&gt; np.ndarray:
@@ -77,7 +81,8 @@ def performance_scale( ace_id: str, ace_backend: str, constraints: dict
     return { &#39;op1&#39;: op1.output_scale
            , &#39;op2&#39;: op2.output_scale
            , &#39;op8&#39;: op8.output_scale
-           , }.get( ace_id, NotImplementedError(err_msg)
+           , &#39;op11&#39;: op11.output_scale
+           , }.get(ace_id, NotImplementedError(err_msg)
                   )(constraints, ace_backend)
 
 def reference_goal( ace_id: str, ace_backend: str, constraints: dict
@@ -87,8 +92,9 @@ def reference_goal( ace_id: str, ace_backend: str, constraints: dict
     return { &#39;op1&#39;: op1.reference_goal
            , &#39;op2&#39;: op2.reference_goal
            , &#39;op8&#39;: op8.reference_goal
+           , &#39;op11&#39;: op11.reference_goal
            , }.get(ace_id, NotImplementedError(err_msg)
-                 )(constraints, ace_backend)</code></pre>
+                  )(constraints, ace_backend)</code></pre>
 </details>
 </section>
 <section>
@@ -97,6 +103,11 @@ def reference_goal( ace_id: str, ace_backend: str, constraints: dict
 <dt><code class="name"><a title="circus.trafo.op1" href="op1.html">circus.trafo.op1</a></code></dt>
 <dd>
 <div class="desc"><p>Agnostic Design Space Transforation for OP1: Miller Operational Amplifier …</p></div>
+</dd>
+<dt><code class="name"><a title="circus.trafo.op11" href="op11.html">circus.trafo.op11</a></code></dt>
+<dd>
+<div class="desc"><p>Agnostic Design Space Transforation for OP11: Rail-to-Rail Folded-Cascode
+with Wide-Swing Current Mirror</p></div>
 </dd>
 <dt><code class="name"><a title="circus.trafo.op2" href="op2.html">circus.trafo.op2</a></code></dt>
 <dd>
@@ -128,6 +139,7 @@ def reference_goal( ace_id: str, ace_backend: str, constraints: dict
     return { &#39;op1&#39;: op1.INPUTS
            , &#39;op2&#39;: op2.INPUTS
            , &#39;op8&#39;: op8.INPUTS
+           , &#39;op11&#39;: op11.INPUTS
            , }.get(ace_id, NotImplementedError(err_msg))</code></pre>
 </details>
 </dd>
@@ -146,6 +158,7 @@ def reference_goal( ace_id: str, ace_backend: str, constraints: dict
     x_min,x_max,gm,fm,im = { &#39;op1&#39;: op1.unscaler(ace_backend)
                            , &#39;op2&#39;: op2.unscaler(ace_backend)
                            , &#39;op8&#39;: op8.unscaler(ace_backend)
+                           , &#39;op11&#39;: op11.unscaler(ace_backend)
                            , }.get(ace_id, NotImplementedError(err_msg))
 
     def unscale(x: np.ndarray) -&gt; np.ndarray:
@@ -175,7 +188,8 @@ def reference_goal( ace_id: str, ace_backend: str, constraints: dict
     return { &#39;op1&#39;: op1.output_scale
            , &#39;op2&#39;: op2.output_scale
            , &#39;op8&#39;: op8.output_scale
-           , }.get( ace_id, NotImplementedError(err_msg)
+           , &#39;op11&#39;: op11.output_scale
+           , }.get(ace_id, NotImplementedError(err_msg)
                   )(constraints, ace_backend)</code></pre>
 </details>
 </dd>
@@ -195,8 +209,9 @@ def reference_goal( ace_id: str, ace_backend: str, constraints: dict
     return { &#39;op1&#39;: op1.reference_goal
            , &#39;op2&#39;: op2.reference_goal
            , &#39;op8&#39;: op8.reference_goal
+           , &#39;op11&#39;: op11.reference_goal
            , }.get(ace_id, NotImplementedError(err_msg)
-                 )(constraints, ace_backend)</code></pre>
+                  )(constraints, ace_backend)</code></pre>
 </details>
 </dd>
 <dt id="circus.trafo.transformation"><code class="name flex">
@@ -214,6 +229,7 @@ def reference_goal( ace_id: str, ace_backend: str, constraints: dict
     return { &#39;op1&#39;: op1.transform
            , &#39;op2&#39;: op2.transform
            , &#39;op8&#39;: op8.transform
+           , &#39;op11&#39;: op11.transform
            , }.get(ace_id, NotImplementedError(err_msg))</code></pre>
 </details>
 </dd>
@@ -236,6 +252,7 @@ def reference_goal( ace_id: str, ace_backend: str, constraints: dict
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="circus.trafo.op1" href="op1.html">circus.trafo.op1</a></code></li>
+<li><code><a title="circus.trafo.op11" href="op11.html">circus.trafo.op11</a></code></li>
 <li><code><a title="circus.trafo.op2" href="op2.html">circus.trafo.op2</a></code></li>
 <li><code><a title="circus.trafo.op8" href="op8.html">circus.trafo.op8</a></code></li>
 </ul>
