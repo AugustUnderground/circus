@@ -42,7 +42,7 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Mcm32   = int(i0 / i2)
     Mcm33   = int(i0 / i4)
     Mcm34   = int(i0 / i5)
-    Mcm41   = 1
+    Mcm41   = 2
     Mcm42   = 1
     Mcm43   = int(i0 / i1)
     Mcm44   = int(i0 / i3)
@@ -112,17 +112,17 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
     err   = f'No Input Scale for {ace_backend} available'
     x_min = { 'xh035-3V3': np.array([ 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0
                                     , 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0
-                                    , 1.0, 1.0, 1.0, 1.0, 1.0 ])
+                                    , 3.0, 3.0, 3.0, 1.0, 3.0 ])
             , 'xh018-1V8': np.array([ 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0
                                     , 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0
-                                    , 1.0, 1.0, 1.0, 1.0, 1.0 ])
+                                    , 3.0, 3.0, 3.0, 1.0, 3.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     x_max = { 'xh035-3V3': np.array([ 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0
                                     , 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0
-                                    , 6.0, 6.0, 9.0, 9.0, 12.0 ])
+                                    , 9.0, 9.0, 9.0, 2.0, 9.0 ])
             , 'xh018-1V8': np.array([ 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0
                                     , 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0
-                                    , 6.0, 6.0, 9.0, 9.0, 12.0 ])
+                                    , 9.0, 9.0, 9.0, 2.0, 9.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,9))   for i in range(23)])
     fm    = np.array([(i in range(9,15))  for i in range(23)])
