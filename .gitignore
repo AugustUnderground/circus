@@ -20,3 +20,5 @@ circus/__pycache__/
 circus/*.py[cod]
 circus/*$py.class
 log
+
+*.dat
