@@ -6,6 +6,7 @@ import numpy as np
 from circus.trafo import op1
 from circus.trafo import op2
 from circus.trafo import op8
+from circus.trafo import op11
 
 def transformation(ace_id: str) -> Callable:
     """ Get transformation function for a given ace id """
@@ -13,6 +14,7 @@ def transformation(ace_id: str) -> Callable:
     return { 'op1': op1.transform
            , 'op2': op2.transform
            , 'op8': op8.transform
+           , 'op11': op11.transform
            , }.get(ace_id, NotImplementedError(err_msg))
 
 def electric_identifiers(ace_id: str) -> [str]:
@@ -21,6 +23,7 @@ def electric_identifiers(ace_id: str) -> [str]:
     return { 'op1': op1.INPUTS
            , 'op2': op2.INPUTS
            , 'op8': op8.INPUTS
+           , 'op11': op11.INPUTS
            , }.get(ace_id, NotImplementedError(err_msg))
 
 def electric_unscaler(ace_id: str, ace_backend: str) -> Callable:
@@ -29,6 +32,7 @@ def electric_unscaler(ace_id: str, ace_backend: str) -> Callable:
     x_min,x_max,gm,fm,im = { 'op1': op1.unscaler(ace_backend)
                            , 'op2': op2.unscaler(ace_backend)
                            , 'op8': op8.unscaler(ace_backend)
+                           , 'op11': op11.unscaler(ace_backend)
                            , }.get(ace_id, NotImplementedError(err_msg))
 
     def unscale(x: np.ndarray) -> np.ndarray:
@@ -48,6 +52,7 @@ def performance_scale( ace_id: str, ace_backend: str, constraints: dict
     return { 'op1': op1.output_scale
            , 'op2': op2.output_scale
            , 'op8': op8.output_scale
+           , 'op11': op11.output_scale
            , }.get(ace_id, NotImplementedError(err_msg)
                   )(constraints, ace_backend)
 
@@ -58,5 +63,6 @@ def reference_goal( ace_id: str, ace_backend: str, constraints: dict
     return { 'op1': op1.reference_goal
            , 'op2': op2.reference_goal
            , 'op8': op8.reference_goal
+           , 'op11': op11.reference_goal
            , }.get(ace_id, NotImplementedError(err_msg)
                   )(constraints, ace_backend)

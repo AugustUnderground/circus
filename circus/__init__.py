@@ -43,6 +43,19 @@ register( id          = 'op8-xh035-elec-v0'
 register( id          = 'op8-xh035-elec-v1'
         , entry_point = 'circus.gym:OP8XH035ElecV1'
         , )
+# AC²E: OP11 - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
+register( id          = 'op11-xh035-geom-v0'
+        , entry_point = 'circus.gym:OP8XH035GeomV0'
+        , )
+register( id          = 'op11-xh035-geom-v1'
+        , entry_point = 'circus.gym:OP8XH035GeomV1'
+        , )
+register( id          = 'op11-xh035-elec-v0'
+        , entry_point = 'circus.gym:OP8XH035ElecV0'
+        , )
+register( id          = 'op11-xh035-elec-v1'
+        , entry_point = 'circus.gym:OP8XH035ElecV1'
+        , )
 
 ## XH018-1V8
 # AC²E: OP1 - Miller Operational Amplifier
@@ -83,4 +96,17 @@ register( id          = 'op8-xh018-elec-v0'
         , )
 register( id          = 'op8-xh018-elec-v1'
         , entry_point = 'circus.gym:OP8XH018ElecV1'
+        , )
+# AC²E: OP11 - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
+register( id          = 'op11-xh018-geom-v0'
+        , entry_point = 'circus.gym:OP8XH035GeomV0'
+        , )
+register( id          = 'op11-xh018-geom-v1'
+        , entry_point = 'circus.gym:OP8XH035GeomV1'
+        , )
+register( id          = 'op11-xh018-elec-v0'
+        , entry_point = 'circus.gym:OP8XH035ElecV0'
+        , )
+register( id          = 'op11-xh018-elec-v1'
+        , entry_point = 'circus.gym:OP8XH035ElecV1'
         , )
