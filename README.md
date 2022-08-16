@@ -25,3 +25,8 @@ in the `circuis` directory takes about ~5min.
 ```bash
 $ pytest
 ```
+
+## Demonsrtraion / Baseline
+
+For a demonstation / Baseline Implementation, see 
+[circus-solver](https://github.com/MichaelEssich/circus-solver).
