@@ -28,70 +28,48 @@ integrated circuit design, based on
 </th>
 </tr>
 <tr>
-<th>
-<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op1.png">op1</a>
-</th>
-<td>elec, geom, (non-)goal</td> <td>elec, geom, (non-)goal</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+<th> <a href="./op1.md">op1</a> </th>
+<td>✔</td> <td>✔</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th>
-<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op2.png">op2</a>
-</th>
-<td>elec, geom, (non-)goal</td> <td>elec, geom, (non-)goal</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+<th> <a href="./op2.md">op2</a> </th>
+<td>✔</td> <td>✔</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th>
-<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op3.png">op3</a>
-</th>
-<td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+<th> <a href="">op3</a> </th>
+<td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th>
-<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op4.png">op4</a>
-</th>
-<td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+<th> <a href="">op4</a> </th>
+<td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th>
-<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op5.png">op5</a>
-</th>
-<td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+<th> <a href="">op5</a> </th>
+<td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th>
-<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op6.png">op6</a>
-</th>
-<td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+<th> <a href="">op6</a> </th>
+<td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th>
-<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op7.png">op7</a>
-</th>
-<td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+<th> <a href="">op7</a> </th>
+<td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th>
-<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op8.png">op8</a>
-</th>
-<td>elec, geom, (non-)goal</td> <td>elec, geom, (non-)goal</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+<th> <a href="./op8.md">op8</a> </th>
+<td>✔</td> <td>✔</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th>
-<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op9.png">op9</a>
-</th>
-<td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+<th> <a href="">op9</a> </th>
+<td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th>
-<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op10.png">op10</a>
-</th>
-<td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+<th> <a href="">op10</a> </th>
+<td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th>
-<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op11.png">op11</a>
-</th>
-<td>elec, geom, (non-)goal</td> <td>elec, geom, (non-)goal</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+<th> <a href="./op11.md">op11</a> </th>
+<td>✔</td> <td>✔</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 </table>
 
