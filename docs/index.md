@@ -28,11 +28,11 @@ integrated circuit design, based on
 </th>
 </tr>
 <tr>
-<th> <a href="./op1.md">op1</a> </th>
+<th> <a href="./op1.html">op1</a> </th>
 <td>✔</td> <td>✔</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th> <a href="./op2.md">op2</a> </th>
+<th> <a href="./op2.html">op2</a> </th>
 <td>✔</td> <td>✔</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
@@ -56,7 +56,7 @@ integrated circuit design, based on
 <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th> <a href="./op8.md">op8</a> </th>
+<th> <a href="./op8.html">op8</a> </th>
 <td>✔</td> <td>✔</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
@@ -68,7 +68,7 @@ integrated circuit design, based on
 <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 <tr>
-<th> <a href="./op11.md">op11</a> </th>
+<th> <a href="./op11.html">op11</a> </th>
 <td>✔</td> <td>✔</td> <td>✘</td> <td>✘</td> <td>✘</td> <td>✘</td>
 </tr>
 </table>
