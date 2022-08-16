@@ -87,6 +87,12 @@ integrated circuit design, based on
 </th>
 <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
 </tr>
+<tr>
+<th>
+<a href="https://raw.githubusercontent.com/matthschw/ace/main/figures/op11.png">op11</a>
+</th>
+<td>elec, geom, (non-)goal</td> <td>elec, geom, (non-)goal</td> <td>N/A</td> <td>N/A</td> <td>N/A</td> <td>N/A</td>
+</tr>
 </table>
 
 ## Table of Contents
@@ -102,7 +108,8 @@ integrated circuit design, based on
     + [ ] [OP4: Symmetrical Cascode Amplifier]()
     + [ ] [OP5: Un-Symmetrical Cascode Amplifier]()
     + [ ] [OP6: Miller Amplifier w/o Passives]()
-    + [ ] [OP7: TBA]()
+    + [ ] [OP7: Feed-Forward Operational Amplifier]()
     + [X] [OP8: Folded Cascode Amplifier](./op8.md)
     + [ ] [OP9: Amplifier with Cascode Wideswing Current Mirror]()
-    + [ ] [OP10: TBA](./op10.md)
+    + [ ] [OP10: Rail-To-Rail Folded Cascode Amplifier]()
+    + [X] [OP11: Rail-To-Rail Folded Cascode Amplifier with Wide-Swing Current Mirror](./op11.md)
