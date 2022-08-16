@@ -32,30 +32,30 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     W1_lim  = constraints.get("Mcm1", {}).get("max", 42)
     W2_lim  = constraints.get("Mcm1", {}).get("max", 42)
 
-    iU      = i0
-    i5      = (i1 / 2.0) + iX
-    i6      = (i2 / 2.0) + iX
+    iU      =  i0 / 2.0
+    iVW     = (i1 / 2.0) + iX
+    iYZ     = (i2 / 2.0) + iX
 
-    Mdp1    = constraints.get("Md1", {}).get("init", 1)
-    Mdp2    = constraints.get("Md2", {}).get("init", 1)
+    Mdp1    = constraints.get("Md1", {}).get("init", 2)
+    Mdp2    = constraints.get("Md2", {}).get("init", 2)
     Mcm31   = 1
-    Mcm32   = int(i0 / i2)
-    Mcm33   = int(i0 / i4)
-    Mcm34   = int(i0 / i5)
+    Mcm32   = int(iU / i2)
+    Mcm33   = int(iU / i4)
+    Mcm34   = int(iU / iVW)
     Mcm41   = 2
     Mcm42   = 1
     Mcm43   = int(i0 / i1)
     Mcm44   = int(i0 / i3)
 
-    dp1_in  = np.array([[gmid_dp1, fug_dp1,  (vdd / 1.5),  -(vdd / 5.0)]])
-    dp2_in  = np.array([[gmid_dp2, fug_dp2, -(vdd / 1.5),   (vdd / 5.0)]])
-    cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 6.6),          0.0 ]])
-    ls1_in  = np.array([[gmid_ls1, fug_ls1, -(vdd / 10.0), -(vdd / 6.6)]])
-    rs1_in  = np.array([[gmid_rs1, fug_rs1, -(vdd / 2.0),          0.0 ]])
-    cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 1.65),  (vdd / 5.5)]])
-    rs2_in  = np.array([[gmid_rs2, fug_rs2, -(vdd / 2.0),          0.0 ]])
-    cm3_in  = np.array([[gmid_cm3, fug_cm3, -(vdd / 3.3),          0.0 ]])
-    cm4_in  = np.array([[gmid_cm4, fug_cm4,  (vdd / 4.5),          0.0 ]])
+    dp1_in  = np.array([[gmid_dp1, fug_dp1,  (vdd / 1.65), -(vdd /  5.0)]])
+    dp2_in  = np.array([[gmid_dp2, fug_dp2, -(vdd / 1.65),  (vdd /  5.0)]])
+    cm1_in  = np.array([[gmid_cm1, fug_cm1,  (vdd / 16.6),          0.0 ]])
+    ls1_in  = np.array([[gmid_ls1, fug_ls1,  (vdd / 6.0),  -(vdd / 16.5)]])
+    rs1_in  = np.array([[gmid_rs1, fug_rs1,  (vdd / 3.5),           0.0 ]])
+    cm2_in  = np.array([[gmid_cm2, fug_cm2, -(vdd / 1.65),  (vdd /  5.5)]])
+    rs2_in  = np.array([[gmid_rs2, fug_rs2, -(vdd / 2.0),           0.0 ]])
+    cm3_in  = np.array([[gmid_cm3, fug_cm3, -(vdd / 3.5),           0.0 ]])
+    cm4_in  = np.array([[gmid_cm4, fug_cm4,  (vdd / 4.5),           0.0 ]])
 
     dp1_out = nmos.predict(dp1_in)[0]
     dp2_out = pmos.predict(dp2_in)[0]
