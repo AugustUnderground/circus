@@ -113,3 +113,4 @@ integrated circuit design, based on
     + [ ] [OP9: Amplifier with Cascode Wideswing Current Mirror]()
     + [ ] [OP10: Rail-To-Rail Folded Cascode Amplifier]()
     + [X] [OP11: Rail-To-Rail Folded Cascode Amplifier with Wide-Swing Current Mirror](./op11.md)
+
