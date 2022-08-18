@@ -43,3 +43,10 @@ The goal space _must_ be a subset of this.
 
 Action Spaces are _continuous_ and implemented with `gym.spaces.Box`. 
 For further details, see the descriptions for specific environments. 
+
+### Electrical Design Space
+
+For using the `*-elec-*` environments, primitive deivce models for converting
+electrical characteristics to geometric ones are required. Please see
+[prehsept](https://github.com/AugustUnderground/prehsept) on how to create them
+for the technology of your choice.
