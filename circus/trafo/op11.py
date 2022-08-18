@@ -32,20 +32,20 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     W1_lim  = constraints.get("Mcm1", {}).get("max", 42)
     W2_lim  = constraints.get("Mcm1", {}).get("max", 42)
 
-    iU      =  i0 / 2.0
-    iVW     = (i1 / 2.0) + iX
-    iYZ     = (i2 / 2.0) + iX
+    iU      = i0 / 2.0
+    iV      = abs(i1 / 2.0) + iX
+    iY      = abs(i2 / 2.0) + iX
 
     Mdp1    = constraints.get("Md1", {}).get("init", 2)
     Mdp2    = constraints.get("Md2", {}).get("init", 2)
     Mcm31   = 1
-    Mcm32   = int(iU / i2)
-    Mcm33   = int(iU / i4)
-    Mcm34   = int(iU / iVW)
+    Mcm32   = max(int(i2 / iU), 1) * Mcm31
+    Mcm33   = max(int(i4 / iU), 1) * Mcm31
+    Mcm34   = max(int(iV / iU), 1) * Mcm31
     Mcm41   = 2
-    Mcm42   = 1
-    Mcm43   = int(i0 / i1)
-    Mcm44   = int(i0 / i3)
+    Mcm42   = int(Mcm41 / 2)
+    Mcm43   = max(int(i1 / i0), 1) * Mcm41
+    Mcm44   = max(int(i3 / i0), 1) * Mcm41
 
     dp1_in  = np.array([[gmid_dp1, fug_dp1,  (vdd / 1.65), -(vdd /  5.0)]])
     dp2_in  = np.array([[gmid_dp2, fug_dp2, -(vdd / 1.65),  (vdd /  5.0)]])
@@ -77,9 +77,9 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Lcm3    = cm3_out[1]
     Lcm4    = cm4_out[1]
 
-    Wc1     = i6 / cm1_out[0]
-    Wl1     = iX / ls1_out[0]
-    Wc2     = iX / cm2_out[0]
+    Wc1     = iY / cm1_out[0]
+    Wl1     = iX  / ls1_out[0]
+    Wc2     = iX  / cm2_out[0]
 
     Mcm1    = np.ceil(Wc1 / W1_lim).item()
     Mls1    = np.ceil(Wl1 / W1_lim).item()
@@ -92,7 +92,7 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     Wrs1    = i4 / rs1_out[0]
     Wcm2    = Wc2 / Mcm2
     Wrs2    = i3 / rs2_out[0]
-    Wcm3    = i0 / cm3_out[0]
+    Wcm3    = iU / cm3_out[0]
     Wcm4    = i0 / cm4_out[0]
 
     sizing  = { 'Ld1':  Ldp1, 'Ld2': Ldp2, 'Lcm1': Lcm1, 'Lls1':  Lls1, 'Lr1': Lrs1
@@ -125,8 +125,8 @@ def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
                                     , 9.0, 9.0, 9.0, 2.0, 9.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,9))   for i in range(23)])
-    fm    = np.array([(i in range(9,15))  for i in range(23)])
-    im    = np.array([(i in range(15,23)) for i in range(23)])
+    fm    = np.array([(i in range(9,18))  for i in range(23)])
+    im    = np.array([(i in range(18,23)) for i in range(23)])
     return (x_min, x_max, gm, fm, im)
 
 def reference_goal(constraints: dict, ace_backend: str) -> np.ndarray:
