@@ -133,17 +133,17 @@ def reference_goal(constraints: dict, ace_backend: str) -> np.ndarray:
     """ Corated Referece Goal for OP8 """
     err   = f'No Reference Goal for {ace_backend} available'
     vdd   = constraints.get('vsup', {}).get('init', 3.3)
-    return { 'xh035-3V3': { "A":                    0.00015
+    return { 'xh035-3V3': { "A":                    5.0e-6
                           , "a_0":                  65
-                          , "ugbw":                 5000000.0
-                          , "sr_r":                 2500000.0
-                          , "sr_f":                 2500000.0
-                          , "pm":                   45.0
+                          , "ugbw":                 1.0e6
+                          , "sr_r":                 1.0e6
+                          , "sr_f":                 1.0e6
+                          , "pm":                   85.0
                           , "gm":                   -50.0
                           , "cmrr":                 120.0
                           , "psrr_n":               80.0
                           , "psrr_p":               100.0
-                          , "idd":                  1.0e-4
+                          , "idd":                  2.5e-5
                           , "iss":                  -0.0001
                           , "vn_1Hz":               3.5e-06
                           , "vn_10Hz":              1.0e-06
@@ -151,28 +151,28 @@ def reference_goal(constraints: dict, ace_backend: str) -> np.ndarray:
                           , "vn_1kHz":              1.65e-07
                           , "vn_10kHz":             5.0e-08
                           , "vn_100kHz":            2.5e-08
-                          , "cof":                  150000000.0
-                          , "overshoot_r":          8000000.0
-                          , "overshoot_f":          250000000.0
+                          , "cof":                  1000000000.0
+                          , "overshoot_r":          5.5e-4
+                          , "overshoot_f":          5.5e-4
                           , "i_out_min":            -2.0e-05
                           , "i_out_max":            3.5e-05
                           , "v_ol":                 (vdd * 0.45)
                           , "v_oh":                 (vdd * 0.55)
                           , "v_il":                 (vdd * 0.1)
                           , "v_ih":                 (vdd * 1.0)
-                          , "voff_stat":            1.5e-3
-                          , "voff_sys":             0.05 }
-           , 'xh018-1V8': { "A":                    0.00015
+                          , "voff_stat":            3.0e-3
+                          , "voff_sys":             1.5e-4 }
+           , 'xh018-1V8': { "A":                    5.0e-6
                           , "a_0":                  65
-                          , "ugbw":                 5000000.0
-                          , "sr_r":                 2500000.0
-                          , "sr_f":                 2500000.0
-                          , "pm":                   45.0
+                          , "ugbw":                 1.0e6
+                          , "sr_r":                 1.0e6
+                          , "sr_f":                 1.0e6
+                          , "pm":                   85.0
                           , "gm":                   -50.0
                           , "cmrr":                 120.0
                           , "psrr_n":               80.0
                           , "psrr_p":               100.0
-                          , "idd":                  1.0e-4
+                          , "idd":                  2.5e-5
                           , "iss":                  -0.0001
                           , "vn_1Hz":               3.5e-06
                           , "vn_10Hz":              1.0e-06
@@ -180,17 +180,17 @@ def reference_goal(constraints: dict, ace_backend: str) -> np.ndarray:
                           , "vn_1kHz":              1.65e-07
                           , "vn_10kHz":             5.0e-08
                           , "vn_100kHz":            2.5e-08
-                          , "cof":                  150000000.0
-                          , "overshoot_r":          8000000.0
-                          , "overshoot_f":          250000000.0
+                          , "cof":                  1000000000.0
+                          , "overshoot_r":          5.5e-4
+                          , "overshoot_f":          5.5e-4
                           , "i_out_min":            -2.0e-05
                           , "i_out_max":            3.5e-05
                           , "v_ol":                 (vdd * 0.45)
                           , "v_oh":                 (vdd * 0.55)
                           , "v_il":                 (vdd * 0.1)
                           , "v_ih":                 (vdd * 1.0)
-                          , "voff_stat":            1.5e-3
-                          , "voff_sys":             0.05 }
+                          , "voff_stat":            3.0e-3
+                          , "voff_sys":             1.5e-4 }
            , }.get(ace_backend, NotImplementedError(err))
 
 def output_scale( constraints: dict, ace_backend: str
