@@ -14,7 +14,7 @@ INPUTS: [str] = [ 'MND11:gmoverid',  'MPD21:gmoverid',  'MNCM11:gmoverid'
                 , 'MNLS11:fug',      'MNR1:fug',        'MPCM21:fug'
                 , 'MPR2:fug',        'MPCM31:fug',      'MNCM41:fug'
                 , 'MNCM43:id',       'MNCM32:id',       'MNCM44:id'
-                , 'MPCM33:id',       'MPCM34:id' ]
+                , 'MPCM33:id',       'MNLS11:id' ]
 
 def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
              , gmid_dp1: float, gmid_dp2: float, gmid_cm1: float, gmid_ls1: float
@@ -107,22 +107,22 @@ def transform( constraints: dict, nmos: PrimitiveDevice, pmos: PrimitiveDevice
     return sizing
 
 def unscaler(ace_backend: str) -> tuple[ np.ndarray, np.ndarray, np.ndarray
-                                       , np.ndarray, np.ndarray]:
+                                       , np.ndarray, np.ndarray ]:
     """ Unscale function for a given PDK """
     err   = f'No Input Scale for {ace_backend} available'
-    x_min = { 'xh035-3V3': np.array([ 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0
+    x_min = { 'xh035-3V3': np.array([ 5.0, 5.0, 5.0, 10.0, 1.0, 10.0, 1.0, 5.0, 5.0
                                     , 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0
-                                    , 3.0, 3.0, 3.0, 1.0, 3.0 ])
-            , 'xh018-1V8': np.array([ 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0
+                                    , 3.0, 3.0, 3.0, 3.0, 1.0 ])
+            , 'xh018-1V8': np.array([ 5.0, 5.0, 5.0, 10.0, 1.0, 10.0, 1.0, 5.0, 5.0
                                     , 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0
-                                    , 3.0, 3.0, 3.0, 1.0, 3.0 ])
+                                    , 3.0, 3.0, 3.0, 3.0, 1.0 ])
             , }.get(ace_backend, NotImplementedError(err))
-    x_max = { 'xh035-3V3': np.array([ 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0
+    x_max = { 'xh035-3V3': np.array([ 15.0, 15.0, 15.0, 20.0, 10.0, 20.0, 10.0, 15.0, 15.0
                                     , 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0
-                                    , 9.0, 9.0, 9.0, 2.0, 9.0 ])
-            , 'xh018-1V8': np.array([ 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0
+                                    , 9.0, 9.0, 9.0, 9.0, 6.0 ])
+            , 'xh018-1V8': np.array([ 15.0, 15.0, 15.0, 20.0, 10.0, 20.0, 10.0, 15.0, 15.0
                                     , 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0, 9.0
-                                    , 9.0, 9.0, 9.0, 2.0, 9.0 ])
+                                    , 9.0, 9.0, 9.0, 9.0, 6.0 ])
             , }.get(ace_backend, NotImplementedError(err))
     gm    = np.array([(i in range(0,9))   for i in range(23)])
     fm    = np.array([(i in range(9,18))  for i in range(23)])
@@ -133,64 +133,65 @@ def reference_goal(constraints: dict, ace_backend: str) -> np.ndarray:
     """ Corated Referece Goal for OP8 """
     err   = f'No Reference Goal for {ace_backend} available'
     vdd   = constraints.get('vsup', {}).get('init', 3.3)
-    return { 'xh035-3V3': { "A":                    5.0e-6
-                          , "a_0":                  65
-                          , "ugbw":                 1.0e6
-                          , "sr_r":                 1.0e6
-                          , "sr_f":                 1.0e6
-                          , "pm":                   85.0
-                          , "gm":                   -50.0
-                          , "cmrr":                 120.0
-                          , "psrr_n":               80.0
-                          , "psrr_p":               100.0
-                          , "idd":                  2.5e-5
-                          , "iss":                  -0.0001
-                          , "vn_1Hz":               3.5e-06
-                          , "vn_10Hz":              1.0e-06
-                          , "vn_100Hz":             5.0e-07
-                          , "vn_1kHz":              1.65e-07
-                          , "vn_10kHz":             5.0e-08
-                          , "vn_100kHz":            2.5e-08
-                          , "cof":                  1000000000.0
-                          , "overshoot_r":          5.5e-4
-                          , "overshoot_f":          5.5e-4
-                          , "i_out_min":            -2.0e-05
-                          , "i_out_max":            3.5e-05
-                          , "v_ol":                 (vdd * 0.45)
-                          , "v_oh":                 (vdd * 0.55)
-                          , "v_il":                 (vdd * 0.1)
-                          , "v_ih":                 (vdd * 1.0)
-                          , "voff_stat":            3.0e-3
-                          , "voff_sys":             1.5e-4 }
-           , 'xh018-1V8': { "A":                    5.0e-6
-                          , "a_0":                  65
-                          , "ugbw":                 1.0e6
-                          , "sr_r":                 1.0e6
-                          , "sr_f":                 1.0e6
-                          , "pm":                   85.0
-                          , "gm":                   -50.0
-                          , "cmrr":                 120.0
-                          , "psrr_n":               80.0
-                          , "psrr_p":               100.0
-                          , "idd":                  2.5e-5
-                          , "iss":                  -0.0001
-                          , "vn_1Hz":               3.5e-06
-                          , "vn_10Hz":              1.0e-06
-                          , "vn_100Hz":             5.0e-07
-                          , "vn_1kHz":              1.65e-07
-                          , "vn_10kHz":             5.0e-08
-                          , "vn_100kHz":            2.5e-08
-                          , "cof":                  1000000000.0
-                          , "overshoot_r":          5.5e-4
-                          , "overshoot_f":          5.5e-4
-                          , "i_out_min":            -2.0e-05
-                          , "i_out_max":            3.5e-05
-                          , "v_ol":                 (vdd * 0.45)
-                          , "v_oh":                 (vdd * 0.55)
-                          , "v_il":                 (vdd * 0.1)
-                          , "v_ih":                 (vdd * 1.0)
-                          , "voff_stat":            3.0e-3
-                          , "voff_sys":             1.5e-4 }
+
+    return { 'xh035-3V3': { "A":           1.0e-5
+                          , "a_0":         70.0
+                          , "ugbw":        2000000.0
+                          , "sr_r":        500000.0
+                          , "sr_f":        -500000.0
+                          , "pm":          80.0
+                          , "gm":          -65.0
+                          , "cmrr":        120.0
+                          , "psrr_n":      100.0
+                          , "psrr_p":      125.0
+                          , "idd":         4.0e-05
+                          , "iss":         -4.0e-05
+                          , "vn_1Hz":      3.5e-06
+                          , "vn_10Hz":     1.0e-06
+                          , "vn_100Hz":    3.5e-07
+                          , "vn_1kHz":     1.0e-07
+                          , "vn_10kHz":    5.25e-08
+                          , "vn_100kHz":   4.5e-08
+                          , "cof":         400000000.0
+                          , "overshoot_r": 0.0005
+                          , "overshoot_f": 0.0005
+                          , "i_out_max":   1.5e-05
+                          , "i_out_min":   -1.5e-05
+                          , "v_ol":        (vdd * 0.45)
+                          , "v_oh":        (vdd * 0.55)
+                          , "v_il":        (vdd * 0.25)
+                          , "v_ih":        (vdd * 0.75)
+                          , "voff_stat":   0.002
+                          , "voff_sys":    -5.0e-06 }
+           , 'xh018-1V8': { "A":           1.0e-5
+                          , "a_0":         70.0
+                          , "ugbw":        2000000.0
+                          , "sr_r":        500000.0
+                          , "sr_f":        -500000.0
+                          , "pm":          80.0
+                          , "gm":          -65.0
+                          , "cmrr":        120.0
+                          , "psrr_n":      100.0
+                          , "psrr_p":      125.0
+                          , "idd":         4.0e-05
+                          , "iss":         -4.0e-05
+                          , "vn_1Hz":      3.5e-06
+                          , "vn_10Hz":     1.0e-06
+                          , "vn_100Hz":    3.5e-07
+                          , "vn_1kHz":     1.0e-07
+                          , "vn_10kHz":    5.25e-08
+                          , "vn_100kHz":   4.5e-08
+                          , "cof":         400000000.0
+                          , "overshoot_r": 0.0005
+                          , "overshoot_f": 0.0005
+                          , "i_out_max":   1.5e-05
+                          , "i_out_min":   -1.5e-05
+                          , "v_ol":        (vdd * 0.45)
+                          , "v_oh":        (vdd * 0.55)
+                          , "v_il":        (vdd * 0.25)
+                          , "v_ih":        (vdd * 0.75)
+                          , "voff_stat":   0.002
+                          , "voff_sys":    -5.0e-06 }
            , }.get(ace_backend, NotImplementedError(err))
 
 def output_scale( constraints: dict, ace_backend: str
