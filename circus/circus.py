@@ -1,6 +1,7 @@
 """ Gym compatible Analog Circuit Environment """
 
 import os
+import warnings
 from functools import partial
 from collections import OrderedDict
 from typing import Any, List, Optional, Type, Union, Callable, Mapping
@@ -361,14 +362,24 @@ class CircusElec(CircusGeom):
         """
         super().__init__(**kwargs)
 
-        nmos_path = os.path.expanduser(f'~/.ace/{self.ace_backend}/nmos')
-        pmos_path = os.path.expanduser(f'~/.ace/{self.ace_backend}/pmos')
-        params_x  = ['gmoverid', 'fug', 'Vds', 'Vbs']
-        params_y  = ['idoverw', 'L', 'gdsoverw', 'Vgs']
-        trafo_x   = ['fug']
-        trafo_y   = ['idoverw', 'gdsoverw']
-        self.nmos = PrimitiveDevice(nmos_path, params_x, params_y, trafo_x, trafo_y)
-        self.pmos = PrimitiveDevice(pmos_path, params_x, params_y, trafo_x, trafo_y)
+        nmos_path = os.path.expanduser(f'~/.ace/{self.ace_backend}/nmos/trace.pt')
+        pmos_path = os.path.expanduser(f'~/.ace/{self.ace_backend}/pmos/trace.pt')
+
+        if os.path.isfile(nmos_path) and os.path.isfile(pmos_path):
+            self.nmos = pt.jit.load(nmos_path).cpu().eval()
+            self.pmos = pt.jit.load(pmos_path).cpu().eval()
+        else:
+            warnings.warn( "The use of PrimitiveDevice is deprecated, please use trace.pt"
+                         , DeprecationWarning )
+
+            nmos_path = os.path.expanduser(f'~/.ace/{self.ace_backend}/nmos')
+            pmos_path = os.path.expanduser(f'~/.ace/{self.ace_backend}/pmos')
+            params_x  = ['gmoverid', 'fug', 'Vds', 'Vbs']
+            params_y  = ['idoverw', 'L', 'gdsoverw', 'Vgs']
+            trafo_x   = ['fug']
+            trafo_y   = ['idoverw', 'gdsoverw']
+            self.nmos = PrimitiveDevice(nmos_path, params_x, params_y, trafo_x, trafo_y)
+            self.pmos = PrimitiveDevice(pmos_path, params_x, params_y, trafo_x, trafo_y)
 
         self.transformation = partial( transformation(self.ace_id)
                                      , self.constraints
