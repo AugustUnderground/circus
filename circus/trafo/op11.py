@@ -141,9 +141,9 @@ def reference_goal(constraints: dict, ace_backend: str) -> np.ndarray:
                           , "sr_f":        -500000.0
                           , "pm":          80.0
                           , "gm":          -65.0
-                          , "cmrr":        120.0
+                          , "cmrr":        100.0 #120.0
                           , "psrr_n":      100.0
-                          , "psrr_p":      125.0
+                          , "psrr_p":      100.0 # 125.0
                           , "idd":         4.0e-05
                           , "iss":         -4.0e-05
                           , "vn_1Hz":      3.5e-06
@@ -170,9 +170,9 @@ def reference_goal(constraints: dict, ace_backend: str) -> np.ndarray:
                           , "sr_f":        -500000.0
                           , "pm":          80.0
                           , "gm":          -65.0
-                          , "cmrr":        120.0
+                          , "cmrr":        100.0 #120.0
                           , "psrr_n":      100.0
-                          , "psrr_p":      125.0
+                          , "psrr_p":      100.0 # 125.0
                           , "idd":         4.0e-05
                           , "iss":         -4.0e-05
                           , "vn_1Hz":      3.5e-06
