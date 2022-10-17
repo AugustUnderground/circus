@@ -223,7 +223,6 @@ def _test_op_v0(env_id):
     _test_goal_env(env)
     env.close()
     del env
-
 def _test_op_v1(env_id):
     env = circus.make(env_id, n_envs = 5)
     _test_vec_env(env)
@@ -232,24 +231,97 @@ def _test_op_v1(env_id):
 
 def test_mil_gpdk180_geom_v0():
     _test_op_v0('circus:mil-gpdk180-geom-v0')
-
 def test_sym_gpdk180_geom_v0():
     _test_op_v0('circus:sym-gpdk180-geom-v0')
-
 def test_fca_gpdk180_geom_v0():
     _test_op_v0('circus:fca-gpdk180-geom-v0')
-
 def test_rfa_gpdk180_geom_v0():
     _test_op_v0('circus:rfa-gpdk180-geom-v0')
-
+#def test_ffa_gpdk180_geom_v0():
+#    _test_op_v0('circus:ffa-gpdk180-geom-v0')
 def test_mil_gpdk180_elec_v0():
     _test_op_v0('circus:mil-gpdk180-elec-v0')
-
 def test_sym_gpdk180_elec_v0():
     _test_op_v0('circus:sym-gpdk180-elec-v0')
-
 def test_fca_gpdk180_elec_v0():
     _test_op_v0('circus:fca-gpdk180-elec-v0')
-
 def test_rfa_gpdk180_elec_v0():
     _test_op_v0('circus:rfa-gpdk180-elec-v0')
+#def test_ffa_gpdk180_elec_v0():
+#    _test_op_v0('circus:ffa-gpdk180-elec-v0')
+
+#def test_mil_gpdk090_geom_v0():
+#    _test_op_v0('circus:mil-gpdk090-geom-v0')
+#def test_sym_gpdk090_geom_v0():
+#    _test_op_v0('circus:sym-gpdk090-geom-v0')
+#def test_fca_gpdk090_geom_v0():
+#   _test_op_v0('circus:fca-gpdk090-geom-v0')
+#def test_rfa_gpdk090_geom_v0():
+#    _test_op_v0('circus:rfa-gpdk090-geom-v0')
+#def test_mil_gpdk090_elec_v0():
+#    _test_op_v0('circus:mil-gpdk090-elec-v0')
+#def test_sym_gpdk090_elec_v0():
+#    _test_op_v0('circus:sym-gpdk090-elec-v0')
+#def test_fca_gpdk090_elec_v0():
+#    _test_op_v0('circus:fca-gpdk090-elec-v0')
+#def test_rfa_gpdk090_elec_v0():
+#    _test_op_v0('circus:rfa-gpdk090-elec-v0')
+
+#def test_mil_gpdk045_geom_v0():
+#    _test_op_v0('circus:mil-gpdk045-geom-v0')
+# def test_sym_gpdk045_geom_v0():
+#     _test_op_v0('circus:sym-gpdk045-geom-v0')
+#def test_fca_gpdk045_geom_v0():
+#    _test_op_v0('circus:fca-gpdk045-geom-v0')
+#def test_rfa_gpdk045_geom_v0():
+#    _test_op_v0('circus:rfa-gpdk045-geom-v0')
+# def test_mil_gpdk045_elec_v0():
+#     _test_op_v0('circus:mil-gpdk045-elec-v0')
+# def test_sym_gpdk045_elec_v0():
+#     _test_op_v0('circus:sym-gpdk045-elec-v0')
+# def test_fca_gpdk045_elec_v0():
+#     _test_op_v0('circus:fca-gpdk045-elec-v0')
+# def test_rfa_gpdk045_elec_v0():
+#     _test_op_v0('circus:rfa-gpdk045-elec-v0')
+
+def test_mil_xh018_geom_v0():
+    _test_op_v0('circus:mil-xh018-geom-v0')
+def test_sym_xh018_geom_v0():
+    _test_op_v0('circus:sym-xh018-geom-v0')
+def test_fca_xh018_geom_v0():
+    _test_op_v0('circus:fca-xh018-geom-v0')
+def test_rfa_xh018_geom_v0():
+    _test_op_v0('circus:rfa-xh018-geom-v0')
+#def test_ffa_xh018_geom_v0():
+#    _test_op_v0('circus:ffa-xh018-geom-v0')
+def test_mil_xh018_elec_v0():
+    _test_op_v0('circus:mil-xh018-elec-v0')
+def test_sym_xh018_elec_v0():
+    _test_op_v0('circus:sym-xh018-elec-v0')
+def test_fca_xh018_elec_v0():
+    _test_op_v0('circus:fca-xh018-elec-v0')
+def test_rfa_xh018_elec_v0():
+    _test_op_v0('circus:rfa-xh018-elec-v0')
+#def test_ffa_xh018_elec_v0():
+#    _test_op_v0('circus:ffa-xh018-elec-v0')
+
+def test_mil_xt018_geom_v0():
+    _test_op_v0('circus:mil-xt018-geom-v0')
+def test_sym_xt018_geom_v0():
+    _test_op_v0('circus:sym-xt018-geom-v0')
+def test_fca_xt018_geom_v0():
+    _test_op_v0('circus:fca-xt018-geom-v0')
+def test_rfa_xt018_geom_v0():
+    _test_op_v0('circus:rfa-xt018-geom-v0')
+#def test_ffa_xt018_geom_v0():
+#    _test_op_v0('circus:ffa-xt018-geom-v0')
+def test_mil_xt018_elec_v0():
+    _test_op_v0('circus:mil-xt018-elec-v0')
+def test_sym_xt018_elec_v0():
+    _test_op_v0('circus:sym-xt018-elec-v0')
+def test_fca_xt018_elec_v0():
+    _test_op_v0('circus:fca-xt018-elec-v0')
+def test_rfa_xt018_elec_v0():
+    _test_op_v0('circus:rfa-xt018-elec-v0')
+#def test_ffa_xt018_elec_v0():
+#    _test_op_v0('circus:ffa-xt018-elec-v0')

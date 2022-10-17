@@ -79,7 +79,7 @@ def geometric_unscaler( constraints: dict[str, dict[str, float]]
                          1.0 ) for g in geom_params ])
     x_max = np.array([ ( constraints['length']['max'] if g.startswith('L') else
                          constraints['width']['max'] if g.startswith('W') else
-                         40.0 ) for g in geom_params ])
+                         10.0 ) for g in geom_params ])
 
     return (lambda x: x_min + ( ((np.vstack(x) + 1.0) / 2.0) * (x_max - x_min)))
 

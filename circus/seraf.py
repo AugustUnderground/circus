@@ -21,10 +21,6 @@ def make_ops( ckt_cfg: str, pdk_cfg: str, netlist: str, num: int
     Returns:
         - `list[serafin.OperationalAmplifier]`
     """
-    # pdk_cfg = os.path.expanduser(f'~/.circus/pdk/{pdk_id}.yml')
-    # ckt_cfg = os.path.expanduser(f'~/.circus/ckt/{ckt_id}.yml')
-    # netlist = os.path.expanduser(f'~/.circus/pdk/{pdk_id}/{ckt_id}.scs')
-
     with Pool(num) as pl:
         args = zip(num * [pdk_cfg], num * [ckt_cfg], num * [netlist])
         ops  = pl.starmap(sf.operational_amplifier, args)
@@ -58,8 +54,19 @@ def random_sizing( ops: Iterable[sf.OperationalAmplifier] ) -> pd.DataFrame:
     Get a random sizing for all `ops`. Row index corresponds to index in `ops`.
     """
     num = len(ops)
+    mul = pd.DataFrame.from_dict({ k: num * [m]
+                                   for k,m in ops[0].geom_init.items()
+                                   if k.startswith('M') }
+                                ).reset_index(drop = True)
+
+    wls = [ c for c in list(ops[0].geom_init.keys())
+              if c not in list(mul.columns) ]
+
     with Pool(num) as pl:
-        sizing = pd.concat(pl.map(sf.random_sizing, ops))
+        siz = pd.concat(pl.map(sf.random_sizing, ops))[wls].reset_index(drop = True)
+
+    sizing = pd.concat([siz, mul], axis = 1)
+
     return sizing
 
 def evaluate( ops: Iterable[sf.OperationalAmplifier], sizing: pd.DataFrame
