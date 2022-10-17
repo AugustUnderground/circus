@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>circus.trafo.sym API documentation</title>
+<meta name="description" content="Agnostic Design Space Transforation for SYM: Symmetrical Amplifier …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>circus.trafo.sym</code></h1>
+</header>
+<section id="section-intro">
+<p>Agnostic Design Space Transforation for SYM: Symmetrical Amplifier</p>
+<p><code>INPUTS</code> are:</p>
+<pre><code>[ 'MNCM11_gmoverid', 'MPCM221_gmoverid', 'MNCM31_gmoverid', 'MND11_gmoverid'
+, 'MNCM11_fug',      'MPCM221_fug',      'MNCM31_fug',      'MND11_fug'
+, 'MNCM12_id',       'MNCM32_id' ]
+</code></pre>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Agnostic Design Space Transforation for SYM: Symmetrical Amplifier
+
+`INPUTS` are:
+
+    [ &#39;MNCM11_gmoverid&#39;, &#39;MPCM221_gmoverid&#39;, &#39;MNCM31_gmoverid&#39;, &#39;MND11_gmoverid&#39;
+    , &#39;MNCM11_fug&#39;,      &#39;MPCM221_fug&#39;,      &#39;MNCM31_fug&#39;,      &#39;MND11_fug&#39;
+    , &#39;MNCM12_id&#39;,       &#39;MNCM32_id&#39; ]
+&#34;&#34;&#34;
+
+from fractions import Fraction
+import numpy as np
+import torch as pt
+import pandas as pd
+
+INPUTS: list[str] = [ &#39;MNCM11_gmoverid&#39;, &#39;MPCM221_gmoverid&#39;, &#39;MNCM31_gmoverid&#39;, &#39;MND11_gmoverid&#39;
+                    , &#39;MNCM11_fug&#39;,      &#39;MPCM221_fug&#39;,      &#39;MNCM31_fug&#39;,      &#39;MND11_fug&#39;
+                    , &#39;MNCM12_id&#39;,       &#39;MNCM32_id&#39; ]
+
+def transform( constraints: dict, nmos: pt.nn.Module, pmos: pt.nn.Module
+             , gmid_cm1: float, gmid_cm2: float, gmid_cm4: float, gmid_dp1: float
+             , fug_cm1: float,  fug_cm2: float,  fug_cm4: float,  fug_dp1: float
+             , i1: float, i2: float ) -&gt; dict[str, float]:
+    &#34;&#34;&#34; Electrical to Geometrical Transforation for SYM &#34;&#34;&#34;
+
+    i0      = constraints.get(&#39;i0&#39;,  3e-6)
+    vdd     = constraints.get(&#39;vdd&#39;, 1.8)
+
+    M1_lim  = 42
+    M2_lim  = 42
+
+    M1      = Fraction(i0       / i1).limit_denominator(M1_lim)
+    M2      = Fraction(i1 / 2.0 / i2).limit_denominator(M2_lim)
+
+    Mcm11   = max(M1.numerator, 1)
+    Mcm12   = max(M1.denominator, 1)
+    Mcm21   = max(M2.numerator, 1)
+    Mcm22   = max(M2.denominator, 1)
+
+    Mdp11   = constraints.get(&#39;Mdp11&#39;, 2)
+    Mdp12   = constraints.get(&#39;Mdp12&#39;, Mdp11)
+    Mcm41   = constraints.get(&#39;Mcm41&#39;, 2)
+    Mcm42   = constraints.get(&#39;Mcm42&#39;, 2)
+
+    cm1_in  = pt.Tensor([[gmid_cm1, fug_cm1,  (vdd / 4.25),         0.00 ]])
+    cm2_in  = pt.Tensor([[gmid_cm2, fug_cm2, -(vdd / 3.15),         0.00 ]])
+    cm4_in  = pt.Tensor([[gmid_cm4, fug_cm4,  (vdd / 4.25),         0.00 ]])
+    dp1_in  = pt.Tensor([[gmid_dp1, fug_dp1,  (vdd / 2.10), -(vdd / 4.85)]])
+
+    cm1_out = nmos(cm1_in).numpy()[0]
+    cm2_out = pmos(cm2_in).numpy()[0]
+    cm4_out = nmos(cm4_in).numpy()[0]
+    dp1_out = nmos(dp1_in).numpy()[0]
+
+    Lcm1    = cm1_out[1]
+    Lcm2    = cm2_out[1]
+    Lcm4    = cm4_out[1]
+    Ldp1    = dp1_out[1]
+
+    Wcm1    = i0       / cm1_out[0] / Mcm11
+    Wcm2    = i1 / 2.0 / cm2_out[0] / Mcm21
+    Wcm4    = i2       / cm4_out[0] / Mcm41
+    Wdp1    = i1 / 2.0 / dp1_out[0] / Mdp11
+
+    Lcm3    = Lcm2
+    Wcm3    = Wcm2
+    Mcm31   = Mcm21
+    Mcm32   = Mcm22
+
+    keys    = [ &#39;Ldp1&#39;,  &#39;Lcm1&#39;,  &#39;Lcm2&#39;,  &#39;Lcm3&#39;,  &#39;Lcm4&#39;
+              , &#39;Wdp1&#39;,  &#39;Wcm1&#39;,  &#39;Wcm2&#39;,  &#39;Wcm3&#39;,  &#39;Wcm4&#39;
+              , &#39;Mdp11&#39;, &#39;Mcm11&#39;, &#39;Mcm21&#39;, &#39;Mcm31&#39;, &#39;Mcm41&#39;
+              , &#39;Mdp12&#39;, &#39;Mcm12&#39;, &#39;Mcm22&#39;, &#39;Mcm32&#39;, &#39;Mcm42&#39; ]
+
+    values  = [ Ldp1,  Lcm1,  Lcm2,  Lcm3,  Lcm4
+              , Wdp1,  Wcm1,  Wcm2,  Wcm3,  Wcm4
+              , Mdp11, Mcm11, Mcm21, Mcm31, Mcm41
+              , Mdp12, Mcm12, Mcm22, Mcm32, Mcm42 ]
+
+    sizing  = pd.DataFrame(np.array([values]), columns = keys)
+
+    return sizing
+
+def unscaler() -&gt; tuple[ np.ndarray, np.ndarray, np.ndarray
+                       , np.ndarray, np.ndarray ]:
+    &#34;&#34;&#34; Upper and lower bounds and selection masks &#34;&#34;&#34;
+    x_min = np.array([5.0,  5.0,  5.0,  5.0,  7.0, 7.0, 7.0, 7.0, 1.0,  3.0])
+    x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
+    gm    = np.array([(i in range(0,4))  for i in range(10)])
+    fm    = np.array([(i in range(4,8))  for i in range(10)])
+    im    = np.array([(i in range(8,10)) for i in range(10)])
+    return (x_min, x_max, gm, fm, im)
+
+def reference_goal(constraints: dict) -&gt; np.ndarray:
+    &#34;&#34;&#34; Curated Referece Goal for SYM &#34;&#34;&#34;
+    vdd = constraints.get(&#39;vdd&#39;, 1.8)
+    return { &#34;area&#34;:        5.0e-10      # 5.010925e-10
+           , &#34;a_0&#34;:         55.0         # 54.962221293150016
+           , &#34;ugbw&#34;:        3.5e6        # 3428563.930768671
+           , &#34;sr_r&#34;:        3.5e6        # 3822408.8725046776
+           , &#34;sr_f&#34;:        3.5e6        # -3846399.224656781
+           , &#34;pm&#34;:          65.0         # 67.0570640439259
+           , &#34;gm&#34;:          -30.0        # -32.298672913767724
+           , &#34;cmrr&#34;:        100.0        # 101.52646998121247
+           , &#34;psrr_n&#34;:      55.0         # 55.22058921101098
+           , &#34;psrr_p&#34;:      90.0         # 91.50247601455912
+           , &#34;idd&#34;:         3.0e-5       # 3.0211906622006625e-05
+           , &#34;iss&#34;:         3.3e-5       # -3.3211921814583654e-05
+           , &#34;vn_1Hz&#34;:      6.5e-6       # 6.216847362829546e-06
+           , &#34;vn_10Hz&#34;:     2.0e-6       # 1.8361486757073514e-06
+           , &#34;vn_100Hz&#34;:    5.5e-7       # 5.395284017023125e-07
+           , &#34;vn_1kHz&#34;:     1.75e-7      # 1.6163236371474532e-07
+           , &#34;vn_10kHz&#34;:    6.5e-8       # 6.295679831589233e-08
+           , &#34;vn_100kHz&#34;:   4.5e-8       # 4.421652882505914e-08
+           , &#34;cof&#34;:         35.0e6       # 34532197.91934585
+           , &#34;os_r&#34;:        2.5          # 2.6405786027522846
+           , &#34;os_f&#34;:        2.0          # 2.152491375598402
+           , &#34;i_out_min&#34;:   -2.5e-5      # -2.34598447270796e-05
+           , &#34;i_out_max&#34;:   2.5e-5       # 2.375395528802124e-05
+           , &#34;v_ol&#34;:        (vdd * 0.50) # 1.6314814360399006
+           , &#34;v_oh&#34;:        (vdd * 0.95) # 1.6685034539424761
+           , &#34;v_il&#34;:        (vdd * 0.25) # 0.5688672464434619
+           , &#34;v_ih&#34;:        (vdd * 0.95) # 3.3502486012612174
+           , &#34;voff_stat&#34;:   3.0e-3       # 0.0031193237064727104
+           , &#34;voff_syst&#34;:   -1.5e-3      # -0.0015180853180561346
+           , }
+
+def output_scale( constraints: dict
+                ) -&gt; tuple[dict[str, float], dict[str,float]]:
+    &#34;&#34;&#34; Extimated Min/Max values for scaling &#39;perf&#39; &#34;&#34;&#34;
+    vdd   = constraints.get(&#39;vdd&#39;, 1.8)
+    x_min = { &#39;a_0&#39;         : 25.0
+            , &#39;ugbw&#39;        : 5.0
+            , &#39;pm&#39;          : 0.0
+            , &#39;gm&#39;          : 0.0
+            , &#39;sr_r&#39;        : 4.0
+            , &#39;sr_f&#39;        : 4.0
+            , &#39;vn_1Hz&#39;      : -10.0
+            , &#39;vn_10Hz&#39;     : -10.0
+            , &#39;vn_100Hz&#39;    : -10.0
+            , &#39;vn_1kHz&#39;     : -10.0
+            , &#39;vn_10kHz&#39;    : -10.0
+            , &#39;vn_100kHz&#39;   : -10.0
+            , &#39;cmrr&#39;        : 70
+            , &#39;psrr_n&#39;      : 30.0
+            , &#39;psrr_p&#39;      : 40.0
+            , &#39;v_il&#39;        : 0.0
+            , &#39;v_ih&#39;        : 0.0
+            , &#39;v_ol&#39;        : 0.0
+            , &#39;v_oh&#39;        : 0.0
+            , &#39;i_out_min&#39;   : -6.0
+            , &#39;i_out_max&#39;   : -6.0
+            , &#39;idd&#39;         : -6.0
+            , &#39;iss&#39;         : -6.0
+            , &#39;os_r&#39;        : 0.0
+            , &#39;os_f&#39;        : 0.0
+            , &#39;cof&#39;         : 5.0
+            , &#39;voff_stat&#39;   : -5.0
+            , &#39;voff_syst&#39;   : -5.0
+            , &#39;area&#39;        : -15.0
+            , }
+    x_max = { &#39;a_0&#39;         : 70.0
+            , &#39;ugbw&#39;        : 10.0
+            , &#39;pm&#39;          : 120.0
+            , &#39;gm&#39;          : 80.0
+            , &#39;sr_r&#39;        : 8.0
+            , &#39;sr_f&#39;        : 8.0
+            , &#39;vn_1Hz&#39;      : -4.0
+            , &#39;vn_10Hz&#39;     : -4.0
+            , &#39;vn_100Hz&#39;    : -4.0
+            , &#39;vn_1kHz&#39;     : -4.0
+            , &#39;vn_10kHz&#39;    : -4.0
+            , &#39;vn_100kHz&#39;   : -4.0
+            , &#39;cmrr&#39;        : 150.0
+            , &#39;psrr_n&#39;      : 70.0
+            , &#39;psrr_p&#39;      : 140.0
+            , &#39;v_il&#39;        : (2.0 * vdd)
+            , &#39;v_ih&#39;        : (2.0 * vdd)
+            , &#39;v_ol&#39;        : (2.0 * vdd)
+            , &#39;v_oh&#39;        : (2.0 * vdd)
+            , &#39;i_out_min&#39;   : -3.0
+            , &#39;i_out_max&#39;   : -3.0
+            , &#39;idd&#39;         : -3.0
+            , &#39;iss&#39;         : -3.0
+            , &#39;os_r&#39;        : 130.0
+            , &#39;os_f&#39;        : 130.0
+            , &#39;cof&#39;         : 9.0
+            , &#39;voff_stat&#39;   : 0.0
+            , &#39;voff_syst&#39;   : 0.0
+            , &#39;area&#39;        : -5.0
+            , }
+    return (x_min, x_max)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="circus.trafo.sym.output_scale"><code class="name flex">
+<span>def <span class="ident">output_scale</span></span>(<span>constraints: dict) ‑> tuple[dict[str, float], dict[str, float]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extimated Min/Max values for scaling 'perf'</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def output_scale( constraints: dict
+                ) -&gt; tuple[dict[str, float], dict[str,float]]:
+    &#34;&#34;&#34; Extimated Min/Max values for scaling &#39;perf&#39; &#34;&#34;&#34;
+    vdd   = constraints.get(&#39;vdd&#39;, 1.8)
+    x_min = { &#39;a_0&#39;         : 25.0
+            , &#39;ugbw&#39;        : 5.0
+            , &#39;pm&#39;          : 0.0
+            , &#39;gm&#39;          : 0.0
+            , &#39;sr_r&#39;        : 4.0
+            , &#39;sr_f&#39;        : 4.0
+            , &#39;vn_1Hz&#39;      : -10.0
+            , &#39;vn_10Hz&#39;     : -10.0
+            , &#39;vn_100Hz&#39;    : -10.0
+            , &#39;vn_1kHz&#39;     : -10.0
+            , &#39;vn_10kHz&#39;    : -10.0
+            , &#39;vn_100kHz&#39;   : -10.0
+            , &#39;cmrr&#39;        : 70
+            , &#39;psrr_n&#39;      : 30.0
+            , &#39;psrr_p&#39;      : 40.0
+            , &#39;v_il&#39;        : 0.0
+            , &#39;v_ih&#39;        : 0.0
+            , &#39;v_ol&#39;        : 0.0
+            , &#39;v_oh&#39;        : 0.0
+            , &#39;i_out_min&#39;   : -6.0
+            , &#39;i_out_max&#39;   : -6.0
+            , &#39;idd&#39;         : -6.0
+            , &#39;iss&#39;         : -6.0
+            , &#39;os_r&#39;        : 0.0
+            , &#39;os_f&#39;        : 0.0
+            , &#39;cof&#39;         : 5.0
+            , &#39;voff_stat&#39;   : -5.0
+            , &#39;voff_syst&#39;   : -5.0
+            , &#39;area&#39;        : -15.0
+            , }
+    x_max = { &#39;a_0&#39;         : 70.0
+            , &#39;ugbw&#39;        : 10.0
+            , &#39;pm&#39;          : 120.0
+            , &#39;gm&#39;          : 80.0
+            , &#39;sr_r&#39;        : 8.0
+            , &#39;sr_f&#39;        : 8.0
+            , &#39;vn_1Hz&#39;      : -4.0
+            , &#39;vn_10Hz&#39;     : -4.0
+            , &#39;vn_100Hz&#39;    : -4.0
+            , &#39;vn_1kHz&#39;     : -4.0
+            , &#39;vn_10kHz&#39;    : -4.0
+            , &#39;vn_100kHz&#39;   : -4.0
+            , &#39;cmrr&#39;        : 150.0
+            , &#39;psrr_n&#39;      : 70.0
+            , &#39;psrr_p&#39;      : 140.0
+            , &#39;v_il&#39;        : (2.0 * vdd)
+            , &#39;v_ih&#39;        : (2.0 * vdd)
+            , &#39;v_ol&#39;        : (2.0 * vdd)
+            , &#39;v_oh&#39;        : (2.0 * vdd)
+            , &#39;i_out_min&#39;   : -3.0
+            , &#39;i_out_max&#39;   : -3.0
+            , &#39;idd&#39;         : -3.0
+            , &#39;iss&#39;         : -3.0
+            , &#39;os_r&#39;        : 130.0
+            , &#39;os_f&#39;        : 130.0
+            , &#39;cof&#39;         : 9.0
+            , &#39;voff_stat&#39;   : 0.0
+            , &#39;voff_syst&#39;   : 0.0
+            , &#39;area&#39;        : -5.0
+            , }
+    return (x_min, x_max)</code></pre>
+</details>
+</dd>
+<dt id="circus.trafo.sym.reference_goal"><code class="name flex">
+<span>def <span class="ident">reference_goal</span></span>(<span>constraints: dict) ‑> numpy.ndarray</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Curated Referece Goal for SYM</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reference_goal(constraints: dict) -&gt; np.ndarray:
+    &#34;&#34;&#34; Curated Referece Goal for SYM &#34;&#34;&#34;
+    vdd = constraints.get(&#39;vdd&#39;, 1.8)
+    return { &#34;area&#34;:        5.0e-10      # 5.010925e-10
+           , &#34;a_0&#34;:         55.0         # 54.962221293150016
+           , &#34;ugbw&#34;:        3.5e6        # 3428563.930768671
+           , &#34;sr_r&#34;:        3.5e6        # 3822408.8725046776
+           , &#34;sr_f&#34;:        3.5e6        # -3846399.224656781
+           , &#34;pm&#34;:          65.0         # 67.0570640439259
+           , &#34;gm&#34;:          -30.0        # -32.298672913767724
+           , &#34;cmrr&#34;:        100.0        # 101.52646998121247
+           , &#34;psrr_n&#34;:      55.0         # 55.22058921101098
+           , &#34;psrr_p&#34;:      90.0         # 91.50247601455912
+           , &#34;idd&#34;:         3.0e-5       # 3.0211906622006625e-05
+           , &#34;iss&#34;:         3.3e-5       # -3.3211921814583654e-05
+           , &#34;vn_1Hz&#34;:      6.5e-6       # 6.216847362829546e-06
+           , &#34;vn_10Hz&#34;:     2.0e-6       # 1.8361486757073514e-06
+           , &#34;vn_100Hz&#34;:    5.5e-7       # 5.395284017023125e-07
+           , &#34;vn_1kHz&#34;:     1.75e-7      # 1.6163236371474532e-07
+           , &#34;vn_10kHz&#34;:    6.5e-8       # 6.295679831589233e-08
+           , &#34;vn_100kHz&#34;:   4.5e-8       # 4.421652882505914e-08
+           , &#34;cof&#34;:         35.0e6       # 34532197.91934585
+           , &#34;os_r&#34;:        2.5          # 2.6405786027522846
+           , &#34;os_f&#34;:        2.0          # 2.152491375598402
+           , &#34;i_out_min&#34;:   -2.5e-5      # -2.34598447270796e-05
+           , &#34;i_out_max&#34;:   2.5e-5       # 2.375395528802124e-05
+           , &#34;v_ol&#34;:        (vdd * 0.50) # 1.6314814360399006
+           , &#34;v_oh&#34;:        (vdd * 0.95) # 1.6685034539424761
+           , &#34;v_il&#34;:        (vdd * 0.25) # 0.5688672464434619
+           , &#34;v_ih&#34;:        (vdd * 0.95) # 3.3502486012612174
+           , &#34;voff_stat&#34;:   3.0e-3       # 0.0031193237064727104
+           , &#34;voff_syst&#34;:   -1.5e-3      # -0.0015180853180561346
+           , }</code></pre>
+</details>
+</dd>
+<dt id="circus.trafo.sym.transform"><code class="name flex">
+<span>def <span class="ident">transform</span></span>(<span>constraints: dict, nmos: torch.nn.modules.module.Module, pmos: torch.nn.modules.module.Module, gmid_cm1: float, gmid_cm2: float, gmid_cm4: float, gmid_dp1: float, fug_cm1: float, fug_cm2: float, fug_cm4: float, fug_dp1: float, i1: float, i2: float) ‑> dict[str, float]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Electrical to Geometrical Transforation for SYM</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def transform( constraints: dict, nmos: pt.nn.Module, pmos: pt.nn.Module
+             , gmid_cm1: float, gmid_cm2: float, gmid_cm4: float, gmid_dp1: float
+             , fug_cm1: float,  fug_cm2: float,  fug_cm4: float,  fug_dp1: float
+             , i1: float, i2: float ) -&gt; dict[str, float]:
+    &#34;&#34;&#34; Electrical to Geometrical Transforation for SYM &#34;&#34;&#34;
+
+    i0      = constraints.get(&#39;i0&#39;,  3e-6)
+    vdd     = constraints.get(&#39;vdd&#39;, 1.8)
+
+    M1_lim  = 42
+    M2_lim  = 42
+
+    M1      = Fraction(i0       / i1).limit_denominator(M1_lim)
+    M2      = Fraction(i1 / 2.0 / i2).limit_denominator(M2_lim)
+
+    Mcm11   = max(M1.numerator, 1)
+    Mcm12   = max(M1.denominator, 1)
+    Mcm21   = max(M2.numerator, 1)
+    Mcm22   = max(M2.denominator, 1)
+
+    Mdp11   = constraints.get(&#39;Mdp11&#39;, 2)
+    Mdp12   = constraints.get(&#39;Mdp12&#39;, Mdp11)
+    Mcm41   = constraints.get(&#39;Mcm41&#39;, 2)
+    Mcm42   = constraints.get(&#39;Mcm42&#39;, 2)
+
+    cm1_in  = pt.Tensor([[gmid_cm1, fug_cm1,  (vdd / 4.25),         0.00 ]])
+    cm2_in  = pt.Tensor([[gmid_cm2, fug_cm2, -(vdd / 3.15),         0.00 ]])
+    cm4_in  = pt.Tensor([[gmid_cm4, fug_cm4,  (vdd / 4.25),         0.00 ]])
+    dp1_in  = pt.Tensor([[gmid_dp1, fug_dp1,  (vdd / 2.10), -(vdd / 4.85)]])
+
+    cm1_out = nmos(cm1_in).numpy()[0]
+    cm2_out = pmos(cm2_in).numpy()[0]
+    cm4_out = nmos(cm4_in).numpy()[0]
+    dp1_out = nmos(dp1_in).numpy()[0]
+
+    Lcm1    = cm1_out[1]
+    Lcm2    = cm2_out[1]
+    Lcm4    = cm4_out[1]
+    Ldp1    = dp1_out[1]
+
+    Wcm1    = i0       / cm1_out[0] / Mcm11
+    Wcm2    = i1 / 2.0 / cm2_out[0] / Mcm21
+    Wcm4    = i2       / cm4_out[0] / Mcm41
+    Wdp1    = i1 / 2.0 / dp1_out[0] / Mdp11
+
+    Lcm3    = Lcm2
+    Wcm3    = Wcm2
+    Mcm31   = Mcm21
+    Mcm32   = Mcm22
+
+    keys    = [ &#39;Ldp1&#39;,  &#39;Lcm1&#39;,  &#39;Lcm2&#39;,  &#39;Lcm3&#39;,  &#39;Lcm4&#39;
+              , &#39;Wdp1&#39;,  &#39;Wcm1&#39;,  &#39;Wcm2&#39;,  &#39;Wcm3&#39;,  &#39;Wcm4&#39;
+              , &#39;Mdp11&#39;, &#39;Mcm11&#39;, &#39;Mcm21&#39;, &#39;Mcm31&#39;, &#39;Mcm41&#39;
+              , &#39;Mdp12&#39;, &#39;Mcm12&#39;, &#39;Mcm22&#39;, &#39;Mcm32&#39;, &#39;Mcm42&#39; ]
+
+    values  = [ Ldp1,  Lcm1,  Lcm2,  Lcm3,  Lcm4
+              , Wdp1,  Wcm1,  Wcm2,  Wcm3,  Wcm4
+              , Mdp11, Mcm11, Mcm21, Mcm31, Mcm41
+              , Mdp12, Mcm12, Mcm22, Mcm32, Mcm42 ]
+
+    sizing  = pd.DataFrame(np.array([values]), columns = keys)
+
+    return sizing</code></pre>
+</details>
+</dd>
+<dt id="circus.trafo.sym.unscaler"><code class="name flex">
+<span>def <span class="ident">unscaler</span></span>(<span>) ‑> tuple[numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Upper and lower bounds and selection masks</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def unscaler() -&gt; tuple[ np.ndarray, np.ndarray, np.ndarray
+                       , np.ndarray, np.ndarray ]:
+    &#34;&#34;&#34; Upper and lower bounds and selection masks &#34;&#34;&#34;
+    x_min = np.array([5.0,  5.0,  5.0,  5.0,  7.0, 7.0, 7.0, 7.0, 1.0,  3.0])
+    x_max = np.array([15.0, 15.0, 15.0, 15.0, 9.0, 9.0, 9.0, 9.0, 9.0, 15.0])
+    gm    = np.array([(i in range(0,4))  for i in range(10)])
+    fm    = np.array([(i in range(4,8))  for i in range(10)])
+    im    = np.array([(i in range(8,10)) for i in range(10)])
+    return (x_min, x_max, gm, fm, im)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="circus.trafo" href="index.html">circus.trafo</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="circus.trafo.sym.output_scale" href="#circus.trafo.sym.output_scale">output_scale</a></code></li>
+<li><code><a title="circus.trafo.sym.reference_goal" href="#circus.trafo.sym.reference_goal">reference_goal</a></code></li>
+<li><code><a title="circus.trafo.sym.transform" href="#circus.trafo.sym.transform">transform</a></code></li>
+<li><code><a title="circus.trafo.sym.unscaler" href="#circus.trafo.sym.unscaler">unscaler</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

@@ -31,38 +31,39 @@
 
 from typing import Any, List, Optional, Type, Union, Callable
 import numpy as np
+import pandas as pd
 
-from circus.trafo import op1
-from circus.trafo import op2
-from circus.trafo import op8
-from circus.trafo import op11
+from circus.trafo import mil
+from circus.trafo import sym
+from circus.trafo import fca
+from circus.trafo import rfa
 
-def transformation(ace_id: str) -&gt; Callable:
-    &#34;&#34;&#34; Get transformation function for a given ace id &#34;&#34;&#34;
-    err_msg = f&#39;No Transformation function for {ace_id} available&#39;
-    return { &#39;op1&#39;: op1.transform
-           , &#39;op2&#39;: op2.transform
-           , &#39;op8&#39;: op8.transform
-           , &#39;op11&#39;: op11.transform
-           , }.get(ace_id, NotImplementedError(err_msg))
+def transformation(ckt_id: str) -&gt; Callable:
+    &#34;&#34;&#34; Get transformation function for a given ckt id &#34;&#34;&#34;
+    err_msg = f&#39;No Transformation function for {ckt_id} available&#39;
+    return { &#39;mil&#39;: mil.transform
+           , &#39;sym&#39;: sym.transform
+           , &#39;fca&#39;: fca.transform
+           , &#39;rfa&#39;: rfa.transform
+           , }.get(ckt_id, NotImplementedError(err_msg))
 
-def electric_identifiers(ace_id: str) -&gt; [str]:
-    &#34;&#34;&#34; Get Electric Design Parameters for a given ace id &#34;&#34;&#34;
-    err_msg = f&#39;No Input Parameters for {ace_id} available&#39;
-    return { &#39;op1&#39;: op1.INPUTS
-           , &#39;op2&#39;: op2.INPUTS
-           , &#39;op8&#39;: op8.INPUTS
-           , &#39;op11&#39;: op11.INPUTS
-           , }.get(ace_id, NotImplementedError(err_msg))
+def electric_identifiers(ckt_id: str) -&gt; [str]:
+    &#34;&#34;&#34; Get Electric Design Parameters for a given ckt id &#34;&#34;&#34;
+    err_msg = f&#39;No Input Parameters for {ckt_id} available&#39;
+    return { &#39;mil&#39;: mil.INPUTS
+           , &#39;sym&#39;: sym.INPUTS
+           , &#39;fca&#39;: fca.INPUTS
+           , &#39;rfa&#39;: rfa.INPUTS
+           , }.get(ckt_id, NotImplementedError(err_msg))
 
-def electric_unscaler(ace_id: str, ace_backend: str) -&gt; Callable:
-    &#34;&#34;&#34; Min-Max scaler for given ACE ID and PDK &#34;&#34;&#34;
-    err_msg = f&#39;No Scaler for {ace_id} available&#39;
-    x_min,x_max,gm,fm,im = { &#39;op1&#39;: op1.unscaler(ace_backend)
-                           , &#39;op2&#39;: op2.unscaler(ace_backend)
-                           , &#39;op8&#39;: op8.unscaler(ace_backend)
-                           , &#39;op11&#39;: op11.unscaler(ace_backend)
-                           , }.get(ace_id, NotImplementedError(err_msg))
+def electric_unscaler(ckt_id: str) -&gt; Callable:
+    &#34;&#34;&#34; Min-Max scaler for given ckt id and PDK &#34;&#34;&#34;
+    err_msg = f&#39;No Scaler for {ckt_id} available&#39;
+    x_min,x_max,gm,fm,im = { &#39;mil&#39;: mil.unscaler()
+                           , &#39;sym&#39;: sym.unscaler()
+                           , &#39;fca&#39;: fca.unscaler()
+                           , &#39;rfa&#39;: rfa.unscaler()
+                           , }.get(ckt_id, NotImplementedError(err_msg))
 
     def unscale(x: np.ndarray) -&gt; np.ndarray:
         y_ = np.clip( x_min + (((x + 1.0) / 2.0) * (x_max - x_min))
@@ -74,48 +75,49 @@ def electric_unscaler(ace_id: str, ace_backend: str) -&gt; Callable:
 
     return unscale
 
-def performance_scale( ace_id: str, ace_backend: str, constraints: dict
-                          ) -&gt; (dict[str,float], dict[str,float]):
+def performance_scale( ckt_id: str, constraints: dict
+                     ) -&gt; (dict[str,float], dict[str,float]):
     &#34;&#34;&#34; Return performance scaling dicts (min,max) &#34;&#34;&#34;
-    err_msg = f&#39;No Performance Scale for {ace_id} available&#39;
-    return { &#39;op1&#39;: op1.output_scale
-           , &#39;op2&#39;: op2.output_scale
-           , &#39;op8&#39;: op8.output_scale
-           , &#39;op11&#39;: op11.output_scale
-           , }.get(ace_id, NotImplementedError(err_msg)
-                  )(constraints, ace_backend)
+    err_msg = f&#39;No Performance Scale for {ckt_id} available&#39;
+    return { &#39;mil&#39;: mil.output_scale
+           , &#39;sym&#39;: sym.output_scale
+           , &#39;fca&#39;: fca.output_scale
+           , &#39;rfa&#39;: rfa.output_scale
+           , }.get(ckt_id, NotImplementedError(err_msg)
+                  )(constraints)
 
-def reference_goal( ace_id: str, ace_backend: str, constraints: dict
-                  ) -&gt; dict[str, float]:
-    &#34;&#34;&#34; Curated Refernce goal for OP &#34;&#34;&#34;
-    err_msg = f&#39;No Reference Goal for {ace_id} available&#39;
-    return { &#39;op1&#39;: op1.reference_goal
-           , &#39;op2&#39;: op2.reference_goal
-           , &#39;op8&#39;: op8.reference_goal
-           , &#39;op11&#39;: op11.reference_goal
-           , }.get(ace_id, NotImplementedError(err_msg)
-                  )(constraints, ace_backend)</code></pre>
+def reference_goal( ckt_id: str, constraints: dict
+                  ) -&gt; pd.DataFrame:
+    &#34;&#34;&#34; Curated Refernce goal for operational amplifier &#34;&#34;&#34;
+    err_msg = f&#39;No Reference Goal for {ckt_id} available&#39;
+    goal    = { &#39;mil&#39;: mil.reference_goal
+              , &#39;sym&#39;: sym.reference_goal
+              , &#39;fca&#39;: fca.reference_goal
+              , &#39;rfa&#39;: rfa.reference_goal
+              , }.get(ckt_id, NotImplementedError(err_msg)
+                     )(constraints)
+    return pd.DataFrame.from_dict({k: [v] for k,v in goal.items()})</code></pre>
 </details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
-<dt><code class="name"><a title="circus.trafo.op1" href="op1.html">circus.trafo.op1</a></code></dt>
+<dt><code class="name"><a title="circus.trafo.fca" href="fca.html">circus.trafo.fca</a></code></dt>
 <dd>
-<div class="desc"><p>Agnostic Design Space Transforation for OP1: Miller Operational Amplifier …</p></div>
+<div class="desc"><p>Agnostic Design Space Transforation for FCA: Folded Cascode Amplifier …</p></div>
 </dd>
-<dt><code class="name"><a title="circus.trafo.op11" href="op11.html">circus.trafo.op11</a></code></dt>
+<dt><code class="name"><a title="circus.trafo.mil" href="mil.html">circus.trafo.mil</a></code></dt>
 <dd>
-<div class="desc"><p>Agnostic Design Space Transforation for OP11: Rail-to-Rail Folded-Cascode
-with Wide-Swing Current Mirror</p></div>
+<div class="desc"><p>Agnostic Design Space Transforation for MIL: Miller Operational Amplifier …</p></div>
 </dd>
-<dt><code class="name"><a title="circus.trafo.op2" href="op2.html">circus.trafo.op2</a></code></dt>
+<dt><code class="name"><a title="circus.trafo.rfa" href="rfa.html">circus.trafo.rfa</a></code></dt>
 <dd>
-<div class="desc"><p>Agnostic Design Space Transforation for OP2: Symmetrical Amplifier</p></div>
+<div class="desc"><p>Agnostic Design Space Transforation for RFA: Rail-to-Rail Folded-Cascode
+with Wide-Swing Current Mirror …</p></div>
 </dd>
-<dt><code class="name"><a title="circus.trafo.op8" href="op8.html">circus.trafo.op8</a></code></dt>
+<dt><code class="name"><a title="circus.trafo.sym" href="sym.html">circus.trafo.sym</a></code></dt>
 <dd>
-<div class="desc"><p>Agnostic Design Space Transforation for OP8: Folded Cascode</p></div>
+<div class="desc"><p>Agnostic Design Space Transforation for SYM: Symmetrical Amplifier …</p></div>
 </dd>
 </dl>
 </section>
@@ -125,41 +127,41 @@ with Wide-Swing Current Mirror</p></div>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="circus.trafo.electric_identifiers"><code class="name flex">
-<span>def <span class="ident">electric_identifiers</span></span>(<span>ace_id: str) ‑> [<class 'str'>]</span>
+<span>def <span class="ident">electric_identifiers</span></span>(<span>ckt_id: str) ‑> [<class 'str'>]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Get Electric Design Parameters for a given ace id</p></div>
+<div class="desc"><p>Get Electric Design Parameters for a given ckt id</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def electric_identifiers(ace_id: str) -&gt; [str]:
-    &#34;&#34;&#34; Get Electric Design Parameters for a given ace id &#34;&#34;&#34;
-    err_msg = f&#39;No Input Parameters for {ace_id} available&#39;
-    return { &#39;op1&#39;: op1.INPUTS
-           , &#39;op2&#39;: op2.INPUTS
-           , &#39;op8&#39;: op8.INPUTS
-           , &#39;op11&#39;: op11.INPUTS
-           , }.get(ace_id, NotImplementedError(err_msg))</code></pre>
+<pre><code class="python">def electric_identifiers(ckt_id: str) -&gt; [str]:
+    &#34;&#34;&#34; Get Electric Design Parameters for a given ckt id &#34;&#34;&#34;
+    err_msg = f&#39;No Input Parameters for {ckt_id} available&#39;
+    return { &#39;mil&#39;: mil.INPUTS
+           , &#39;sym&#39;: sym.INPUTS
+           , &#39;fca&#39;: fca.INPUTS
+           , &#39;rfa&#39;: rfa.INPUTS
+           , }.get(ckt_id, NotImplementedError(err_msg))</code></pre>
 </details>
 </dd>
 <dt id="circus.trafo.electric_unscaler"><code class="name flex">
-<span>def <span class="ident">electric_unscaler</span></span>(<span>ace_id: str, ace_backend: str) ‑> Callable</span>
+<span>def <span class="ident">electric_unscaler</span></span>(<span>ckt_id: str) ‑> Callable</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Min-Max scaler for given ACE ID and PDK</p></div>
+<div class="desc"><p>Min-Max scaler for given ckt id and PDK</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def electric_unscaler(ace_id: str, ace_backend: str) -&gt; Callable:
-    &#34;&#34;&#34; Min-Max scaler for given ACE ID and PDK &#34;&#34;&#34;
-    err_msg = f&#39;No Scaler for {ace_id} available&#39;
-    x_min,x_max,gm,fm,im = { &#39;op1&#39;: op1.unscaler(ace_backend)
-                           , &#39;op2&#39;: op2.unscaler(ace_backend)
-                           , &#39;op8&#39;: op8.unscaler(ace_backend)
-                           , &#39;op11&#39;: op11.unscaler(ace_backend)
-                           , }.get(ace_id, NotImplementedError(err_msg))
+<pre><code class="python">def electric_unscaler(ckt_id: str) -&gt; Callable:
+    &#34;&#34;&#34; Min-Max scaler for given ckt id and PDK &#34;&#34;&#34;
+    err_msg = f&#39;No Scaler for {ckt_id} available&#39;
+    x_min,x_max,gm,fm,im = { &#39;mil&#39;: mil.unscaler()
+                           , &#39;sym&#39;: sym.unscaler()
+                           , &#39;fca&#39;: fca.unscaler()
+                           , &#39;rfa&#39;: rfa.unscaler()
+                           , }.get(ckt_id, NotImplementedError(err_msg))
 
     def unscale(x: np.ndarray) -&gt; np.ndarray:
         y_ = np.clip( x_min + (((x + 1.0) / 2.0) * (x_max - x_min))
@@ -173,7 +175,7 @@ with Wide-Swing Current Mirror</p></div>
 </details>
 </dd>
 <dt id="circus.trafo.performance_scale"><code class="name flex">
-<span>def <span class="ident">performance_scale</span></span>(<span>ace_id: str, ace_backend: str, constraints: dict) ‑> (dict[str, float], dict[str, float])</span>
+<span>def <span class="ident">performance_scale</span></span>(<span>ckt_id: str, constraints: dict) ‑> (dict[str, float], dict[str, float])</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Return performance scaling dicts (min,max)</p></div>
@@ -181,56 +183,57 @@ with Wide-Swing Current Mirror</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def performance_scale( ace_id: str, ace_backend: str, constraints: dict
-                          ) -&gt; (dict[str,float], dict[str,float]):
+<pre><code class="python">def performance_scale( ckt_id: str, constraints: dict
+                     ) -&gt; (dict[str,float], dict[str,float]):
     &#34;&#34;&#34; Return performance scaling dicts (min,max) &#34;&#34;&#34;
-    err_msg = f&#39;No Performance Scale for {ace_id} available&#39;
-    return { &#39;op1&#39;: op1.output_scale
-           , &#39;op2&#39;: op2.output_scale
-           , &#39;op8&#39;: op8.output_scale
-           , &#39;op11&#39;: op11.output_scale
-           , }.get(ace_id, NotImplementedError(err_msg)
-                  )(constraints, ace_backend)</code></pre>
+    err_msg = f&#39;No Performance Scale for {ckt_id} available&#39;
+    return { &#39;mil&#39;: mil.output_scale
+           , &#39;sym&#39;: sym.output_scale
+           , &#39;fca&#39;: fca.output_scale
+           , &#39;rfa&#39;: rfa.output_scale
+           , }.get(ckt_id, NotImplementedError(err_msg)
+                  )(constraints)</code></pre>
 </details>
 </dd>
 <dt id="circus.trafo.reference_goal"><code class="name flex">
-<span>def <span class="ident">reference_goal</span></span>(<span>ace_id: str, ace_backend: str, constraints: dict) ‑> dict[str, float]</span>
+<span>def <span class="ident">reference_goal</span></span>(<span>ckt_id: str, constraints: dict) ‑> pandas.core.frame.DataFrame</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Curated Refernce goal for OP</p></div>
+<div class="desc"><p>Curated Refernce goal for operational amplifier</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def reference_goal( ace_id: str, ace_backend: str, constraints: dict
-                  ) -&gt; dict[str, float]:
-    &#34;&#34;&#34; Curated Refernce goal for OP &#34;&#34;&#34;
-    err_msg = f&#39;No Reference Goal for {ace_id} available&#39;
-    return { &#39;op1&#39;: op1.reference_goal
-           , &#39;op2&#39;: op2.reference_goal
-           , &#39;op8&#39;: op8.reference_goal
-           , &#39;op11&#39;: op11.reference_goal
-           , }.get(ace_id, NotImplementedError(err_msg)
-                  )(constraints, ace_backend)</code></pre>
+<pre><code class="python">def reference_goal( ckt_id: str, constraints: dict
+                  ) -&gt; pd.DataFrame:
+    &#34;&#34;&#34; Curated Refernce goal for operational amplifier &#34;&#34;&#34;
+    err_msg = f&#39;No Reference Goal for {ckt_id} available&#39;
+    goal    = { &#39;mil&#39;: mil.reference_goal
+              , &#39;sym&#39;: sym.reference_goal
+              , &#39;fca&#39;: fca.reference_goal
+              , &#39;rfa&#39;: rfa.reference_goal
+              , }.get(ckt_id, NotImplementedError(err_msg)
+                     )(constraints)
+    return pd.DataFrame.from_dict({k: [v] for k,v in goal.items()})</code></pre>
 </details>
 </dd>
 <dt id="circus.trafo.transformation"><code class="name flex">
-<span>def <span class="ident">transformation</span></span>(<span>ace_id: str) ‑> Callable</span>
+<span>def <span class="ident">transformation</span></span>(<span>ckt_id: str) ‑> Callable</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Get transformation function for a given ace id</p></div>
+<div class="desc"><p>Get transformation function for a given ckt id</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def transformation(ace_id: str) -&gt; Callable:
-    &#34;&#34;&#34; Get transformation function for a given ace id &#34;&#34;&#34;
-    err_msg = f&#39;No Transformation function for {ace_id} available&#39;
-    return { &#39;op1&#39;: op1.transform
-           , &#39;op2&#39;: op2.transform
-           , &#39;op8&#39;: op8.transform
-           , &#39;op11&#39;: op11.transform
-           , }.get(ace_id, NotImplementedError(err_msg))</code></pre>
+<pre><code class="python">def transformation(ckt_id: str) -&gt; Callable:
+    &#34;&#34;&#34; Get transformation function for a given ckt id &#34;&#34;&#34;
+    err_msg = f&#39;No Transformation function for {ckt_id} available&#39;
+    return { &#39;mil&#39;: mil.transform
+           , &#39;sym&#39;: sym.transform
+           , &#39;fca&#39;: fca.transform
+           , &#39;rfa&#39;: rfa.transform
+           , }.get(ckt_id, NotImplementedError(err_msg))</code></pre>
 </details>
 </dd>
 </dl>
@@ -251,10 +254,10 @@ with Wide-Swing Current Mirror</p></div>
 </li>
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
-<li><code><a title="circus.trafo.op1" href="op1.html">circus.trafo.op1</a></code></li>
-<li><code><a title="circus.trafo.op11" href="op11.html">circus.trafo.op11</a></code></li>
-<li><code><a title="circus.trafo.op2" href="op2.html">circus.trafo.op2</a></code></li>
-<li><code><a title="circus.trafo.op8" href="op8.html">circus.trafo.op8</a></code></li>
+<li><code><a title="circus.trafo.fca" href="fca.html">circus.trafo.fca</a></code></li>
+<li><code><a title="circus.trafo.mil" href="mil.html">circus.trafo.mil</a></code></li>
+<li><code><a title="circus.trafo.rfa" href="rfa.html">circus.trafo.rfa</a></code></li>
+<li><code><a title="circus.trafo.sym" href="sym.html">circus.trafo.sym</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>

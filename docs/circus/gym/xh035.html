@@ -201,7 +201,7 @@ class OP11XH035ElecV1(OPElecV1):
 <li><code><a title="circus.gym.op.OPElecV0.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV0.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.step_async" href="../circus.html#circus.circus.CircusElec.step_async">step_async</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
 </ul>
 </li>
@@ -248,12 +248,12 @@ class OP11XH035ElecV1(OPElecV1):
 <li><code><a title="circus.gym.op.OPElecV1.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.reset" href="../circus.html#circus.circus.CircusElecVec.reset">reset</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.step_async" href="../circus.html#circus.circus.CircusElec.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.step_wait" href="../circus.html#circus.circus.CircusElecVec.step_wait">step_wait</a></code></li>
 </ul>
 </li>
 </ul>
@@ -266,37 +266,50 @@ class OP11XH035ElecV1(OPElecV1):
 <div class="desc"><p>OP11: Symmetrical Amplifier Goal Env</p>
 <p>Construct a Geometric Sizing Goal Environment</p>
 <h2 id="arguments">Arguments</h2>
-<p><code>ace_id</code>:
-ID of the form 'op#', see ACE Documentation for further
-details.
-<code>ace_backend</code>:
-PDK, available are 'xh035' and 'xh018'.
-<code>num_envs</code>:
-Numer of Parallel Environments ∈ [ 1 .. <code>nproc</code> ]
-<code>num_steps</code>:
-Number of steps per Episode.
-<code>seed</code>:
-Random Seed
-<code>obs_filter</code>:
-Filter Performance dict obtained from ACE:
-'perf': Only performance paramters (default)
-'all': All parameters from ACE
-[str]: List of parameters
-<code>goal_filter</code>:
-List of parameters
-<code>goal_preds</code>:
-Binary comparison operator
-<code>goal_init</code>:
+<ul>
+<li><code>ckt_id</code>:
+3 Letter ID, see serafin Documentation for
+further details.</li>
+<li><code>pdk_id</code>:
+PDK, available are 'xt018', 'xh018',
+'gpdk180', 'gpdk090', 'gpdk045'</li>
+<li><code>ckt_cfg</code>:
+Path to <code>ckt_id.yml</code>, if not providied it
+will be searched for in default locations</li>
+<li><code>pdk_cfg</code>:
+Path to <code>pdk_id.yml</code>, if not provided it
+will be searched for in default locations</li>
+<li><code>netlist</code>:
+Path to OpAmp netlist. if not provieded it
+will be searched for in default locations</li>
+<li><code>num_envs</code>:
+Numer of Parallel Environments ∈ [ 1 .. ∞]</li>
+<li><code>num_steps</code>:
+Number of steps per Episode.</li>
+<li><code>seed</code>:
+Random Seed</li>
+<li><code>obs_filter</code>:
+Filter Performance dict obtained from serafin:
+'perf': Only performance paramters (default),
+'all': All parameters from serafin,
+[str]: List of parameters</li>
+<li><code>goal_filter</code>:
+Optional list of parameters</li>
+<li><code>goal_preds</code>:
+Binary comparison operators</li>
+<li><code>goal_init</code>:
 How to initialize new goals on reset:
-'noisy': Put some noise on a reference goal (default)
-'random': Choose a point in goal space
-np.ndarray: A specific goal of shape
-(num_envs, len(goal_filter))
-<code>reward_fn</code>:
-Optional reward function that takes an observation dict.
-<code>scale_observation</code>: Scale the observations and goals as specified in trafo
-<code>auto_reset</code>:
-Automatically reset environemt when done.</p></div>
+'noisy': Put some noise on a reference goal (default),
+'random': Choose a point in goal space,
+np.ndarray: A specific fix goal of shape
+(num_envs, len(goal_filter)).</li>
+<li><code>reward_fn</code>:
+Optional reward function that takes an observation dict.</li>
+<li><code>scale_observation</code>: Scale the observations and goals as
+specified in trafo (default = True)</li>
+<li><code>auto_reset</code>:
+Automatically reset environemt when done (default = False).</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -378,12 +391,12 @@ Automatically reset environemt when done.</p></div>
 <li><code><a title="circus.gym.op.OPGeomV1.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
-<li><code><a title="circus.gym.op.OPGeomV1.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.reset" href="../circus.html#circus.circus.CircusGeomVec.reset">reset</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
-<li><code><a title="circus.gym.op.OPGeomV1.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.step_wait" href="../circus.html#circus.circus.CircusGeomVec.step_wait">step_wait</a></code></li>
 </ul>
 </li>
 </ul>
@@ -432,7 +445,7 @@ Automatically reset environemt when done.</p></div>
 <li><code><a title="circus.gym.op.OPElecV0.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV0.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.step_async" href="../circus.html#circus.circus.CircusElec.step_async">step_async</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
 </ul>
 </li>
@@ -479,12 +492,12 @@ Automatically reset environemt when done.</p></div>
 <li><code><a title="circus.gym.op.OPElecV1.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.reset" href="../circus.html#circus.circus.CircusElecVec.reset">reset</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.step_async" href="../circus.html#circus.circus.CircusElec.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.step_wait" href="../circus.html#circus.circus.CircusElecVec.step_wait">step_wait</a></code></li>
 </ul>
 </li>
 </ul>
@@ -497,37 +510,50 @@ Automatically reset environemt when done.</p></div>
 <div class="desc"><p>OP1: Symmetrical Amplifier Goal Env</p>
 <p>Construct a Geometric Sizing Goal Environment</p>
 <h2 id="arguments">Arguments</h2>
-<p><code>ace_id</code>:
-ID of the form 'op#', see ACE Documentation for further
-details.
-<code>ace_backend</code>:
-PDK, available are 'xh035' and 'xh018'.
-<code>num_envs</code>:
-Numer of Parallel Environments ∈ [ 1 .. <code>nproc</code> ]
-<code>num_steps</code>:
-Number of steps per Episode.
-<code>seed</code>:
-Random Seed
-<code>obs_filter</code>:
-Filter Performance dict obtained from ACE:
-'perf': Only performance paramters (default)
-'all': All parameters from ACE
-[str]: List of parameters
-<code>goal_filter</code>:
-List of parameters
-<code>goal_preds</code>:
-Binary comparison operator
-<code>goal_init</code>:
+<ul>
+<li><code>ckt_id</code>:
+3 Letter ID, see serafin Documentation for
+further details.</li>
+<li><code>pdk_id</code>:
+PDK, available are 'xt018', 'xh018',
+'gpdk180', 'gpdk090', 'gpdk045'</li>
+<li><code>ckt_cfg</code>:
+Path to <code>ckt_id.yml</code>, if not providied it
+will be searched for in default locations</li>
+<li><code>pdk_cfg</code>:
+Path to <code>pdk_id.yml</code>, if not provided it
+will be searched for in default locations</li>
+<li><code>netlist</code>:
+Path to OpAmp netlist. if not provieded it
+will be searched for in default locations</li>
+<li><code>num_envs</code>:
+Numer of Parallel Environments ∈ [ 1 .. ∞]</li>
+<li><code>num_steps</code>:
+Number of steps per Episode.</li>
+<li><code>seed</code>:
+Random Seed</li>
+<li><code>obs_filter</code>:
+Filter Performance dict obtained from serafin:
+'perf': Only performance paramters (default),
+'all': All parameters from serafin,
+[str]: List of parameters</li>
+<li><code>goal_filter</code>:
+Optional list of parameters</li>
+<li><code>goal_preds</code>:
+Binary comparison operators</li>
+<li><code>goal_init</code>:
 How to initialize new goals on reset:
-'noisy': Put some noise on a reference goal (default)
-'random': Choose a point in goal space
-np.ndarray: A specific goal of shape
-(num_envs, len(goal_filter))
-<code>reward_fn</code>:
-Optional reward function that takes an observation dict.
-<code>scale_observation</code>: Scale the observations and goals as specified in trafo
-<code>auto_reset</code>:
-Automatically reset environemt when done.</p></div>
+'noisy': Put some noise on a reference goal (default),
+'random': Choose a point in goal space,
+np.ndarray: A specific fix goal of shape
+(num_envs, len(goal_filter)).</li>
+<li><code>reward_fn</code>:
+Optional reward function that takes an observation dict.</li>
+<li><code>scale_observation</code>: Scale the observations and goals as
+specified in trafo (default = True)</li>
+<li><code>auto_reset</code>:
+Automatically reset environemt when done (default = False).</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -609,12 +635,12 @@ Automatically reset environemt when done.</p></div>
 <li><code><a title="circus.gym.op.OPGeomV1.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
-<li><code><a title="circus.gym.op.OPGeomV1.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.reset" href="../circus.html#circus.circus.CircusGeomVec.reset">reset</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
-<li><code><a title="circus.gym.op.OPGeomV1.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.step_wait" href="../circus.html#circus.circus.CircusGeomVec.step_wait">step_wait</a></code></li>
 </ul>
 </li>
 </ul>
@@ -663,7 +689,7 @@ Automatically reset environemt when done.</p></div>
 <li><code><a title="circus.gym.op.OPElecV0.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV0.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.step_async" href="../circus.html#circus.circus.CircusElec.step_async">step_async</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
 </ul>
 </li>
@@ -710,12 +736,12 @@ Automatically reset environemt when done.</p></div>
 <li><code><a title="circus.gym.op.OPElecV1.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.reset" href="../circus.html#circus.circus.CircusElecVec.reset">reset</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.step_async" href="../circus.html#circus.circus.CircusElec.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.step_wait" href="../circus.html#circus.circus.CircusElecVec.step_wait">step_wait</a></code></li>
 </ul>
 </li>
 </ul>
@@ -728,37 +754,50 @@ Automatically reset environemt when done.</p></div>
 <div class="desc"><p>OP2: Symmetrical Amplifier Goal Env</p>
 <p>Construct a Geometric Sizing Goal Environment</p>
 <h2 id="arguments">Arguments</h2>
-<p><code>ace_id</code>:
-ID of the form 'op#', see ACE Documentation for further
-details.
-<code>ace_backend</code>:
-PDK, available are 'xh035' and 'xh018'.
-<code>num_envs</code>:
-Numer of Parallel Environments ∈ [ 1 .. <code>nproc</code> ]
-<code>num_steps</code>:
-Number of steps per Episode.
-<code>seed</code>:
-Random Seed
-<code>obs_filter</code>:
-Filter Performance dict obtained from ACE:
-'perf': Only performance paramters (default)
-'all': All parameters from ACE
-[str]: List of parameters
-<code>goal_filter</code>:
-List of parameters
-<code>goal_preds</code>:
-Binary comparison operator
-<code>goal_init</code>:
+<ul>
+<li><code>ckt_id</code>:
+3 Letter ID, see serafin Documentation for
+further details.</li>
+<li><code>pdk_id</code>:
+PDK, available are 'xt018', 'xh018',
+'gpdk180', 'gpdk090', 'gpdk045'</li>
+<li><code>ckt_cfg</code>:
+Path to <code>ckt_id.yml</code>, if not providied it
+will be searched for in default locations</li>
+<li><code>pdk_cfg</code>:
+Path to <code>pdk_id.yml</code>, if not provided it
+will be searched for in default locations</li>
+<li><code>netlist</code>:
+Path to OpAmp netlist. if not provieded it
+will be searched for in default locations</li>
+<li><code>num_envs</code>:
+Numer of Parallel Environments ∈ [ 1 .. ∞]</li>
+<li><code>num_steps</code>:
+Number of steps per Episode.</li>
+<li><code>seed</code>:
+Random Seed</li>
+<li><code>obs_filter</code>:
+Filter Performance dict obtained from serafin:
+'perf': Only performance paramters (default),
+'all': All parameters from serafin,
+[str]: List of parameters</li>
+<li><code>goal_filter</code>:
+Optional list of parameters</li>
+<li><code>goal_preds</code>:
+Binary comparison operators</li>
+<li><code>goal_init</code>:
 How to initialize new goals on reset:
-'noisy': Put some noise on a reference goal (default)
-'random': Choose a point in goal space
-np.ndarray: A specific goal of shape
-(num_envs, len(goal_filter))
-<code>reward_fn</code>:
-Optional reward function that takes an observation dict.
-<code>scale_observation</code>: Scale the observations and goals as specified in trafo
-<code>auto_reset</code>:
-Automatically reset environemt when done.</p></div>
+'noisy': Put some noise on a reference goal (default),
+'random': Choose a point in goal space,
+np.ndarray: A specific fix goal of shape
+(num_envs, len(goal_filter)).</li>
+<li><code>reward_fn</code>:
+Optional reward function that takes an observation dict.</li>
+<li><code>scale_observation</code>: Scale the observations and goals as
+specified in trafo (default = True)</li>
+<li><code>auto_reset</code>:
+Automatically reset environemt when done (default = False).</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -840,12 +879,12 @@ Automatically reset environemt when done.</p></div>
 <li><code><a title="circus.gym.op.OPGeomV1.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
-<li><code><a title="circus.gym.op.OPGeomV1.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.reset" href="../circus.html#circus.circus.CircusGeomVec.reset">reset</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
-<li><code><a title="circus.gym.op.OPGeomV1.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.step_wait" href="../circus.html#circus.circus.CircusGeomVec.step_wait">step_wait</a></code></li>
 </ul>
 </li>
 </ul>
@@ -894,7 +933,7 @@ Automatically reset environemt when done.</p></div>
 <li><code><a title="circus.gym.op.OPElecV0.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV0.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV0.step_async" href="../circus.html#circus.circus.CircusElec.step_async">step_async</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV0.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
 </ul>
 </li>
@@ -941,12 +980,12 @@ Automatically reset environemt when done.</p></div>
 <li><code><a title="circus.gym.op.OPElecV1.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.reset" href="../circus.html#circus.circus.CircusElecVec.reset">reset</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPElecV1.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
-<li><code><a title="circus.gym.op.OPElecV1.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.step_async" href="../circus.html#circus.circus.CircusElec.step_async">step_async</a></code></li>
+<li><code><a title="circus.gym.op.OPElecV1.step_wait" href="../circus.html#circus.circus.CircusElecVec.step_wait">step_wait</a></code></li>
 </ul>
 </li>
 </ul>
@@ -959,37 +998,50 @@ Automatically reset environemt when done.</p></div>
 <div class="desc"><p>OP8: Symmetrical Amplifier Goal Env</p>
 <p>Construct a Geometric Sizing Goal Environment</p>
 <h2 id="arguments">Arguments</h2>
-<p><code>ace_id</code>:
-ID of the form 'op#', see ACE Documentation for further
-details.
-<code>ace_backend</code>:
-PDK, available are 'xh035' and 'xh018'.
-<code>num_envs</code>:
-Numer of Parallel Environments ∈ [ 1 .. <code>nproc</code> ]
-<code>num_steps</code>:
-Number of steps per Episode.
-<code>seed</code>:
-Random Seed
-<code>obs_filter</code>:
-Filter Performance dict obtained from ACE:
-'perf': Only performance paramters (default)
-'all': All parameters from ACE
-[str]: List of parameters
-<code>goal_filter</code>:
-List of parameters
-<code>goal_preds</code>:
-Binary comparison operator
-<code>goal_init</code>:
+<ul>
+<li><code>ckt_id</code>:
+3 Letter ID, see serafin Documentation for
+further details.</li>
+<li><code>pdk_id</code>:
+PDK, available are 'xt018', 'xh018',
+'gpdk180', 'gpdk090', 'gpdk045'</li>
+<li><code>ckt_cfg</code>:
+Path to <code>ckt_id.yml</code>, if not providied it
+will be searched for in default locations</li>
+<li><code>pdk_cfg</code>:
+Path to <code>pdk_id.yml</code>, if not provided it
+will be searched for in default locations</li>
+<li><code>netlist</code>:
+Path to OpAmp netlist. if not provieded it
+will be searched for in default locations</li>
+<li><code>num_envs</code>:
+Numer of Parallel Environments ∈ [ 1 .. ∞]</li>
+<li><code>num_steps</code>:
+Number of steps per Episode.</li>
+<li><code>seed</code>:
+Random Seed</li>
+<li><code>obs_filter</code>:
+Filter Performance dict obtained from serafin:
+'perf': Only performance paramters (default),
+'all': All parameters from serafin,
+[str]: List of parameters</li>
+<li><code>goal_filter</code>:
+Optional list of parameters</li>
+<li><code>goal_preds</code>:
+Binary comparison operators</li>
+<li><code>goal_init</code>:
 How to initialize new goals on reset:
-'noisy': Put some noise on a reference goal (default)
-'random': Choose a point in goal space
-np.ndarray: A specific goal of shape
-(num_envs, len(goal_filter))
-<code>reward_fn</code>:
-Optional reward function that takes an observation dict.
-<code>scale_observation</code>: Scale the observations and goals as specified in trafo
-<code>auto_reset</code>:
-Automatically reset environemt when done.</p></div>
+'noisy': Put some noise on a reference goal (default),
+'random': Choose a point in goal space,
+np.ndarray: A specific fix goal of shape
+(num_envs, len(goal_filter)).</li>
+<li><code>reward_fn</code>:
+Optional reward function that takes an observation dict.</li>
+<li><code>scale_observation</code>: Scale the observations and goals as
+specified in trafo (default = True)</li>
+<li><code>auto_reset</code>:
+Automatically reset environemt when done (default = False).</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1071,12 +1123,12 @@ Automatically reset environemt when done.</p></div>
 <li><code><a title="circus.gym.op.OPGeomV1.get_attr" href="../circus.html#circus.circus.CircusGeom.get_attr">get_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.observation_dict" href="../circus.html#circus.circus.CircusGeom.observation_dict">observation_dict</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.render" href="../circus.html#circus.circus.CircusGeom.render">render</a></code></li>
-<li><code><a title="circus.gym.op.OPGeomV1.reset" href="../circus.html#circus.circus.CircusGeom.reset">reset</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.reset" href="../circus.html#circus.circus.CircusGeomVec.reset">reset</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.seed" href="../circus.html#circus.circus.CircusGeom.seed">seed</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.set_attr" href="../circus.html#circus.circus.CircusGeom.set_attr">set_attr</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.step" href="../circus.html#circus.circus.CircusGeom.step">step</a></code></li>
 <li><code><a title="circus.gym.op.OPGeomV1.step_async" href="../circus.html#circus.circus.CircusGeom.step_async">step_async</a></code></li>
-<li><code><a title="circus.gym.op.OPGeomV1.step_wait" href="../circus.html#circus.circus.CircusGeom.step_wait">step_wait</a></code></li>
+<li><code><a title="circus.gym.op.OPGeomV1.step_wait" href="../circus.html#circus.circus.CircusGeomVec.step_wait">step_wait</a></code></li>
 </ul>
 </li>
 </ul>

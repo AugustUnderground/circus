@@ -33,121 +33,333 @@ from gym.envs.registration import register
 from .circus import *
 
 ## XH035-3V3
-# AC²E: OP1 - Miller Operational Amplifier
-register( id          = &#39;op1-xh035-geom-v0&#39;
-        , entry_point = &#39;circus.gym:OP1XH035GeomV0&#39;
+# AC²E: MIL - Miller Operational Amplifier
+# register( id          = &#39;mil-xh035-geom-v0&#39;
+#         , entry_point = &#39;circus.gym:MILXH035GeomV0&#39;
+#         , )
+# register( id          = &#39;mil-xh035-geom-v1&#39;
+#         , entry_point = &#39;circus.gym:MILXH035GeomV1&#39;
+#         , )
+# register( id          = &#39;mil-xh035-elec-v0&#39;
+#         , entry_point = &#39;circus.gym:MILXH035ElecV0&#39;
+#         , )
+# register( id          = &#39;mil-xh035-elec-v1&#39;
+#         , entry_point = &#39;circus.gym:MILXH035ElecV1&#39;
+#         , )
+# # AC²E: SYM - Symmetrical Amplifier
+# register( id          = &#39;sym-xh035-geom-v0&#39;
+#         , entry_point = &#39;circus.gym:SYMXH035GeomV0&#39;
+#         , )
+# register( id          = &#39;sym-xh035-geom-v1&#39;
+#         , entry_point = &#39;circus.gym:SYMXH035GeomV1&#39;
+#         , )
+# register( id          = &#39;sym-xh035-elec-v0&#39;
+#         , entry_point = &#39;circus.gym:SYMXH035ElecV0&#39;
+#         , )
+# register( id          = &#39;sym-xh035-elec-v1&#39;
+#         , entry_point = &#39;circus.gym:SYMXH035ElecV1&#39;
+#         , )
+# # AC²E: FCA - Folded Cascode
+# register( id          = &#39;fca-xh035-geom-v0&#39;
+#         , entry_point = &#39;circus.gym:FCAXH035GeomV0&#39;
+#         , )
+# register( id          = &#39;fca-xh035-geom-v1&#39;
+#         , entry_point = &#39;circus.gym:FCAXH035GeomV1&#39;
+#         , )
+# register( id          = &#39;fca-xh035-elec-v0&#39;
+#         , entry_point = &#39;circus.gym:FCAXH035ElecV0&#39;
+#         , )
+# register( id          = &#39;fca-xh035-elec-v1&#39;
+#         , entry_point = &#39;circus.gym:FCAXH035ElecV1&#39;
+#         , )
+# # AC²E: RFA - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
+# register( id          = &#39;rfa-xh035-geom-v0&#39;
+#         , entry_point = &#39;circus.gym:FCAXH035GeomV0&#39;
+#         , )
+# register( id          = &#39;rfa-xh035-geom-v1&#39;
+#         , entry_point = &#39;circus.gym:FCAXH035GeomV1&#39;
+#         , )
+# register( id          = &#39;rfa-xh035-elec-v0&#39;
+#         , entry_point = &#39;circus.gym:FCAXH035ElecV0&#39;
+#         , )
+# register( id          = &#39;rfa-xh035-elec-v1&#39;
+#         , entry_point = &#39;circus.gym:FCAXH035ElecV1&#39;
+#         , )
+
+## XH018
+# MIL - Miller Operational Amplifier
+register( id          = &#39;mil-xh018-geom-v0&#39;
+        , entry_point = &#39;circus.gym:MILXH018GeomV0&#39;
         , )
-register( id          = &#39;op1-xh035-geom-v1&#39;
-        , entry_point = &#39;circus.gym:OP1XH035GeomV1&#39;
+register( id          = &#39;mil-xh018-geom-v1&#39;
+        , entry_point = &#39;circus.gym:MILXH018GeomV1&#39;
         , )
-register( id          = &#39;op1-xh035-elec-v0&#39;
-        , entry_point = &#39;circus.gym:OP1XH035ElecV0&#39;
+register( id          = &#39;mil-xh018-elec-v0&#39;
+        , entry_point = &#39;circus.gym:MILXH018ElecV0&#39;
         , )
-register( id          = &#39;op1-xh035-elec-v1&#39;
-        , entry_point = &#39;circus.gym:OP1XH035ElecV1&#39;
+register( id          = &#39;mil-xh018-elec-v1&#39;
+        , entry_point = &#39;circus.gym:MILXH018ElecV1&#39;
         , )
-# AC²E: OP2 - Symmetrical Amplifier
-register( id          = &#39;op2-xh035-geom-v0&#39;
-        , entry_point = &#39;circus.gym:OP2XH035GeomV0&#39;
+# SYM - Symmetrical Amplifier
+register( id          = &#39;sym-xh018-geom-v0&#39;
+        , entry_point = &#39;circus.gym:SYMXH018GeomV0&#39;
         , )
-register( id          = &#39;op2-xh035-geom-v1&#39;
-        , entry_point = &#39;circus.gym:OP2XH035GeomV1&#39;
+register( id          = &#39;sym-xh018-geom-v1&#39;
+        , entry_point = &#39;circus.gym:SYMXH018GeomV1&#39;
         , )
-register( id          = &#39;op2-xh035-elec-v0&#39;
-        , entry_point = &#39;circus.gym:OP2XH035ElecV0&#39;
+register( id          = &#39;sym-xh018-elec-v0&#39;
+        , entry_point = &#39;circus.gym:SYMXH018ElecV0&#39;
         , )
-register( id          = &#39;op2-xh035-elec-v1&#39;
-        , entry_point = &#39;circus.gym:OP2XH035ElecV1&#39;
+register( id          = &#39;sym-xh018-elec-v1&#39;
+        , entry_point = &#39;circus.gym:SYMXH018ElecV1&#39;
         , )
-# AC²E: OP8 - Folded Cascode
-register( id          = &#39;op8-xh035-geom-v0&#39;
-        , entry_point = &#39;circus.gym:OP8XH035GeomV0&#39;
+# FCA - Folded Cascode
+register( id          = &#39;fca-xh018-geom-v0&#39;
+        , entry_point = &#39;circus.gym:FCAXH018GeomV0&#39;
         , )
-register( id          = &#39;op8-xh035-geom-v1&#39;
-        , entry_point = &#39;circus.gym:OP8XH035GeomV1&#39;
+register( id          = &#39;fca-xh018-geom-v1&#39;
+        , entry_point = &#39;circus.gym:FCAXH018GeomV1&#39;
         , )
-register( id          = &#39;op8-xh035-elec-v0&#39;
-        , entry_point = &#39;circus.gym:OP8XH035ElecV0&#39;
+register( id          = &#39;fca-xh018-elec-v0&#39;
+        , entry_point = &#39;circus.gym:FCAXH018ElecV0&#39;
         , )
-register( id          = &#39;op8-xh035-elec-v1&#39;
-        , entry_point = &#39;circus.gym:OP8XH035ElecV1&#39;
+register( id          = &#39;fca-xh018-elec-v1&#39;
+        , entry_point = &#39;circus.gym:FCAXH018ElecV1&#39;
         , )
-# AC²E: OP11 - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
-register( id          = &#39;op11-xh035-geom-v0&#39;
-        , entry_point = &#39;circus.gym:OP8XH035GeomV0&#39;
+# RFA - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
+register( id          = &#39;rfa-xh018-geom-v0&#39;
+        , entry_point = &#39;circus.gym:RFAXH018GeomV0&#39;
         , )
-register( id          = &#39;op11-xh035-geom-v1&#39;
-        , entry_point = &#39;circus.gym:OP8XH035GeomV1&#39;
+register( id          = &#39;rfa-xh018-geom-v1&#39;
+        , entry_point = &#39;circus.gym:RFAXH018GeomV1&#39;
         , )
-register( id          = &#39;op11-xh035-elec-v0&#39;
-        , entry_point = &#39;circus.gym:OP8XH035ElecV0&#39;
+register( id          = &#39;rfa-xh018-elec-v0&#39;
+        , entry_point = &#39;circus.gym:RFAXH018ElecV0&#39;
         , )
-register( id          = &#39;op11-xh035-elec-v1&#39;
-        , entry_point = &#39;circus.gym:OP8XH035ElecV1&#39;
+register( id          = &#39;rfa-xh018-elec-v1&#39;
+        , entry_point = &#39;circus.gym:RFAXH018ElecV1&#39;
         , )
 
-## XH018-1V8
-# AC²E: OP1 - Miller Operational Amplifier
-register( id          = &#39;op1-xh018-geom-v0&#39;
-        , entry_point = &#39;circus.gym:OP1XH018GeomV0&#39;
+## XT018
+# MIL - Miller Operational Amplifier
+register( id          = &#39;mil-xt018-geom-v0&#39;
+        , entry_point = &#39;circus.gym:MILXT018GeomV0&#39;
         , )
-register( id          = &#39;op1-xh018-geom-v1&#39;
-        , entry_point = &#39;circus.gym:OP1XH018GeomV1&#39;
+register( id          = &#39;mil-xt018-geom-v1&#39;
+        , entry_point = &#39;circus.gym:MILXT018GeomV1&#39;
         , )
-register( id          = &#39;op1-xh018-elec-v0&#39;
-        , entry_point = &#39;circus.gym:OP1XH018ElecV0&#39;
+register( id          = &#39;mil-xt018-elec-v0&#39;
+        , entry_point = &#39;circus.gym:MILXT018ElecV0&#39;
         , )
-register( id          = &#39;op1-xh018-elec-v1&#39;
-        , entry_point = &#39;circus.gym:OP1XH018ElecV1&#39;
+register( id          = &#39;mil-xt018-elec-v1&#39;
+        , entry_point = &#39;circus.gym:MILXT018ElecV1&#39;
         , )
-# AC²E: OP2 - Symmetrical Amplifier
-register( id          = &#39;op2-xh018-geom-v0&#39;
-        , entry_point = &#39;circus.gym:OP2XH018GeomV0&#39;
+# SYM - Symmetrical Amplifier
+register( id          = &#39;sym-xt018-geom-v0&#39;
+        , entry_point = &#39;circus.gym:SYMXT018GeomV0&#39;
         , )
-register( id          = &#39;op2-xh018-geom-v1&#39;
-        , entry_point = &#39;circus.gym:OP2XH018GeomV1&#39;
+register( id          = &#39;sym-xt018-geom-v1&#39;
+        , entry_point = &#39;circus.gym:SYMXT018GeomV1&#39;
         , )
-register( id          = &#39;op2-xh018-elec-v0&#39;
-        , entry_point = &#39;circus.gym:OP2XH018ElecV0&#39;
+register( id          = &#39;sym-xt018-elec-v0&#39;
+        , entry_point = &#39;circus.gym:SYMXT018ElecV0&#39;
         , )
-register( id          = &#39;op2-xh018-elec-v1&#39;
-        , entry_point = &#39;circus.gym:OP2XH018ElecV1&#39;
+register( id          = &#39;sym-xt018-elec-v1&#39;
+        , entry_point = &#39;circus.gym:SYMXT018ElecV1&#39;
         , )
-# AC²E: OP8 - Folded Cascode
-register( id          = &#39;op8-xh018-geom-v0&#39;
-        , entry_point = &#39;circus.gym:OP8XH018GeomV0&#39;
+# FCA - Folded Cascode Amplifier
+register( id          = &#39;fca-xt018-geom-v0&#39;
+        , entry_point = &#39;circus.gym:FCAXT018GeomV0&#39;
         , )
-register( id          = &#39;op8-xh018-geom-v1&#39;
-        , entry_point = &#39;circus.gym:OP8XH018GeomV1&#39;
+register( id          = &#39;fca-xt018-geom-v1&#39;
+        , entry_point = &#39;circus.gym:FCAXT018GeomV1&#39;
         , )
-register( id          = &#39;op8-xh018-elec-v0&#39;
-        , entry_point = &#39;circus.gym:OP8XH018ElecV0&#39;
+register( id          = &#39;fca-xt018-elec-v0&#39;
+        , entry_point = &#39;circus.gym:FCAXT018ElecV0&#39;
         , )
-register( id          = &#39;op8-xh018-elec-v1&#39;
-        , entry_point = &#39;circus.gym:OP8XH018ElecV1&#39;
+register( id          = &#39;fca-xt018-elec-v1&#39;
+        , entry_point = &#39;circus.gym:FCAXT018ElecV1&#39;
         , )
-# AC²E: OP11 - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
-register( id          = &#39;op11-xh018-geom-v0&#39;
-        , entry_point = &#39;circus.gym:OP8XH035GeomV0&#39;
+# RFA - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
+register( id          = &#39;rfa-xt018-geom-v0&#39;
+        , entry_point = &#39;circus.gym:RFAXT018GeomV0&#39;
         , )
-register( id          = &#39;op11-xh018-geom-v1&#39;
-        , entry_point = &#39;circus.gym:OP8XH035GeomV1&#39;
+register( id          = &#39;rfa-xt018-geom-v1&#39;
+        , entry_point = &#39;circus.gym:RFAXT018GeomV1&#39;
         , )
-register( id          = &#39;op11-xh018-elec-v0&#39;
-        , entry_point = &#39;circus.gym:OP8XH035ElecV0&#39;
+register( id          = &#39;rfa-xt018-elec-v0&#39;
+        , entry_point = &#39;circus.gym:RFAXT018ElecV0&#39;
         , )
-register( id          = &#39;op11-xh018-elec-v1&#39;
-        , entry_point = &#39;circus.gym:OP8XH035ElecV1&#39;
+register( id          = &#39;rfa-xt018-elec-v1&#39;
+        , entry_point = &#39;circus.gym:RFAXT018ElecV1&#39;
+        , )
+
+## GPDK180
+# MIL - Miller Operational Amplifier
+register( id          = &#39;mil-gpdk180-geom-v0&#39;
+        , entry_point = &#39;circus.gym:MILGPDK180GeomV0&#39;
+        , )
+register( id          = &#39;mil-gpdk180-geom-v1&#39;
+        , entry_point = &#39;circus.gym:MILGPDK180GeomV1&#39;
+        , )
+register( id          = &#39;mil-gpdk180-elec-v0&#39;
+        , entry_point = &#39;circus.gym:MILGPDK180ElecV0&#39;
+        , )
+register( id          = &#39;mil-gpdk180-elec-v1&#39;
+        , entry_point = &#39;circus.gym:MILGPDK180ElecV1&#39;
+        , )
+# SYM - Symmetrical Amplifier
+register( id          = &#39;sym-gpdk180-geom-v0&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK180GeomV0&#39;
+        , )
+register( id          = &#39;sym-gpdk180-geom-v1&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK180GeomV1&#39;
+        , )
+register( id          = &#39;sym-gpdk180-elec-v0&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK180ElecV0&#39;
+        , )
+register( id          = &#39;sym-gpdk180-elec-v1&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK180ElecV1&#39;
+        , )
+# FCA - Folded Cascode Amplifier
+register( id          = &#39;fca-gpdk180-geom-v0&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK180GeomV0&#39;
+        , )
+register( id          = &#39;fca-gpdk180-geom-v1&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK180GeomV1&#39;
+        , )
+register( id          = &#39;fca-gpdk180-elec-v0&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK180ElecV0&#39;
+        , )
+register( id          = &#39;fca-gpdk180-elec-v1&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK180ElecV1&#39;
+        , )
+# RFA - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
+register( id          = &#39;rfa-gpdk180-geom-v0&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK180GeomV0&#39;
+        , )
+register( id          = &#39;rfa-gpdk180-geom-v1&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK180GeomV1&#39;
+        , )
+register( id          = &#39;rfa-gpdk180-elec-v0&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK180ElecV0&#39;
+        , )
+register( id          = &#39;rfa-gpdk180-elec-v1&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK180ElecV1&#39;
+        , )
+
+## GPDK090
+# MIL - Miller Operational Amplifier
+register( id          = &#39;mil-gpdk090-geom-v0&#39;
+        , entry_point = &#39;circus.gym:MILGPDK090GeomV0&#39;
+        , )
+register( id          = &#39;mil-gpdk090-geom-v1&#39;
+        , entry_point = &#39;circus.gym:MILGPDK090GeomV1&#39;
+        , )
+register( id          = &#39;mil-gpdk090-elec-v0&#39;
+        , entry_point = &#39;circus.gym:MILGPDK090ElecV0&#39;
+        , )
+register( id          = &#39;mil-gpdk090-elec-v1&#39;
+        , entry_point = &#39;circus.gym:MILGPDK090ElecV1&#39;
+        , )
+# SYM - Symmetrical Amplifier
+register( id          = &#39;sym-gpdk090-geom-v0&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK090GeomV0&#39;
+        , )
+register( id          = &#39;sym-gpdk090-geom-v1&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK090GeomV1&#39;
+        , )
+register( id          = &#39;sym-gpdk090-elec-v0&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK090ElecV0&#39;
+        , )
+register( id          = &#39;sym-gpdk090-elec-v1&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK090ElecV1&#39;
+        , )
+# FCA - Folded Cascode Amplifier
+register( id          = &#39;fca-gpdk090-geom-v0&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK090GeomV0&#39;
+        , )
+register( id          = &#39;fca-gpdk090-geom-v1&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK090GeomV1&#39;
+        , )
+register( id          = &#39;fca-gpdk090-elec-v0&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK090ElecV0&#39;
+        , )
+register( id          = &#39;fca-gpdk090-elec-v1&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK090ElecV1&#39;
+        , )
+# RFA - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
+register( id          = &#39;rfa-gpdk090-geom-v0&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK090GeomV0&#39;
+        , )
+register( id          = &#39;rfa-gpdk090-geom-v1&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK090GeomV1&#39;
+        , )
+register( id          = &#39;rfa-gpdk090-elec-v0&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK090ElecV0&#39;
+        , )
+register( id          = &#39;rfa-gpdk090-elec-v1&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK090ElecV1&#39;
+        , )
+
+## GPDK045
+# MIL - Miller Operational Amplifier
+register( id          = &#39;mil-gpdk045-geom-v0&#39;
+        , entry_point = &#39;circus.gym:MILGPDK045GeomV0&#39;
+        , )
+register( id          = &#39;mil-gpdk045-geom-v1&#39;
+        , entry_point = &#39;circus.gym:MILGPDK045GeomV1&#39;
+        , )
+register( id          = &#39;mil-gpdk045-elec-v0&#39;
+        , entry_point = &#39;circus.gym:MILGPDK045ElecV0&#39;
+        , )
+register( id          = &#39;mil-gpdk045-elec-v1&#39;
+        , entry_point = &#39;circus.gym:MILGPDK045ElecV1&#39;
+        , )
+# SYM - Symmetrical Amplifier
+register( id          = &#39;sym-gpdk045-geom-v0&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK045GeomV0&#39;
+        , )
+register( id          = &#39;sym-gpdk045-geom-v1&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK045GeomV1&#39;
+        , )
+register( id          = &#39;sym-gpdk045-elec-v0&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK045ElecV0&#39;
+        , )
+register( id          = &#39;sym-gpdk045-elec-v1&#39;
+        , entry_point = &#39;circus.gym:SYMGPDK045ElecV1&#39;
+        , )
+# FCA - Folded Cascode Amplifier
+register( id          = &#39;fca-gpdk045-geom-v0&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK045GeomV0&#39;
+        , )
+register( id          = &#39;fca-gpdk045-geom-v1&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK045GeomV1&#39;
+        , )
+register( id          = &#39;fca-gpdk045-elec-v0&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK045ElecV0&#39;
+        , )
+register( id          = &#39;fca-gpdk045-elec-v1&#39;
+        , entry_point = &#39;circus.gym:FCAGPDK045ElecV1&#39;
+        , )
+# RFA - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
+register( id          = &#39;rfa-gpdk045-geom-v0&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK045GeomV0&#39;
+        , )
+register( id          = &#39;rfa-gpdk045-geom-v1&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK045GeomV1&#39;
+        , )
+register( id          = &#39;rfa-gpdk045-elec-v0&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK045ElecV0&#39;
+        , )
+register( id          = &#39;rfa-gpdk045-elec-v1&#39;
+        , entry_point = &#39;circus.gym:RFAGPDK045ElecV1&#39;
         , )</code></pre>
 </details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
-<dt><code class="name"><a title="circus.ace" href="ace.html">circus.ace</a></code></dt>
-<dd>
-<div class="desc"><p>ACE Utilities</p></div>
-</dd>
 <dt><code class="name"><a title="circus.circus" href="circus.html">circus.circus</a></code></dt>
 <dd>
 <div class="desc"><p>Gym compatible Analog Circuit Environment</p></div>
@@ -156,10 +368,6 @@ register( id          = &#39;op11-xh018-elec-v1&#39;
 <dd>
 <div class="desc"><p>Circuits Constructors for gym registry.</p></div>
 </dd>
-<dt><code class="name"><a title="circus.prim" href="prim.html">circus.prim</a></code></dt>
-<dd>
-<div class="desc"><p>Primitive Device Models for Design Space transformation</p></div>
-</dd>
 <dt><code class="name"><a title="circus.rest" href="rest.html">circus.rest</a></code></dt>
 <dd>
 <div class="desc"><p>REST API</p></div>
@@ -167,6 +375,10 @@ register( id          = &#39;op11-xh018-elec-v1&#39;
 <dt><code class="name"><a title="circus.reward" href="reward.html">circus.reward</a></code></dt>
 <dd>
 <div class="desc"><p>Reward Functions</p></div>
+</dd>
+<dt><code class="name"><a title="circus.seraf" href="seraf.html">circus.seraf</a></code></dt>
+<dd>
+<div class="desc"><p>Serafin Parallel Processing Utilities</p></div>
 </dd>
 <dt><code class="name"><a title="circus.trafo" href="trafo/index.html">circus.trafo</a></code></dt>
 <dd>
@@ -193,12 +405,11 @@ register( id          = &#39;op11-xh018-elec-v1&#39;
 <ul id="index">
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
-<li><code><a title="circus.ace" href="ace.html">circus.ace</a></code></li>
 <li><code><a title="circus.circus" href="circus.html">circus.circus</a></code></li>
 <li><code><a title="circus.gym" href="gym/index.html">circus.gym</a></code></li>
-<li><code><a title="circus.prim" href="prim.html">circus.prim</a></code></li>
 <li><code><a title="circus.rest" href="rest.html">circus.rest</a></code></li>
 <li><code><a title="circus.reward" href="reward.html">circus.reward</a></code></li>
+<li><code><a title="circus.seraf" href="seraf.html">circus.seraf</a></code></li>
 <li><code><a title="circus.trafo" href="trafo/index.html">circus.trafo</a></code></li>
 <li><code><a title="circus.util" href="util.html">circus.util</a></code></li>
 </ul>

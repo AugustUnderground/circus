@@ -5,28 +5,29 @@ ready for use. See `test/example.py` for some code examples and the
 [API Documentation](./circus/index.html) for more details.
 
 ```python
-import circus
-from stable_baselines3 import DDPG
+import gym
 
-env  = circus.make('circus:op2-xh035-geom-v1')
-ddpg = DDPG('MlpPolicy', env, verbose = 1)
-ddpg.learn(total_timesteps=10000, log_interval=1)
-```
-
-Alternatively, the `gym` registry can be used:
-
-```python
-env     = gym.make('circus:op2-xh035-geom-v0')
+env     = gym.make('circus:sym-gpdk180-geom-v0')
 obs     = env.reset()
 a       = np.random.randn(env.action_space.shape[0])
 o,r,d,i = env.step(a)
 ```
 
-The `circus.make` constructor accepts several optional arguments.
+Or test it with an of-the-shelf agent implementation:
+
+```python
+from stable_baselines3 import DDPG
+
+env  = gym.make('circus:sym-gpdk180-geom-v1')
+ddpg = DDPG('MlpPolicy', env, verbose = 1)
+ddpg.learn(total_timesteps=10000, log_interval=1)
+```
+
+The `circus.make` constructor accepts several additional optional arguments.
 
 ```python
 # OP2 GoalEnv in xh035 with electric design space
-env = circus.make( 'circus:op2-xh035-elec-v0'
+env = circus.make( 'circus:sym-gpdk180-elec-v0'
                  , n_envs: int                      = 1       # Number of environemts
                  , num_steps: int                   = 50      # Maximum number of steps
                  , seed: int                        = 666     # Random Seed for all Environments
@@ -84,12 +85,12 @@ and `'desired_goal'` for `GoalEnv`s.
 
 #### id
 
-The `id` field is linked to the ACE id as shown in the
-[availability table](./index.md) and the Table of Contents.
+The `id` field is linked to the serafin id as shown in the
+[availability matrix](./index.md) and the Table of Contents.
 
 #### pdk
 
-Same goes for the `pdk` field, it is linked to the available ACE backends.
+Same goes for the `pdk` field, it is linked to the backends.
 
 #### space
 
@@ -108,3 +109,4 @@ The variants `v#` define the shape of the observation space
 |---------|------------------------------|
 | `v0`    | `GoalEnv` with `Dict` space. |
 | `v1`    | `VecEnv`  with `Box` space.  |
+

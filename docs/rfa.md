@@ -1,8 +1,8 @@
-### Rail-To-Rail Folded Cascode Amplifier with Wide-Swing Current Mirror (OP11)
+### Rail-To-Rail Folded Cascode Amplifier with Wide-Swing Current Mirror (RFA)
 
-![op11](https://raw.githubusercontent.com/matthschw/ace/main/figures/op11.png)
+![RFA](./fig/rfa.png)
 
-Available via `circus` constructor with `circus:op11-<tech>-<space>-<variant>`.
+Available via `circus` constructor with `circus:rfa-<pdk>-<space>-<variant>`.
 
 #### Observation Space
 

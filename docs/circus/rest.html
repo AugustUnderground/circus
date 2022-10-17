@@ -29,14 +29,14 @@
 </summary>
 <pre><code class="python">&#34;&#34;&#34; REST API &#34;&#34;&#34;
 
-from typing import Any, List, Optional, Type, Union, Callable, Mapping
-from argparse import ArgumentParser
-from collections import namedtuple
+from   typing      import Union
+from   argparse    import ArgumentParser
+from   collections import namedtuple
 
-import json
-import numpy as np
-import hace as ac
-import circus
+import numpy         as np
+import circus.circus as ckt
+# import circus.seraf  as sfu
+from   .util       import df_to_dict
 
 parser = ArgumentParser()
 parser.add_argument( &#39;--host&#39;, type = str, default = &#39;localhost&#39;
@@ -44,7 +44,7 @@ parser.add_argument( &#39;--host&#39;, type = str, default = &#39;localhost&#39;
 parser.add_argument( &#39;-p&#39;, &#39;--port&#39;, type = int, default = &#39;6007&#39;
                    , help = &#39;Server Port&#39;)
 parser.add_argument( &#39;-e&#39;, &#39;--env&#39;, type = str, default = &#39;op2&#39;
-                   , help = &#39;ACE Environment ID, see Circus doc for what\&#39;s available&#39;)
+                   , help = &#39;Serafin circuit ID, see Circus doc for what\&#39;s available&#39;)
 parser.add_argument( &#39;-s&#39;, &#39;--space&#39;, type = str, default = &#39;elec&#39;
                    , help = &#39;Circus Action Space, see Circus doc for what\&#39;s available&#39;)
 parser.add_argument( &#39;-v&#39;, &#39;--var&#39;, type = int, default = &#39;0&#39;
@@ -56,16 +56,16 @@ parser.add_argument( &#39;-t&#39;, &#39;--step&#39;, type = int, default = 50
 parser.add_argument( &#39;-c&#39;, &#39;--scale&#39;, default = True, action = &#39;store_true&#39;
                    , help = &#39;Circus Action Space, see Circus doc for what\&#39;s available&#39;)
 parser.add_argument( &#39;--pdk&#39;, type = str, default = &#39;xh035&#39;
-                   , help = &#39;ACE backend, see Circus doc for what\&#39;s available&#39;)
+                   , help = &#39;PDK ID, see Circus doc for what\&#39;s available&#39;)
 parser.add_argument( &#39;-gn&#39;, &#39;--goals&#39;, nargs = &#39;+&#39;, default = []
                    , help = &#39;List of goal parameters.&#39;)
 parser.add_argument( &#39;-o&#39;, &#39;--states&#39;, nargs = &#39;+&#39;, default = []
                    , help = &#39;List of observation / state parameters.&#39;)
 
-CircusEnv = namedtuple(&#39;Environment&#39;, &#39;env ace_id backend space variant num_envs&#39;)
+CircusEnv = namedtuple(&#39;Environment&#39;, &#39;env ckt_id pdk_id space variant num_envs&#39;)
 
-def make_env( ace_id: str, backend: str, space: str, variant: int
-            , num_envs: int, num_steps: int = 50, scale: bool = True
+def make_env( ckt_id: str, pdk_id: str, space: str, variant: int
+            , n_envs: int, n_steps: int = 50, scale: bool = True
             , obs_filter: Union[str, list[str]] = &#39;perf&#39;
             , goal_filter: Union[str, list[str]] = &#39;perf&#39;
             ) -&gt; CircusEnv:
@@ -73,24 +73,24 @@ def make_env( ace_id: str, backend: str, space: str, variant: int
     Construct a Circus Environment wrapper for HTTP Access.
     &#34;&#34;&#34;
 
-    env_name      = f&#39;circus:{ace_id}-{backend}-{space}-v{variant}&#39;
+    env_name      = f&#39;circus:{ckt_id}-{pdk_id}-{space}-v{variant}&#39;
 
-    env           = circus.make( env_name
-                               , n_envs            = num_envs
-                               , num_steps         = num_steps
-                               , goal_filter       = goal_filter
-                               , obs_filter        = obs_filter
-                               , scale_observation = scale
-                               , )
+    env           = ckt.make( env_name
+                            , n_envs            = n_envs
+                            , num_steps         = n_steps
+                            , goal_filter       = goal_filter
+                            , obs_filter        = obs_filter
+                            , scale_observation = scale
+                            , )
 
-    return CircusEnv(env, ace_id, backend, space, variant, num_envs)
+    return CircusEnv(env, ckt_id, pdk_id, space, variant, n_envs)
 
 def restart(circ: CircusEnv) -&gt; CircusEnv:
     &#34;&#34;&#34;
-    Restart the Environment(s) including ACE.
+    Restart the Environment(s)
     &#34;&#34;&#34;
-    env, ace_id, backend, space, variant, num_envs = circ
-    return make_env(ace_id, backend, space, variant, num_envs, env.num_steps)
+    env, ckt_id, pdk_id, space, variant, num_envs = circ
+    return make_env(ckt_id, pdk_id, space, variant, num_envs, env.num_steps)
 
 def reset( circ: CircusEnv, env_mask: list[bool] = [], env_ids: list[int] = []
          ) -&gt; dict[str, [[float]]]:
@@ -161,10 +161,7 @@ def current_performance(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
     &#34;&#34;&#34;
     Get current performane from ACE.
     &#34;&#34;&#34;
-    perf = ac.current_performance_pool(circ.env.ace_envs)
-    return { i: { o: np.nan_to_num(p[o], nan=0.0, posinf=0.0,neginf=0.0).item()
-                  for o in circ.env.obs_filter }
-             for i,p in perf.items() }
+    return df_to_dict(circ.env.last_obs)
 
 def current_goal(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
     &#34;&#34;&#34;
@@ -177,15 +174,16 @@ def current_sizing(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
     &#34;&#34;&#34;
     Get the current sizing from ACE.
     &#34;&#34;&#34;
-    return ac.current_sizing_pool(circ.env.ace_envs)
+    return df_to_dict(circ.env.sizing)
 
 def last_action(circ: CircusEnv) -&gt; dict[int, dict[str, float]]:
     &#34;&#34;&#34;
     Get the last action that was taken. Will be same as sizing if
     `space == &#39;geom&#39;` otherwise it will be INPUTS.
     &#34;&#34;&#34;
-    return { i: { k: v for k,v in p.items() if k in circ.env.input_parameters }
-             for i,p in ac.current_performance_pool(circ.env.ace_envs).items() }
+    return df_to_dict(circ.env.last_obs[circ.env.input_parameters]) \
+                if all(i in circ.env.last_obs for i in circ.env.input_parameters) \
+                else current_sizing(circ)
 
 def action_space(circ: CircusEnv) -&gt; dict[int, int]:
     &#34;&#34;&#34;
@@ -293,10 +291,7 @@ def num_steps(circ: CircusEnv) -&gt; dict[int, float]:
     &#34;&#34;&#34;
     Get current performane from ACE.
     &#34;&#34;&#34;
-    perf = ac.current_performance_pool(circ.env.ace_envs)
-    return { i: { o: np.nan_to_num(p[o], nan=0.0, posinf=0.0,neginf=0.0).item()
-                  for o in circ.env.obs_filter }
-             for i,p in perf.items() }</code></pre>
+    return df_to_dict(circ.env.last_obs)</code></pre>
 </details>
 </dd>
 <dt id="circus.rest.current_sizing"><code class="name flex">
@@ -312,7 +307,7 @@ def num_steps(circ: CircusEnv) -&gt; dict[int, float]:
     &#34;&#34;&#34;
     Get the current sizing from ACE.
     &#34;&#34;&#34;
-    return ac.current_sizing_pool(circ.env.ace_envs)</code></pre>
+    return df_to_dict(circ.env.sizing)</code></pre>
 </details>
 </dd>
 <dt id="circus.rest.goal_keys"><code class="name flex">
@@ -346,12 +341,13 @@ def num_steps(circ: CircusEnv) -&gt; dict[int, float]:
     Get the last action that was taken. Will be same as sizing if
     `space == &#39;geom&#39;` otherwise it will be INPUTS.
     &#34;&#34;&#34;
-    return { i: { k: v for k,v in p.items() if k in circ.env.input_parameters }
-             for i,p in ac.current_performance_pool(circ.env.ace_envs).items() }</code></pre>
+    return df_to_dict(circ.env.last_obs[circ.env.input_parameters]) \
+                if all(i in circ.env.last_obs for i in circ.env.input_parameters) \
+                else current_sizing(circ)</code></pre>
 </details>
 </dd>
 <dt id="circus.rest.make_env"><code class="name flex">
-<span>def <span class="ident">make_env</span></span>(<span>ace_id: str, backend: str, space: str, variant: int, num_envs: int, num_steps: int = 50, scale: bool = True, obs_filter: Union[str, list[str]] = 'perf', goal_filter: Union[str, list[str]] = 'perf') ‑> <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a></span>
+<span>def <span class="ident">make_env</span></span>(<span>ckt_id: str, pdk_id: str, space: str, variant: int, n_envs: int, n_steps: int = 50, scale: bool = True, obs_filter: Union[str, list[str]] = 'perf', goal_filter: Union[str, list[str]] = 'perf') ‑> <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Construct a Circus Environment wrapper for HTTP Access.</p></div>
@@ -359,8 +355,8 @@ def num_steps(circ: CircusEnv) -&gt; dict[int, float]:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def make_env( ace_id: str, backend: str, space: str, variant: int
-            , num_envs: int, num_steps: int = 50, scale: bool = True
+<pre><code class="python">def make_env( ckt_id: str, pdk_id: str, space: str, variant: int
+            , n_envs: int, n_steps: int = 50, scale: bool = True
             , obs_filter: Union[str, list[str]] = &#39;perf&#39;
             , goal_filter: Union[str, list[str]] = &#39;perf&#39;
             ) -&gt; CircusEnv:
@@ -368,17 +364,17 @@ def num_steps(circ: CircusEnv) -&gt; dict[int, float]:
     Construct a Circus Environment wrapper for HTTP Access.
     &#34;&#34;&#34;
 
-    env_name      = f&#39;circus:{ace_id}-{backend}-{space}-v{variant}&#39;
+    env_name      = f&#39;circus:{ckt_id}-{pdk_id}-{space}-v{variant}&#39;
 
-    env           = circus.make( env_name
-                               , n_envs            = num_envs
-                               , num_steps         = num_steps
-                               , goal_filter       = goal_filter
-                               , obs_filter        = obs_filter
-                               , scale_observation = scale
-                               , )
+    env           = ckt.make( env_name
+                            , n_envs            = n_envs
+                            , num_steps         = n_steps
+                            , goal_filter       = goal_filter
+                            , obs_filter        = obs_filter
+                            , scale_observation = scale
+                            , )
 
-    return CircusEnv(env, ace_id, backend, space, variant, num_envs)</code></pre>
+    return CircusEnv(env, ckt_id, pdk_id, space, variant, n_envs)</code></pre>
 </details>
 </dd>
 <dt id="circus.rest.num_steps"><code class="name flex">
@@ -485,17 +481,17 @@ def num_steps(circ: CircusEnv) -&gt; dict[int, float]:
 <span>def <span class="ident">restart</span></span>(<span>circ: <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a>) ‑> <a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Restart the Environment(s) including ACE.</p></div>
+<div class="desc"><p>Restart the Environment(s)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def restart(circ: CircusEnv) -&gt; CircusEnv:
     &#34;&#34;&#34;
-    Restart the Environment(s) including ACE.
+    Restart the Environment(s)
     &#34;&#34;&#34;
-    env, ace_id, backend, space, variant, num_envs = circ
-    return make_env(ace_id, backend, space, variant, num_envs, env.num_steps)</code></pre>
+    env, ckt_id, pdk_id, space, variant, num_envs = circ
+    return make_env(ckt_id, pdk_id, space, variant, num_envs, env.num_steps)</code></pre>
 </details>
 </dd>
 <dt id="circus.rest.restore"><code class="name flex">
@@ -588,23 +584,19 @@ def num_steps(circ: CircusEnv) -&gt; dict[int, float]:
 <dl>
 <dt id="circus.rest.Environment"><code class="flex name class">
 <span>class <span class="ident">CircusEnv</span></span>
-<span>(</span><span>env, ace_id, backend, space, variant, num_envs)</span>
+<span>(</span><span>env, ckt_id, pdk_id, space, variant, num_envs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Environment(env, ace_id, backend, space, variant, num_envs)</p></div>
+<div class="desc"><p>Environment(env, ckt_id, pdk_id, space, variant, num_envs)</p></div>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>builtins.tuple</li>
 </ul>
 <h3>Instance variables</h3>
 <dl>
-<dt id="circus.rest.Environment.ace_id"><code class="name">var <span class="ident">ace_id</span></code></dt>
+<dt id="circus.rest.Environment.ckt_id"><code class="name">var <span class="ident">ckt_id</span></code></dt>
 <dd>
 <div class="desc"><p>Alias for field number 1</p></div>
-</dd>
-<dt id="circus.rest.Environment.backend"><code class="name">var <span class="ident">backend</span></code></dt>
-<dd>
-<div class="desc"><p>Alias for field number 2</p></div>
 </dd>
 <dt id="circus.rest.Environment.env"><code class="name">var <span class="ident">env</span></code></dt>
 <dd>
@@ -613,6 +605,10 @@ def num_steps(circ: CircusEnv) -&gt; dict[int, float]:
 <dt id="circus.rest.Environment.num_envs"><code class="name">var <span class="ident">num_envs</span></code></dt>
 <dd>
 <div class="desc"><p>Alias for field number 5</p></div>
+</dd>
+<dt id="circus.rest.Environment.pdk_id"><code class="name">var <span class="ident">pdk_id</span></code></dt>
+<dd>
+<div class="desc"><p>Alias for field number 2</p></div>
 </dd>
 <dt id="circus.rest.Environment.space"><code class="name">var <span class="ident">space</span></code></dt>
 <dd>
@@ -666,10 +662,10 @@ def num_steps(circ: CircusEnv) -&gt; dict[int, float]:
 <li>
 <h4><code><a title="circus.rest.Environment" href="#circus.rest.Environment">Environment</a></code></h4>
 <ul class="two-column">
-<li><code><a title="circus.rest.Environment.ace_id" href="#circus.rest.Environment.ace_id">ace_id</a></code></li>
-<li><code><a title="circus.rest.Environment.backend" href="#circus.rest.Environment.backend">backend</a></code></li>
+<li><code><a title="circus.rest.Environment.ckt_id" href="#circus.rest.Environment.ckt_id">ckt_id</a></code></li>
 <li><code><a title="circus.rest.Environment.env" href="#circus.rest.Environment.env">env</a></code></li>
 <li><code><a title="circus.rest.Environment.num_envs" href="#circus.rest.Environment.num_envs">num_envs</a></code></li>
+<li><code><a title="circus.rest.Environment.pdk_id" href="#circus.rest.Environment.pdk_id">pdk_id</a></code></li>
 <li><code><a title="circus.rest.Environment.space" href="#circus.rest.Environment.space">space</a></code></li>
 <li><code><a title="circus.rest.Environment.variant" href="#circus.rest.Environment.variant">variant</a></code></li>
 </ul>

@@ -1,4 +1,4 @@
-"""OP Sizing Environments (for gym registry)"""
+""" Operational Amplifier Sizing Environments (for gym registry) """
 
 from collections import OrderedDict
 import numpy as np
@@ -6,7 +6,7 @@ import numpy as np
 from ..circus import CircusGeom, CircusGeomVec, CircusElec, CircusElecVec
 
 class OPGeomV0(CircusGeom):
-    """OP Geometric Goal Env Base"""
+    """Generic OP Geometric Goal Env Base"""
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -22,7 +22,7 @@ class OPGeomV0(CircusGeom):
         return (obs, r.item(), d.item(), i[0])
 
 class OPGeomV1(CircusGeomVec):
-    """OP Geometric Non-Goal Env Base"""
+    """Generic OP Geometric Non-Goal Env Base"""
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -37,7 +37,7 @@ class OPGeomV1(CircusGeomVec):
         return (o[0], r.item(), d.item(), i[0])
 
 class OPElecV0(CircusElec):
-    """OP Geometric Goal Env Base"""
+    """Generic OP Geometric Goal Env Base"""
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -53,7 +53,7 @@ class OPElecV0(CircusElec):
         return (obs, r.item(), d.item(), i[0])
 
 class OPElecV1(CircusElecVec):
-    """OP Geometric Non-Goal Env Base"""
+    """Generic OP Geometric Non-Goal Env Base"""
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

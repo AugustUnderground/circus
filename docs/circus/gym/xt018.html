@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>circus.gym.xh018 API documentation</title>
-<meta name="description" content="XFAB - XH018" />
+<title>circus.gym.xt018 API documentation</title>
+<meta name="description" content="XFAB - XT018" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -19,132 +19,132 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>circus.gym.xh018</code></h1>
+<h1 class="title">Module <code>circus.gym.xt018</code></h1>
 </header>
 <section id="section-intro">
-<p>XFAB - XH018</p>
+<p>XFAB - XT018</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34; XFAB - XH018 &#34;&#34;&#34;
+<pre><code class="python">&#34;&#34;&#34; XFAB - XT018 &#34;&#34;&#34;
 
 from .op import *
 
 # MIL - Miller Operational Amplifier
-class MILXH018GeomV0(OPGeomV0):
+class MILXT018GeomV0(OPGeomV0):
     &#34;&#34;&#34;MIL: Miller Operational Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;mil&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class MILXH018GeomV1(OPGeomV1):
+class MILXT018GeomV1(OPGeomV1):
     &#34;&#34;&#34;MIL: Miller Operational Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;mil&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class MILXH018ElecV0(OPElecV0):
+class MILXT018ElecV0(OPElecV0):
     &#34;&#34;&#34;MIL: Miller Operational Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;mil&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class MILXH018ElecV1(OPElecV1):
+class MILXT018ElecV1(OPElecV1):
     &#34;&#34;&#34;MIL: Miller Operational Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;mil&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
 # SYM - Symmetrical Amplifier
-class SYMXH018GeomV0(OPGeomV0):
+class SYMXT018GeomV0(OPGeomV0):
     &#34;&#34;&#34;SYM: Symmetrical Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;sym&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class SYMXH018GeomV1(OPGeomV1):
+class SYMXT018GeomV1(OPGeomV1):
     &#34;&#34;&#34;SYM: Symmetrical Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;sym&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class SYMXH018ElecV0(OPElecV0):
+class SYMXT018ElecV0(OPElecV0):
     &#34;&#34;&#34;SYM: Symmetrical Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;sym&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class SYMXH018ElecV1(OPElecV1):
+class SYMXT018ElecV1(OPElecV1):
     &#34;&#34;&#34;SYM: Symmetrical Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;sym&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
 # FCA - Folded Cascode
-class FCAXH018GeomV0(OPGeomV0):
+class FCAXT018GeomV0(OPGeomV0):
     &#34;&#34;&#34;FCA: Folded Cascode Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;fca&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class FCAXH018GeomV1(OPGeomV1):
+class FCAXT018GeomV1(OPGeomV1):
     &#34;&#34;&#34;FCA: Folded Cascode Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;fca&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class FCAXH018ElecV0(OPElecV0):
+class FCAXT018ElecV0(OPElecV0):
     &#34;&#34;&#34;FCA: Folded Cascode Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;fca&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class FCAXH018ElecV1(OPElecV1):
+class FCAXT018ElecV1(OPElecV1):
     &#34;&#34;&#34;FCA: Folded Cascode Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;fca&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
 # RFA - Rail-To-Rail Folded-Cascode with Wide-Swing Current Mirror
-class RFAXH018GeomV0(OPGeomV0):
+class RFAXT018GeomV0(OPGeomV0):
     &#34;&#34;&#34;RFA: Rail-To-Rail Folded Cascode Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;rfa&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class RFAXH018GeomV1(OPGeomV1):
+class RFAXT018GeomV1(OPGeomV1):
     &#34;&#34;&#34;RFA: Rail-To-Rail Folded Cascode Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;rfa&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class RFAXH018ElecV0(OPElecV0):
+class RFAXT018ElecV0(OPElecV0):
     &#34;&#34;&#34;RFA: Rail-To-Rail Folded Cascode Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;rfa&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )
 
-class RFAXH018ElecV1(OPElecV1):
+class RFAXT018ElecV1(OPElecV1):
     &#34;&#34;&#34;RFA: Rail-To-Rail Folded Cascode Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;rfa&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 </section>
@@ -157,8 +157,8 @@ class RFAXH018ElecV1(OPElecV1):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="circus.gym.xh018.FCAXH018ElecV0"><code class="flex name class">
-<span>class <span class="ident">FCAXH018ElecV0</span></span>
+<dt id="circus.gym.xt018.FCAXT018ElecV0"><code class="flex name class">
+<span>class <span class="ident">FCAXT018ElecV0</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -169,11 +169,11 @@ class RFAXH018ElecV1(OPElecV1):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class FCAXH018ElecV0(OPElecV0):
+<pre><code class="python">class FCAXT018ElecV0(OPElecV0):
     &#34;&#34;&#34;FCA: Folded Cascode Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;fca&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -207,8 +207,8 @@ class RFAXH018ElecV1(OPElecV1):
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.FCAXH018ElecV1"><code class="flex name class">
-<span>class <span class="ident">FCAXH018ElecV1</span></span>
+<dt id="circus.gym.xt018.FCAXT018ElecV1"><code class="flex name class">
+<span>class <span class="ident">FCAXT018ElecV1</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -219,11 +219,11 @@ class RFAXH018ElecV1(OPElecV1):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class FCAXH018ElecV1(OPElecV1):
+<pre><code class="python">class FCAXT018ElecV1(OPElecV1):
     &#34;&#34;&#34;FCA: Folded Cascode Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;fca&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -258,8 +258,8 @@ class RFAXH018ElecV1(OPElecV1):
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.FCAXH018GeomV0"><code class="flex name class">
-<span>class <span class="ident">FCAXH018GeomV0</span></span>
+<dt id="circus.gym.xt018.FCAXT018GeomV0"><code class="flex name class">
+<span>class <span class="ident">FCAXT018GeomV0</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -314,11 +314,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class FCAXH018GeomV0(OPGeomV0):
+<pre><code class="python">class FCAXT018GeomV0(OPGeomV0):
     &#34;&#34;&#34;FCA: Folded Cascode Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;fca&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -351,8 +351,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.FCAXH018GeomV1"><code class="flex name class">
-<span>class <span class="ident">FCAXH018GeomV1</span></span>
+<dt id="circus.gym.xt018.FCAXT018GeomV1"><code class="flex name class">
+<span>class <span class="ident">FCAXT018GeomV1</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -363,11 +363,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class FCAXH018GeomV1(OPGeomV1):
+<pre><code class="python">class FCAXT018GeomV1(OPGeomV1):
     &#34;&#34;&#34;FCA: Folded Cascode Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;fca&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -401,8 +401,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.MILXH018ElecV0"><code class="flex name class">
-<span>class <span class="ident">MILXH018ElecV0</span></span>
+<dt id="circus.gym.xt018.MILXT018ElecV0"><code class="flex name class">
+<span>class <span class="ident">MILXT018ElecV0</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -413,11 +413,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class MILXH018ElecV0(OPElecV0):
+<pre><code class="python">class MILXT018ElecV0(OPElecV0):
     &#34;&#34;&#34;MIL: Miller Operational Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;mil&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -451,8 +451,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.MILXH018ElecV1"><code class="flex name class">
-<span>class <span class="ident">MILXH018ElecV1</span></span>
+<dt id="circus.gym.xt018.MILXT018ElecV1"><code class="flex name class">
+<span>class <span class="ident">MILXT018ElecV1</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -463,11 +463,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class MILXH018ElecV1(OPElecV1):
+<pre><code class="python">class MILXT018ElecV1(OPElecV1):
     &#34;&#34;&#34;MIL: Miller Operational Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;mil&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -502,8 +502,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.MILXH018GeomV0"><code class="flex name class">
-<span>class <span class="ident">MILXH018GeomV0</span></span>
+<dt id="circus.gym.xt018.MILXT018GeomV0"><code class="flex name class">
+<span>class <span class="ident">MILXT018GeomV0</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -558,11 +558,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class MILXH018GeomV0(OPGeomV0):
+<pre><code class="python">class MILXT018GeomV0(OPGeomV0):
     &#34;&#34;&#34;MIL: Miller Operational Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;mil&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -595,8 +595,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.MILXH018GeomV1"><code class="flex name class">
-<span>class <span class="ident">MILXH018GeomV1</span></span>
+<dt id="circus.gym.xt018.MILXT018GeomV1"><code class="flex name class">
+<span>class <span class="ident">MILXT018GeomV1</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -607,11 +607,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class MILXH018GeomV1(OPGeomV1):
+<pre><code class="python">class MILXT018GeomV1(OPGeomV1):
     &#34;&#34;&#34;MIL: Miller Operational Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;mil&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -645,8 +645,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.RFAXH018ElecV0"><code class="flex name class">
-<span>class <span class="ident">RFAXH018ElecV0</span></span>
+<dt id="circus.gym.xt018.RFAXT018ElecV0"><code class="flex name class">
+<span>class <span class="ident">RFAXT018ElecV0</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -657,11 +657,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RFAXH018ElecV0(OPElecV0):
+<pre><code class="python">class RFAXT018ElecV0(OPElecV0):
     &#34;&#34;&#34;RFA: Rail-To-Rail Folded Cascode Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;rfa&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -695,8 +695,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.RFAXH018ElecV1"><code class="flex name class">
-<span>class <span class="ident">RFAXH018ElecV1</span></span>
+<dt id="circus.gym.xt018.RFAXT018ElecV1"><code class="flex name class">
+<span>class <span class="ident">RFAXT018ElecV1</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -707,11 +707,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RFAXH018ElecV1(OPElecV1):
+<pre><code class="python">class RFAXT018ElecV1(OPElecV1):
     &#34;&#34;&#34;RFA: Rail-To-Rail Folded Cascode Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;rfa&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -746,8 +746,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.RFAXH018GeomV0"><code class="flex name class">
-<span>class <span class="ident">RFAXH018GeomV0</span></span>
+<dt id="circus.gym.xt018.RFAXT018GeomV0"><code class="flex name class">
+<span>class <span class="ident">RFAXT018GeomV0</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -802,11 +802,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RFAXH018GeomV0(OPGeomV0):
+<pre><code class="python">class RFAXT018GeomV0(OPGeomV0):
     &#34;&#34;&#34;RFA: Rail-To-Rail Folded Cascode Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;rfa&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -839,8 +839,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.RFAXH018GeomV1"><code class="flex name class">
-<span>class <span class="ident">RFAXH018GeomV1</span></span>
+<dt id="circus.gym.xt018.RFAXT018GeomV1"><code class="flex name class">
+<span>class <span class="ident">RFAXT018GeomV1</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -851,11 +851,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class RFAXH018GeomV1(OPGeomV1):
+<pre><code class="python">class RFAXT018GeomV1(OPGeomV1):
     &#34;&#34;&#34;RFA: Rail-To-Rail Folded Cascode Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;rfa&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -889,8 +889,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.SYMXH018ElecV0"><code class="flex name class">
-<span>class <span class="ident">SYMXH018ElecV0</span></span>
+<dt id="circus.gym.xt018.SYMXT018ElecV0"><code class="flex name class">
+<span>class <span class="ident">SYMXT018ElecV0</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -901,11 +901,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class SYMXH018ElecV0(OPElecV0):
+<pre><code class="python">class SYMXT018ElecV0(OPElecV0):
     &#34;&#34;&#34;SYM: Symmetrical Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;sym&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -939,8 +939,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.SYMXH018ElecV1"><code class="flex name class">
-<span>class <span class="ident">SYMXH018ElecV1</span></span>
+<dt id="circus.gym.xt018.SYMXT018ElecV1"><code class="flex name class">
+<span>class <span class="ident">SYMXT018ElecV1</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -951,11 +951,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class SYMXH018ElecV1(OPElecV1):
+<pre><code class="python">class SYMXT018ElecV1(OPElecV1):
     &#34;&#34;&#34;SYM: Symmetrical Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;sym&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -990,8 +990,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.SYMXH018GeomV0"><code class="flex name class">
-<span>class <span class="ident">SYMXH018GeomV0</span></span>
+<dt id="circus.gym.xt018.SYMXT018GeomV0"><code class="flex name class">
+<span>class <span class="ident">SYMXT018GeomV0</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -1046,11 +1046,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class SYMXH018GeomV0(OPGeomV0):
+<pre><code class="python">class SYMXT018GeomV0(OPGeomV0):
     &#34;&#34;&#34;SYM: Symmetrical Amplifier Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;sym&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -1083,8 +1083,8 @@ Automatically reset environemt when done (default = False).</li>
 </li>
 </ul>
 </dd>
-<dt id="circus.gym.xh018.SYMXH018GeomV1"><code class="flex name class">
-<span>class <span class="ident">SYMXH018GeomV1</span></span>
+<dt id="circus.gym.xt018.SYMXT018GeomV1"><code class="flex name class">
+<span>class <span class="ident">SYMXT018GeomV1</span></span>
 <span>(</span><span>**kwargs)</span>
 </code></dt>
 <dd>
@@ -1095,11 +1095,11 @@ Automatically reset environemt when done (default = False).</li>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class SYMXH018GeomV1(OPGeomV1):
+<pre><code class="python">class SYMXT018GeomV1(OPGeomV1):
     &#34;&#34;&#34;SYM: Symmetrical Amplifier Non-Goal Env&#34;&#34;&#34;
     def __init__(self, **kwargs):
         super().__init__( ckt_id = &#34;sym&#34;
-                        , pdk_id = &#34;xh018&#34;
+                        , pdk_id = &#34;xt018&#34;
                         , **kwargs )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -1150,52 +1150,52 @@ Automatically reset environemt when done (default = False).</li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="circus.gym.xh018.FCAXH018ElecV0" href="#circus.gym.xh018.FCAXH018ElecV0">FCAXH018ElecV0</a></code></h4>
+<h4><code><a title="circus.gym.xt018.FCAXT018ElecV0" href="#circus.gym.xt018.FCAXT018ElecV0">FCAXT018ElecV0</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.FCAXH018ElecV1" href="#circus.gym.xh018.FCAXH018ElecV1">FCAXH018ElecV1</a></code></h4>
+<h4><code><a title="circus.gym.xt018.FCAXT018ElecV1" href="#circus.gym.xt018.FCAXT018ElecV1">FCAXT018ElecV1</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.FCAXH018GeomV0" href="#circus.gym.xh018.FCAXH018GeomV0">FCAXH018GeomV0</a></code></h4>
+<h4><code><a title="circus.gym.xt018.FCAXT018GeomV0" href="#circus.gym.xt018.FCAXT018GeomV0">FCAXT018GeomV0</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.FCAXH018GeomV1" href="#circus.gym.xh018.FCAXH018GeomV1">FCAXH018GeomV1</a></code></h4>
+<h4><code><a title="circus.gym.xt018.FCAXT018GeomV1" href="#circus.gym.xt018.FCAXT018GeomV1">FCAXT018GeomV1</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.MILXH018ElecV0" href="#circus.gym.xh018.MILXH018ElecV0">MILXH018ElecV0</a></code></h4>
+<h4><code><a title="circus.gym.xt018.MILXT018ElecV0" href="#circus.gym.xt018.MILXT018ElecV0">MILXT018ElecV0</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.MILXH018ElecV1" href="#circus.gym.xh018.MILXH018ElecV1">MILXH018ElecV1</a></code></h4>
+<h4><code><a title="circus.gym.xt018.MILXT018ElecV1" href="#circus.gym.xt018.MILXT018ElecV1">MILXT018ElecV1</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.MILXH018GeomV0" href="#circus.gym.xh018.MILXH018GeomV0">MILXH018GeomV0</a></code></h4>
+<h4><code><a title="circus.gym.xt018.MILXT018GeomV0" href="#circus.gym.xt018.MILXT018GeomV0">MILXT018GeomV0</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.MILXH018GeomV1" href="#circus.gym.xh018.MILXH018GeomV1">MILXH018GeomV1</a></code></h4>
+<h4><code><a title="circus.gym.xt018.MILXT018GeomV1" href="#circus.gym.xt018.MILXT018GeomV1">MILXT018GeomV1</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.RFAXH018ElecV0" href="#circus.gym.xh018.RFAXH018ElecV0">RFAXH018ElecV0</a></code></h4>
+<h4><code><a title="circus.gym.xt018.RFAXT018ElecV0" href="#circus.gym.xt018.RFAXT018ElecV0">RFAXT018ElecV0</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.RFAXH018ElecV1" href="#circus.gym.xh018.RFAXH018ElecV1">RFAXH018ElecV1</a></code></h4>
+<h4><code><a title="circus.gym.xt018.RFAXT018ElecV1" href="#circus.gym.xt018.RFAXT018ElecV1">RFAXT018ElecV1</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.RFAXH018GeomV0" href="#circus.gym.xh018.RFAXH018GeomV0">RFAXH018GeomV0</a></code></h4>
+<h4><code><a title="circus.gym.xt018.RFAXT018GeomV0" href="#circus.gym.xt018.RFAXT018GeomV0">RFAXT018GeomV0</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.RFAXH018GeomV1" href="#circus.gym.xh018.RFAXH018GeomV1">RFAXH018GeomV1</a></code></h4>
+<h4><code><a title="circus.gym.xt018.RFAXT018GeomV1" href="#circus.gym.xt018.RFAXT018GeomV1">RFAXT018GeomV1</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.SYMXH018ElecV0" href="#circus.gym.xh018.SYMXH018ElecV0">SYMXH018ElecV0</a></code></h4>
+<h4><code><a title="circus.gym.xt018.SYMXT018ElecV0" href="#circus.gym.xt018.SYMXT018ElecV0">SYMXT018ElecV0</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.SYMXH018ElecV1" href="#circus.gym.xh018.SYMXH018ElecV1">SYMXH018ElecV1</a></code></h4>
+<h4><code><a title="circus.gym.xt018.SYMXT018ElecV1" href="#circus.gym.xt018.SYMXT018ElecV1">SYMXT018ElecV1</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.SYMXH018GeomV0" href="#circus.gym.xh018.SYMXH018GeomV0">SYMXH018GeomV0</a></code></h4>
+<h4><code><a title="circus.gym.xt018.SYMXT018GeomV0" href="#circus.gym.xt018.SYMXT018GeomV0">SYMXT018GeomV0</a></code></h4>
 </li>
 <li>
-<h4><code><a title="circus.gym.xh018.SYMXH018GeomV1" href="#circus.gym.xh018.SYMXH018GeomV1">SYMXH018GeomV1</a></code></h4>
+<h4><code><a title="circus.gym.xt018.SYMXT018GeomV1" href="#circus.gym.xt018.SYMXT018GeomV1">SYMXT018GeomV1</a></code></h4>
 </li>
 </ul>
 </li>

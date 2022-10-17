@@ -1,13 +1,13 @@
 """ REST API """
 
-from typing import Any, List, Optional, Type, Union, Callable, Mapping
-from argparse import ArgumentParser
-from collections import namedtuple
+from   typing      import Union
+from   argparse    import ArgumentParser
+from   collections import namedtuple
 
-import json
-import numpy as np
-import hace as ac
-import circus
+import numpy         as np
+import circus.circus as ckt
+# import circus.seraf  as sfu
+from   .util       import df_to_dict
 
 parser = ArgumentParser()
 parser.add_argument( '--host', type = str, default = 'localhost'
@@ -15,7 +15,7 @@ parser.add_argument( '--host', type = str, default = 'localhost'
 parser.add_argument( '-p', '--port', type = int, default = '6007'
                    , help = 'Server Port')
 parser.add_argument( '-e', '--env', type = str, default = 'op2'
-                   , help = 'ACE Environment ID, see Circus doc for what\'s available')
+                   , help = 'Serafin circuit ID, see Circus doc for what\'s available')
 parser.add_argument( '-s', '--space', type = str, default = 'elec'
                    , help = 'Circus Action Space, see Circus doc for what\'s available')
 parser.add_argument( '-v', '--var', type = int, default = '0'
@@ -27,16 +27,16 @@ parser.add_argument( '-t', '--step', type = int, default = 50
 parser.add_argument( '-c', '--scale', default = True, action = 'store_true'
                    , help = 'Circus Action Space, see Circus doc for what\'s available')
 parser.add_argument( '--pdk', type = str, default = 'xh035'
-                   , help = 'ACE backend, see Circus doc for what\'s available')
+                   , help = 'PDK ID, see Circus doc for what\'s available')
 parser.add_argument( '-gn', '--goals', nargs = '+', default = []
                    , help = 'List of goal parameters.')
 parser.add_argument( '-o', '--states', nargs = '+', default = []
                    , help = 'List of observation / state parameters.')
 
-CircusEnv = namedtuple('Environment', 'env ace_id backend space variant num_envs')
+CircusEnv = namedtuple('Environment', 'env ckt_id pdk_id space variant num_envs')
 
-def make_env( ace_id: str, backend: str, space: str, variant: int
-            , num_envs: int, num_steps: int = 50, scale: bool = True
+def make_env( ckt_id: str, pdk_id: str, space: str, variant: int
+            , n_envs: int, n_steps: int = 50, scale: bool = True
             , obs_filter: Union[str, list[str]] = 'perf'
             , goal_filter: Union[str, list[str]] = 'perf'
             ) -> CircusEnv:
@@ -44,24 +44,24 @@ def make_env( ace_id: str, backend: str, space: str, variant: int
     Construct a Circus Environment wrapper for HTTP Access.
     """
 
-    env_name      = f'circus:{ace_id}-{backend}-{space}-v{variant}'
+    env_name      = f'circus:{ckt_id}-{pdk_id}-{space}-v{variant}'
 
-    env           = circus.make( env_name
-                               , n_envs            = num_envs
-                               , num_steps         = num_steps
-                               , goal_filter       = goal_filter
-                               , obs_filter        = obs_filter
-                               , scale_observation = scale
-                               , )
+    env           = ckt.make( env_name
+                            , n_envs            = n_envs
+                            , num_steps         = n_steps
+                            , goal_filter       = goal_filter
+                            , obs_filter        = obs_filter
+                            , scale_observation = scale
+                            , )
 
-    return CircusEnv(env, ace_id, backend, space, variant, num_envs)
+    return CircusEnv(env, ckt_id, pdk_id, space, variant, n_envs)
 
 def restart(circ: CircusEnv) -> CircusEnv:
     """
-    Restart the Environment(s) including ACE.
+    Restart the Environment(s)
     """
-    env, ace_id, backend, space, variant, num_envs = circ
-    return make_env(ace_id, backend, space, variant, num_envs, env.num_steps)
+    env, ckt_id, pdk_id, space, variant, num_envs = circ
+    return make_env(ckt_id, pdk_id, space, variant, num_envs, env.num_steps)
 
 def reset( circ: CircusEnv, env_mask: list[bool] = [], env_ids: list[int] = []
          ) -> dict[str, [[float]]]:
@@ -132,10 +132,7 @@ def current_performance(circ: CircusEnv) -> dict[int, dict[str, float]]:
     """
     Get current performane from ACE.
     """
-    perf = ac.current_performance_pool(circ.env.ace_envs)
-    return { i: { o: np.nan_to_num(p[o], nan=0.0, posinf=0.0,neginf=0.0).item()
-                  for o in circ.env.obs_filter }
-             for i,p in perf.items() }
+    return df_to_dict(circ.env.last_obs)
 
 def current_goal(circ: CircusEnv) -> dict[int, dict[str, float]]:
     """
@@ -148,15 +145,16 @@ def current_sizing(circ: CircusEnv) -> dict[int, dict[str, float]]:
     """
     Get the current sizing from ACE.
     """
-    return ac.current_sizing_pool(circ.env.ace_envs)
+    return df_to_dict(circ.env.sizing)
 
 def last_action(circ: CircusEnv) -> dict[int, dict[str, float]]:
     """
     Get the last action that was taken. Will be same as sizing if
     `space == 'geom'` otherwise it will be INPUTS.
     """
-    return { i: { k: v for k,v in p.items() if k in circ.env.input_parameters }
-             for i,p in ac.current_performance_pool(circ.env.ace_envs).items() }
+    return df_to_dict(circ.env.last_obs[circ.env.input_parameters]) \
+                if all(i in circ.env.last_obs for i in circ.env.input_parameters) \
+                else current_sizing(circ)
 
 def action_space(circ: CircusEnv) -> dict[int, int]:
     """

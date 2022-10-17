@@ -230,38 +230,26 @@ def _test_op_v1(env_id):
     env.close()
     del env
 
-def test_op1_xh035_geom_v0():
-    _test_op_v0('circus:op1-xh035-geom-v0')
+def test_mil_gpdk180_geom_v0():
+    _test_op_v0('circus:mil-gpdk180-geom-v0')
 
-def test_op2_xh035_geom_v0():
-    _test_op_v0('circus:op2-xh035-geom-v0')
+def test_sym_gpdk180_geom_v0():
+    _test_op_v0('circus:sym-gpdk180-geom-v0')
 
-def test_op8_xh035_geom_v0():
-    _test_op_v0('circus:op8-xh035-geom-v0')
+def test_fca_gpdk180_geom_v0():
+    _test_op_v0('circus:fca-gpdk180-geom-v0')
 
-def test_op1_xh035_elec_v0():
-    _test_op_v0('circus:op1-xh035-elec-v0')
+def test_rfa_gpdk180_geom_v0():
+    _test_op_v0('circus:rfa-gpdk180-geom-v0')
 
-def test_op2_xh035_elec_v0():
-    _test_op_v0('circus:op2-xh035-elec-v0')
+def test_mil_gpdk180_elec_v0():
+    _test_op_v0('circus:mil-gpdk180-elec-v0')
 
-def test_op8_xh035_elec_v0():
-    _test_op_v0('circus:op8-xh035-elec-v0')
+def test_sym_gpdk180_elec_v0():
+    _test_op_v0('circus:sym-gpdk180-elec-v0')
 
-def test_op1_xh018_geom_v0():
-    _test_op_v0('circus:op1-xh018-geom-v0')
+def test_fca_gpdk180_elec_v0():
+    _test_op_v0('circus:fca-gpdk180-elec-v0')
 
-def test_op2_xh018_geom_v0():
-    _test_op_v0('circus:op2-xh018-geom-v0')
-
-def test_op8_xh018_geom_v0():
-    _test_op_v0('circus:op8-xh018-geom-v0')
-
-def test_op1_xh018_elec_v0():
-    _test_op_v0('circus:op1-xh018-elec-v0')
-
-def test_op2_xh018_elec_v0():
-    _test_op_v0('circus:op2-xh018-elec-v0')
-
-def test_op8_xh018_elec_v0():
-    _test_op_v0('circus:op8-xh018-elec-v0')
+def test_rfa_gpdk180_elec_v0():
+    _test_op_v0('circus:rfa-gpdk180-elec-v0')

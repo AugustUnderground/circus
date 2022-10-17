@@ -1,6 +1,7 @@
+pyyaml
+serafin
 Expression
 Flask
-hace
 joblib
 numpy
 setuptools

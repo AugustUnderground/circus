@@ -1,8 +1,8 @@
-### Miller Amplifier (OP1)
+### Miller Amplifier (MIL)
 
-![op1](https://raw.githubusercontent.com/matthschw/ace/main/figures/op1.png)
+![MIL](./fig/mil.png)
 
-Available via `circus` constructor with `circus:op1-<tech>-<space>-<variant>`.
+Available via `circus` constructor with `circus:mil-<pdk>-<space>-<variant>`.
 
 #### Observation Space
 

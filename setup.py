@@ -11,7 +11,7 @@ with open('requirements.txt', 'r') as req:
 scripts: [str] = [ f'carnival = {package_name}.__main__:carnival']
 
 setup( name                          = package_name
-     , version                       = '0.0.1'
+     , version                       = '1.0.1'
      , author                        = 'Yannick Uhlmann'
      , author_email                  = 'augustunderground@getgoogleoff.me'
      , description                   = 'Analog Circuit Sizing Gym Environment'

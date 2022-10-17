@@ -27,23 +27,30 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;Reward Functions&#34;&#34;&#34;
+<pre><code class="python">&#34;&#34;&#34; Reward Functions &#34;&#34;&#34;
 
+import operator
 from typing import Any, List, Optional, Type, Union, Callable
 import numpy as np
 
 def dummy_reward(observation: np.ndarray) -&gt; np.ndarray:
-    &#34;&#34;&#34; Default reward function for non-goal environments (v1).
-    Arguments: `observation`
-    Returns: `reward`
+    &#34;&#34;&#34;
+    Default reward function for non-goal environments (v1).
+    Arguments:
+        - `observation`
+    Returns:
+        - `reward`
     &#34;&#34;&#34;
     return np.sum(observation[&#39;observation&#39;], axis = 1)
 
 def binary_reward( predicate: list[Callable], observation: dict[str, np.ndarray]
                  , ) -&gt; np.ndarray:
-    &#34;&#34;&#34; Default reward function for goal environments (v0).
-    Arguments:  `predicate`, `observation`
-    Returns: `reward` in {-1;0}
+    &#34;&#34;&#34;
+    Default reward function for goal environments (v0).
+    Arguments:
+        - `predicate`, `observation`
+    Returns:
+        - `reward` in {-1;0}
     &#34;&#34;&#34;
     desired_goal  = observation[&#39;desired_goal&#39;]
     achieved_goal = observation[&#39;achieved_goal&#39;]
@@ -52,7 +59,44 @@ def binary_reward( predicate: list[Callable], observation: dict[str, np.ndarray]
                                                      , list(achieved_goal.T)
                                                      , list(desired_goal.T))
                             ]).T
-                 , axis = 1 ) - 1.0</code></pre>
+                 , axis = 1 ) - 1.0
+
+def goal_predicate(parameters: list[str]) -&gt; list[Callable]:
+    &#34;&#34;&#34;
+    List of default predicates for achived / desired goal comparison:
+        - `lambda achived desired: achived &lt;operator&gt; desired`
+    &#34;&#34;&#34;
+    preds = { &#39;area&#39;:        operator.le # Area
+            , &#39;a_0&#39;:         operator.ge # Gain
+            , &#39;cmrr&#39;:        operator.ge # Common Mode Rejection Ration
+            , &#39;cof&#39;:         operator.ge # Cross over Frequency
+            , &#39;gm&#39;:          operator.ge # Gain Margin
+            , &#39;i_out_max&#39;:   operator.ge # Maximum Output Current
+            , &#39;i_out_min&#39;:   operator.ge # Minimum Output Current
+            , &#39;idd&#39;:         operator.le # Current Consumption
+            , &#39;iss&#39;:         operator.le # Current Consumption
+            , &#39;os_f&#39;:        operator.ge # Slew Rate Overswing Falling
+            , &#39;os_r&#39;:        operator.ge # Slew Rate Overswing Rising
+            , &#39;pm&#39;:          operator.ge # Phase Margin
+            , &#39;psrr_n&#39;:      operator.ge # Power Supply Rejection Ratio -
+            , &#39;psrr_p&#39;:      operator.ge # Power Supply Rejection Ratio +
+            , &#39;sr_f&#39;:        operator.ge # Slew Rate Falling
+            , &#39;sr_r&#39;:        operator.ge # Slew Rate Rising
+            , &#39;ugbw&#39;:        operator.ge # Unity Gain Bandwidth Product
+            , &#39;v_ih&#39;:        operator.ge # Input Voltage High
+            , &#39;v_il&#39;:        operator.le # Input Voltage Low
+            , &#39;v_oh&#39;:        operator.ge # Ouput Voltage High
+            , &#39;v_ol&#39;:        operator.le # Ouput Voltage Low
+            , &#39;vn_100Hz&#39;:    operator.le # Output-referred noise density @ 100Hz
+            , &#39;vn_100kHz&#39;:   operator.le # Output-referred noise density @ 100kHz
+            , &#39;vn_10Hz&#39;:     operator.le # Output-referred noise density @ 10Hz
+            , &#39;vn_10kHz&#39;:    operator.le # Output-referred noise density @ 10kHz
+            , &#39;vn_1Hz&#39;:      operator.le # Output-referred noise density @ 1Hz
+            , &#39;vn_1kHz&#39;:     operator.le # Output-referred noise density @ 1kHz
+            , &#39;voff_stat&#39;:   operator.le # Statistical Offset
+            , &#39;voff_syst&#39;:   operator.le # Systematic Offset
+            , }
+    return [preds[p] for p in parameters]</code></pre>
 </details>
 </section>
 <section>
@@ -66,19 +110,27 @@ def binary_reward( predicate: list[Callable], observation: dict[str, np.ndarray]
 <span>def <span class="ident">binary_reward</span></span>(<span>predicate: list[typing.Callable], observation: dict[str, numpy.ndarray]) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Default reward function for goal environments (v0).
-Arguments:
-<code>predicate</code>, <code>observation</code>
-Returns: <code>reward</code> in {-1;0}</p></div>
+<div class="desc"><p>Default reward function for goal environments (v0).</p>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li><code>predicate</code>, <code>observation</code></li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li><code>reward</code> in {-1;0}</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def binary_reward( predicate: list[Callable], observation: dict[str, np.ndarray]
                  , ) -&gt; np.ndarray:
-    &#34;&#34;&#34; Default reward function for goal environments (v0).
-    Arguments:  `predicate`, `observation`
-    Returns: `reward` in {-1;0}
+    &#34;&#34;&#34;
+    Default reward function for goal environments (v0).
+    Arguments:
+        - `predicate`, `observation`
+    Returns:
+        - `reward` in {-1;0}
     &#34;&#34;&#34;
     desired_goal  = observation[&#39;desired_goal&#39;]
     achieved_goal = observation[&#39;achieved_goal&#39;]
@@ -94,19 +146,76 @@ Returns: <code>reward</code> in {-1;0}</p></div>
 <span>def <span class="ident">dummy_reward</span></span>(<span>observation: numpy.ndarray) ‑> numpy.ndarray</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Default reward function for non-goal environments (v1).
-Arguments: <code>observation</code>
-Returns: <code>reward</code></p></div>
+<div class="desc"><p>Default reward function for non-goal environments (v1).</p>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li><code>observation</code></li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li><code>reward</code></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def dummy_reward(observation: np.ndarray) -&gt; np.ndarray:
-    &#34;&#34;&#34; Default reward function for non-goal environments (v1).
-    Arguments: `observation`
-    Returns: `reward`
+    &#34;&#34;&#34;
+    Default reward function for non-goal environments (v1).
+    Arguments:
+        - `observation`
+    Returns:
+        - `reward`
     &#34;&#34;&#34;
     return np.sum(observation[&#39;observation&#39;], axis = 1)</code></pre>
+</details>
+</dd>
+<dt id="circus.reward.goal_predicate"><code class="name flex">
+<span>def <span class="ident">goal_predicate</span></span>(<span>parameters: list[str]) ‑> list[typing.Callable]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>List of default predicates for achived / desired goal comparison:
+- <code>lambda achived desired: achived &lt;operator&gt; desired</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def goal_predicate(parameters: list[str]) -&gt; list[Callable]:
+    &#34;&#34;&#34;
+    List of default predicates for achived / desired goal comparison:
+        - `lambda achived desired: achived &lt;operator&gt; desired`
+    &#34;&#34;&#34;
+    preds = { &#39;area&#39;:        operator.le # Area
+            , &#39;a_0&#39;:         operator.ge # Gain
+            , &#39;cmrr&#39;:        operator.ge # Common Mode Rejection Ration
+            , &#39;cof&#39;:         operator.ge # Cross over Frequency
+            , &#39;gm&#39;:          operator.ge # Gain Margin
+            , &#39;i_out_max&#39;:   operator.ge # Maximum Output Current
+            , &#39;i_out_min&#39;:   operator.ge # Minimum Output Current
+            , &#39;idd&#39;:         operator.le # Current Consumption
+            , &#39;iss&#39;:         operator.le # Current Consumption
+            , &#39;os_f&#39;:        operator.ge # Slew Rate Overswing Falling
+            , &#39;os_r&#39;:        operator.ge # Slew Rate Overswing Rising
+            , &#39;pm&#39;:          operator.ge # Phase Margin
+            , &#39;psrr_n&#39;:      operator.ge # Power Supply Rejection Ratio -
+            , &#39;psrr_p&#39;:      operator.ge # Power Supply Rejection Ratio +
+            , &#39;sr_f&#39;:        operator.ge # Slew Rate Falling
+            , &#39;sr_r&#39;:        operator.ge # Slew Rate Rising
+            , &#39;ugbw&#39;:        operator.ge # Unity Gain Bandwidth Product
+            , &#39;v_ih&#39;:        operator.ge # Input Voltage High
+            , &#39;v_il&#39;:        operator.le # Input Voltage Low
+            , &#39;v_oh&#39;:        operator.ge # Ouput Voltage High
+            , &#39;v_ol&#39;:        operator.le # Ouput Voltage Low
+            , &#39;vn_100Hz&#39;:    operator.le # Output-referred noise density @ 100Hz
+            , &#39;vn_100kHz&#39;:   operator.le # Output-referred noise density @ 100kHz
+            , &#39;vn_10Hz&#39;:     operator.le # Output-referred noise density @ 10Hz
+            , &#39;vn_10kHz&#39;:    operator.le # Output-referred noise density @ 10kHz
+            , &#39;vn_1Hz&#39;:      operator.le # Output-referred noise density @ 1Hz
+            , &#39;vn_1kHz&#39;:     operator.le # Output-referred noise density @ 1kHz
+            , &#39;voff_stat&#39;:   operator.le # Statistical Offset
+            , &#39;voff_syst&#39;:   operator.le # Systematic Offset
+            , }
+    return [preds[p] for p in parameters]</code></pre>
 </details>
 </dd>
 </dl>
@@ -129,6 +238,7 @@ Returns: <code>reward</code></p></div>
 <ul class="">
 <li><code><a title="circus.reward.binary_reward" href="#circus.reward.binary_reward">binary_reward</a></code></li>
 <li><code><a title="circus.reward.dummy_reward" href="#circus.reward.dummy_reward">dummy_reward</a></code></li>
+<li><code><a title="circus.reward.goal_predicate" href="#circus.reward.goal_predicate">goal_predicate</a></code></li>
 </ul>
 </li>
 </ul>

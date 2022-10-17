@@ -29,18 +29,31 @@
 </summary>
 <pre><code class="python">&#34;&#34;&#34; Circus Utility Functions &#34;&#34;&#34;
 
-from typing import Any, List, Optional, Type, Union, Callable, Tuple
+import os
+import errno
+import yaml
+from typing import Any, List, Optional, Type, Union, Callable, Tuple, Iterable
+from functools import partial
 import numpy as np
+import pandas as pd
+import serafin as sf
+import pyspectre as ps
 
 from .trafo import *
+
+def df_to_dict(df: pd.DataFrame) -&gt; dict[int, dict[str, float]]:
+    &#34;&#34;&#34; Convert a dataframe to a dictionary &#34;&#34;&#34;
+    return { row.Index: { k: np.nan_to_num(v, nan = 0.0, posinf = 0.0, neginf = 0.0)
+                          for k,v in row._asdict().items() if (k != &#39;Index&#39;) }
+             for row in df.itertuples() }
 
 def add_noise(x: np.array, η: float = 0.01) -&gt; np.array:
     &#34;&#34;&#34;Add some gaussian noise
     Arguments:
-        `x`: Input
-        `η`: Standard Deviation
+        - `x`: Input
+        _ `η`: Standard Deviation
     Returns:
-        `y`: `x` with noise `η`
+        _ `y`: `x` with noise `η`
     &#34;&#34;&#34;
     d = x.shape
     μ = np.ones(d)
@@ -48,82 +61,81 @@ def add_noise(x: np.array, η: float = 0.01) -&gt; np.array:
     ε = np.random.normal(μ, σ)
     return x * ε
 
-def goal_generator( kind: str, reference: np.ndarray, num_envs: int = 1
+def goal_generator( kind: str, reference: pd.DataFrame
                   ) -&gt; Callable:
     &#34;&#34;&#34;
     Returns a goal generator function
     Arguments:
-        `kind`:
-            - &#39;noisy&#39;: Add noise to reference goal
-            - &#39;random&#39;: Choose a random goal between reference
-            - &#39;fix&#39;: Goal remains the same
-        `reference`: Must be of shape (num_envs, len(goal_filter)) for &#39;noisy&#39;
-                     and (2, len(goal_filter)) for &#39;random&#39;. In case of random,
-                     `reference[0] == min` and `reference[1] == max` for
-                     generating random values in range.
+        - `kind`:
+            + &#39;noisy&#39;: Add noise to reference goal
+            + &#39;random&#39;: Choose a random goal between reference
+            + &#39;fix&#39;: Goal remains the same
+        - `reference`: Must be of shape (num_envs, len(goal_filter)) for &#39;noisy&#39;
+                       and (2, len(goal_filter)) for &#39;random&#39;. In case of random,
+                       `reference[0] == min` and `reference[1] == max` for
+                       generating random values in range.
     &#34;&#34;&#34;
-    return ( (lambda : add_noise(reference))
+    return ( (lambda : reference.apply(add_noise))
              if kind == &#39;noisy&#39; else
-             (lambda : np.random.uniform( *reference
-                                        , size = ( num_envs
-                                                 , reference.shape[1] )
-                                        , ))
+             (lambda : pd.DataFrame( np.random.uniform( *reference.values
+                                                      , size = ( reference.shape[0]
+                                                               , reference.shape[1] )
+                                                      , )
+                                   , columns = reference.columns ))
              if kind == &#39;random&#39; else
              (lambda : reference)
              if kind == &#39;fix&#39; else
              NotImplementedError(f&#39;Goal kind {kind} not implemented.&#39;) )
 
-def filter_results( filter_ids: list[str], results: dict[int, dict[str, float]]
-                  ) -&gt; np.ndarray:
+def filter_results( filter_ids: Iterable[str], results: pd.DataFrame
+                  ) -&gt; pd.DataFrame:
     &#34;&#34;&#34;
-    Filter a set of keys from nested dict. Intended to filter observations and
-    goal states obtained from ACE. Returns a numpy array where 0th dimension is
-    the number of environments and the 1st dimension is `len(filter_ids)`.
+    Extracts given columns for data Frame and makes sure there are no NaNs.
     &#34;&#34;&#34;
-    return np.nan_to_num( np.vstack([ np.array([ results[i][k]
-                                                 for k in filter_ids ])
-                                      for i in sorted(list(results.keys())) ])
-                        , nan = 0.0, posinf = 0.0, neginf = 0.0
-                        , )
+    n2n = partial(np.nan_to_num, nan = 0.0, posinf = 0.0, neginf = 0.0)
+    return results[filter_ids].apply(n2n)
 
-def geometric_unscaler(constraints: dict) -&gt; Callable:
+def geometric_unscaler( constraints: dict[str, dict[str, float]]
+                      , geom_params: Iterable[str]
+                      ) -&gt; Callable:
     &#34;&#34;&#34;
     Unscale action ∈ [-1.0;1.0] into real widths and lengths given
-    constraints obtained from ACE.
+    constraints obtained from serafin.
     Returns a scaler function: `scaler :: np.ndarray -&gt; np.ndarray`
     &#34;&#34;&#34;
-    x_min = np.array([ v[&#39;min&#39;] for _,v in sorted( constraints.items()
-                                                 , key = lambda kv: kv[0] )
-                       if v[&#39;sizing&#39;] ])
-    x_max = np.array([ v[&#39;max&#39;] for _,v in sorted( constraints.items()
-                                                 , key = lambda kv: kv[0] )
-                       if v[&#39;sizing&#39;] ])
+    x_min = np.array([ ( constraints[&#39;length&#39;][&#39;min&#39;] if g.startswith(&#39;L&#39;) else
+                         constraints[&#39;width&#39;][&#39;min&#39;] if g.startswith(&#39;W&#39;) else
+                         1.0 ) for g in geom_params ])
+    x_max = np.array([ ( constraints[&#39;length&#39;][&#39;max&#39;] if g.startswith(&#39;L&#39;) else
+                         constraints[&#39;width&#39;][&#39;max&#39;] if g.startswith(&#39;W&#39;) else
+                         40.0 ) for g in geom_params ])
 
     return (lambda x: x_min + ( ((np.vstack(x) + 1.0) / 2.0) * (x_max - x_min)))
 
-def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
-                      , performance_ids: [str] ) -&gt; Tuple[Callable, Callable]:
+def performance_scaler( ckt_id: str, constraints: dict
+                      , performance_ids: Iterable[str]
+                      ) -&gt; Tuple[Callable, Callable]:
     &#34;&#34;&#34;
-    Scale/Unsclae performance obtained from ACE as specified in the
+    Scale/Unscale performance obtained from serafin as specified in the
     corresponding `trafo` module, s.t. ∈ [-1.0;1.0].
     Returns a scaler and unscaler funciton:
-        `scaler   :: np.ndarray -&gt; np.ndarray`
-        `unscaler :: np.ndarray -&gt; np.ndarray`
+        - `scaler   :: np.ndarray -&gt; np.ndarray`
+        - `unscaler :: np.ndarray -&gt; np.ndarray`
     **Note**: Since the scaling uses log10, it&#39;s a destructive operation,
-    unscaling won&#39;t work.
+    unscaling might result in the wrong sign.
     &#34;&#34;&#34;
-    x_min_d, x_max_d = performance_scale(ace_id, ace_backend, constraints)
+    x_min_d, x_max_d = performance_scale(ckt_id, constraints)
 
-    abs_msk = np.array([ (pp in [ &#39;A&#39;, &#39;cof&#39;, &#39;gm&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
+    abs_msk = np.array([ (pp in [ &#39;area&#39;, &#39;cof&#39;, &#39;gm&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
                                 , &#39;pm&#39;, &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39; , &#39;voff_stat&#39;
                                 , &#39;voff_sys&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39; , &#39;vn_100Hz&#39;
                                 , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;
                                 , &#39;idd&#39;, &#39;iss&#39; ] )
                           for pp in performance_ids ])
 
-    log_msk = np.array([ (pp in [ &#39;A&#39;, &#39;cof&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
+    log_msk = np.array([ (pp in [ &#39;area&#39;, &#39;cof&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
                                 , &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39;, &#39;voff_stat&#39;
-                                , &#39;voff_sys&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39;, &#39;vn_100Hz&#39;
+                                , &#39;voff_syst&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39;, &#39;vn_100Hz&#39;
                                 , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;
                                 , &#39;idd&#39;, &#39;iss&#39; ])
                           for pp in performance_ids ])
@@ -169,10 +181,12 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
 <dd>
 <div class="desc"><p>Add some gaussian noise</p>
 <h2 id="arguments">Arguments</h2>
-<p><code>x</code>: Input
-<code>η</code>: Standard Deviation</p>
+<ul>
+<li><code>x</code>: Input
+_ <code>η</code>: Standard Deviation</li>
+</ul>
 <h2 id="returns">Returns</h2>
-<p><code>y</code>: <code>x</code> with noise <code>η</code></p></div>
+<p>_ <code>y</code>: <code>x</code> with noise <code>η</code></p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -180,10 +194,10 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
 <pre><code class="python">def add_noise(x: np.array, η: float = 0.01) -&gt; np.array:
     &#34;&#34;&#34;Add some gaussian noise
     Arguments:
-        `x`: Input
-        `η`: Standard Deviation
+        - `x`: Input
+        _ `η`: Standard Deviation
     Returns:
-        `y`: `x` with noise `η`
+        _ `y`: `x` with noise `η`
     &#34;&#34;&#34;
     d = x.shape
     μ = np.ones(d)
@@ -192,96 +206,112 @@ def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
     return x * ε</code></pre>
 </details>
 </dd>
-<dt id="circus.util.filter_results"><code class="name flex">
-<span>def <span class="ident">filter_results</span></span>(<span>filter_ids: list[str], results: dict[int, dict[str, float]]) ‑> numpy.ndarray</span>
+<dt id="circus.util.df_to_dict"><code class="name flex">
+<span>def <span class="ident">df_to_dict</span></span>(<span>df: pandas.core.frame.DataFrame) ‑> dict[int, dict[str, float]]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Filter a set of keys from nested dict. Intended to filter observations and
-goal states obtained from ACE. Returns a numpy array where 0th dimension is
-the number of environments and the 1st dimension is <code>len(filter_ids)</code>.</p></div>
+<div class="desc"><p>Convert a dataframe to a dictionary</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def filter_results( filter_ids: list[str], results: dict[int, dict[str, float]]
-                  ) -&gt; np.ndarray:
+<pre><code class="python">def df_to_dict(df: pd.DataFrame) -&gt; dict[int, dict[str, float]]:
+    &#34;&#34;&#34; Convert a dataframe to a dictionary &#34;&#34;&#34;
+    return { row.Index: { k: np.nan_to_num(v, nan = 0.0, posinf = 0.0, neginf = 0.0)
+                          for k,v in row._asdict().items() if (k != &#39;Index&#39;) }
+             for row in df.itertuples() }</code></pre>
+</details>
+</dd>
+<dt id="circus.util.filter_results"><code class="name flex">
+<span>def <span class="ident">filter_results</span></span>(<span>filter_ids: Iterable[str], results: pandas.core.frame.DataFrame) ‑> pandas.core.frame.DataFrame</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extracts given columns for data Frame and makes sure there are no NaNs.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter_results( filter_ids: Iterable[str], results: pd.DataFrame
+                  ) -&gt; pd.DataFrame:
     &#34;&#34;&#34;
-    Filter a set of keys from nested dict. Intended to filter observations and
-    goal states obtained from ACE. Returns a numpy array where 0th dimension is
-    the number of environments and the 1st dimension is `len(filter_ids)`.
+    Extracts given columns for data Frame and makes sure there are no NaNs.
     &#34;&#34;&#34;
-    return np.nan_to_num( np.vstack([ np.array([ results[i][k]
-                                                 for k in filter_ids ])
-                                      for i in sorted(list(results.keys())) ])
-                        , nan = 0.0, posinf = 0.0, neginf = 0.0
-                        , )</code></pre>
+    n2n = partial(np.nan_to_num, nan = 0.0, posinf = 0.0, neginf = 0.0)
+    return results[filter_ids].apply(n2n)</code></pre>
 </details>
 </dd>
 <dt id="circus.util.geometric_unscaler"><code class="name flex">
-<span>def <span class="ident">geometric_unscaler</span></span>(<span>constraints: dict) ‑> Callable</span>
+<span>def <span class="ident">geometric_unscaler</span></span>(<span>constraints: dict[str, dict[str, float]], geom_params: Iterable[str]) ‑> Callable</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Unscale action ∈ [-1.0;1.0] into real widths and lengths given
-constraints obtained from ACE.
+constraints obtained from serafin.
 Returns a scaler function: <code>scaler :: np.ndarray -&gt; np.ndarray</code></p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def geometric_unscaler(constraints: dict) -&gt; Callable:
+<pre><code class="python">def geometric_unscaler( constraints: dict[str, dict[str, float]]
+                      , geom_params: Iterable[str]
+                      ) -&gt; Callable:
     &#34;&#34;&#34;
     Unscale action ∈ [-1.0;1.0] into real widths and lengths given
-    constraints obtained from ACE.
+    constraints obtained from serafin.
     Returns a scaler function: `scaler :: np.ndarray -&gt; np.ndarray`
     &#34;&#34;&#34;
-    x_min = np.array([ v[&#39;min&#39;] for _,v in sorted( constraints.items()
-                                                 , key = lambda kv: kv[0] )
-                       if v[&#39;sizing&#39;] ])
-    x_max = np.array([ v[&#39;max&#39;] for _,v in sorted( constraints.items()
-                                                 , key = lambda kv: kv[0] )
-                       if v[&#39;sizing&#39;] ])
+    x_min = np.array([ ( constraints[&#39;length&#39;][&#39;min&#39;] if g.startswith(&#39;L&#39;) else
+                         constraints[&#39;width&#39;][&#39;min&#39;] if g.startswith(&#39;W&#39;) else
+                         1.0 ) for g in geom_params ])
+    x_max = np.array([ ( constraints[&#39;length&#39;][&#39;max&#39;] if g.startswith(&#39;L&#39;) else
+                         constraints[&#39;width&#39;][&#39;max&#39;] if g.startswith(&#39;W&#39;) else
+                         40.0 ) for g in geom_params ])
 
     return (lambda x: x_min + ( ((np.vstack(x) + 1.0) / 2.0) * (x_max - x_min)))</code></pre>
 </details>
 </dd>
 <dt id="circus.util.goal_generator"><code class="name flex">
-<span>def <span class="ident">goal_generator</span></span>(<span>kind: str, reference: numpy.ndarray, num_envs: int = 1) ‑> Callable</span>
+<span>def <span class="ident">goal_generator</span></span>(<span>kind: str, reference: pandas.core.frame.DataFrame) ‑> Callable</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Returns a goal generator function</p>
 <h2 id="arguments">Arguments</h2>
-<p><code>kind</code>:
-- 'noisy': Add noise to reference goal
-- 'random': Choose a random goal between reference
-- 'fix': Goal remains the same
-<code>reference</code>: Must be of shape (num_envs, len(goal_filter)) for 'noisy'
+<ul>
+<li><code>kind</code>:<ul>
+<li>'noisy': Add noise to reference goal</li>
+<li>'random': Choose a random goal between reference</li>
+<li>'fix': Goal remains the same</li>
+</ul>
+</li>
+<li><code>reference</code>: Must be of shape (num_envs, len(goal_filter)) for 'noisy'
 and (2, len(goal_filter)) for 'random'. In case of random,
 <code>reference[0] == min</code> and <code>reference[1] == max</code> for
-generating random values in range.</p></div>
+generating random values in range.</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def goal_generator( kind: str, reference: np.ndarray, num_envs: int = 1
+<pre><code class="python">def goal_generator( kind: str, reference: pd.DataFrame
                   ) -&gt; Callable:
     &#34;&#34;&#34;
     Returns a goal generator function
     Arguments:
-        `kind`:
-            - &#39;noisy&#39;: Add noise to reference goal
-            - &#39;random&#39;: Choose a random goal between reference
-            - &#39;fix&#39;: Goal remains the same
-        `reference`: Must be of shape (num_envs, len(goal_filter)) for &#39;noisy&#39;
-                     and (2, len(goal_filter)) for &#39;random&#39;. In case of random,
-                     `reference[0] == min` and `reference[1] == max` for
-                     generating random values in range.
+        - `kind`:
+            + &#39;noisy&#39;: Add noise to reference goal
+            + &#39;random&#39;: Choose a random goal between reference
+            + &#39;fix&#39;: Goal remains the same
+        - `reference`: Must be of shape (num_envs, len(goal_filter)) for &#39;noisy&#39;
+                       and (2, len(goal_filter)) for &#39;random&#39;. In case of random,
+                       `reference[0] == min` and `reference[1] == max` for
+                       generating random values in range.
     &#34;&#34;&#34;
-    return ( (lambda : add_noise(reference))
+    return ( (lambda : reference.apply(add_noise))
              if kind == &#39;noisy&#39; else
-             (lambda : np.random.uniform( *reference
-                                        , size = ( num_envs
-                                                 , reference.shape[1] )
-                                        , ))
+             (lambda : pd.DataFrame( np.random.uniform( *reference.values
+                                                      , size = ( reference.shape[0]
+                                                               , reference.shape[1] )
+                                                      , )
+                                   , columns = reference.columns ))
              if kind == &#39;random&#39; else
              (lambda : reference)
              if kind == &#39;fix&#39; else
@@ -289,44 +319,45 @@ generating random values in range.</p></div>
 </details>
 </dd>
 <dt id="circus.util.performance_scaler"><code class="name flex">
-<span>def <span class="ident">performance_scaler</span></span>(<span>ace_id: str, ace_backend: str, constraints: dict, performance_ids: [<class 'str'>]) ‑> Tuple[Callable, Callable]</span>
+<span>def <span class="ident">performance_scaler</span></span>(<span>ckt_id: str, constraints: dict, performance_ids: Iterable[str]) ‑> Tuple[Callable, Callable]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Scale/Unsclae performance obtained from ACE as specified in the
+<div class="desc"><p>Scale/Unscale performance obtained from serafin as specified in the
 corresponding <code>trafo</code> module, s.t. ∈ [-1.0;1.0].
 Returns a scaler and unscaler funciton:
-<code>scaler
+- <code>scaler
 :: np.ndarray -&gt; np.ndarray</code>
-<code>unscaler :: np.ndarray -&gt; np.ndarray</code>
+- <code>unscaler :: np.ndarray -&gt; np.ndarray</code>
 <strong>Note</strong>: Since the scaling uses log10, it's a destructive operation,
-unscaling won't work.</p></div>
+unscaling might result in the wrong sign.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def performance_scaler( ace_id: str, ace_backend: str, constraints: dict
-                      , performance_ids: [str] ) -&gt; Tuple[Callable, Callable]:
+<pre><code class="python">def performance_scaler( ckt_id: str, constraints: dict
+                      , performance_ids: Iterable[str]
+                      ) -&gt; Tuple[Callable, Callable]:
     &#34;&#34;&#34;
-    Scale/Unsclae performance obtained from ACE as specified in the
+    Scale/Unscale performance obtained from serafin as specified in the
     corresponding `trafo` module, s.t. ∈ [-1.0;1.0].
     Returns a scaler and unscaler funciton:
-        `scaler   :: np.ndarray -&gt; np.ndarray`
-        `unscaler :: np.ndarray -&gt; np.ndarray`
+        - `scaler   :: np.ndarray -&gt; np.ndarray`
+        - `unscaler :: np.ndarray -&gt; np.ndarray`
     **Note**: Since the scaling uses log10, it&#39;s a destructive operation,
-    unscaling won&#39;t work.
+    unscaling might result in the wrong sign.
     &#34;&#34;&#34;
-    x_min_d, x_max_d = performance_scale(ace_id, ace_backend, constraints)
+    x_min_d, x_max_d = performance_scale(ckt_id, constraints)
 
-    abs_msk = np.array([ (pp in [ &#39;A&#39;, &#39;cof&#39;, &#39;gm&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
+    abs_msk = np.array([ (pp in [ &#39;area&#39;, &#39;cof&#39;, &#39;gm&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
                                 , &#39;pm&#39;, &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39; , &#39;voff_stat&#39;
                                 , &#39;voff_sys&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39; , &#39;vn_100Hz&#39;
                                 , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;
                                 , &#39;idd&#39;, &#39;iss&#39; ] )
                           for pp in performance_ids ])
 
-    log_msk = np.array([ (pp in [ &#39;A&#39;, &#39;cof&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
+    log_msk = np.array([ (pp in [ &#39;area&#39;, &#39;cof&#39;, &#39;i_out_max&#39;, &#39;i_out_min&#39;
                                 , &#39;sr_f&#39;, &#39;sr_r&#39;, &#39;ugbw&#39;, &#39;voff_stat&#39;
-                                , &#39;voff_sys&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39;, &#39;vn_100Hz&#39;
+                                , &#39;voff_syst&#39;, &#39;vn_1Hz&#39;, &#39;vn_10Hz&#39;, &#39;vn_100Hz&#39;
                                 , &#39;vn_1kHz&#39;, &#39;vn_10kHz&#39;, &#39;vn_100kHz&#39;
                                 , &#39;idd&#39;, &#39;iss&#39; ])
                           for pp in performance_ids ])
@@ -376,8 +407,9 @@ unscaling won't work.</p></div>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="circus.util.add_noise" href="#circus.util.add_noise">add_noise</a></code></li>
+<li><code><a title="circus.util.df_to_dict" href="#circus.util.df_to_dict">df_to_dict</a></code></li>
 <li><code><a title="circus.util.filter_results" href="#circus.util.filter_results">filter_results</a></code></li>
 <li><code><a title="circus.util.geometric_unscaler" href="#circus.util.geometric_unscaler">geometric_unscaler</a></code></li>
 <li><code><a title="circus.util.goal_generator" href="#circus.util.goal_generator">goal_generator</a></code></li>
