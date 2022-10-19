@@ -1,13 +1,16 @@
 """
-Agnostic Design Space Transforation for FCA: Folded Cascode Amplifier
+Agnostic Design Space Transforation for FFA: Feed Forward Amplifier
 
 `INPUTS` are:
 
-    [ 'MNCM11_gmoverid', 'MPCM21_gmoverid', 'MNCM31_gmoverid'
-    , 'MNLS11_gmoverid', 'MNLS21_gmoverid', 'MNDP11_gmoverid'
-    , 'MNCM11_fug',      'MPCM21_fug',      'MNCM31_fug'
-    , 'MNLS11_fug',      'MNLS21_fug',      'MNDP11_fug'
-    , 'MNCM12_id',       'MNCM23_id' ]
+    [ 'MNDP11_gmoverid', 'MNDP21_gmoverid', 'MNDP31_gmoverid'
+    , 'MNCM11_gmoverid', 'MPCM21_gmoverid'
+    , 'MPCS11_gmoverid', 'MPCS21_gmoverid'
+    , 'MNDP11_fug',      'MNDP21_fug',      'MNDP31_fug'
+    , 'MNCM11_fug',      'MPCM21_fug'
+    , 'MPCS11_fug',      'MPCS21_fug'
+    , 'MNCM13_id',       'MNCM14_id',       'MNCM15_id'
+    ]
 """
 
 from fractions import Fraction
@@ -15,90 +18,101 @@ import numpy as np
 import torch as pt
 import pandas as pd
 
-INPUTS: [str] = [ 'MNCM11_gmoverid', 'MPCM21_gmoverid', 'MNCM31_gmoverid'
-                , 'MNLS11_gmoverid', 'MNLS21_gmoverid', 'MNDP11_gmoverid'
-                , 'MNCM11_fug',      'MPCM21_fug',      'MNCM31_fug'
-                , 'MNLS11_fug',      'MNLS21_fug',      'MNDP11_fug'
-                , 'MNCM12_id',       'MNCM23_id' ]
+INPUTS: [str] = [ 'MNDP11_gmoverid', 'MNDP21_gmoverid', 'MNDP31_gmoverid'
+                , 'MNCM11_gmoverid', 'MPCM21_gmoverid'
+                , 'MPCS11_gmoverid', 'MPCS21_gmoverid'
+                , 'MNDP11_fug',      'MNDP21_fug',      'MNDP31_fug'
+                , 'MNCM11_fug',      'MPCM21_fug'
+                , 'MPCS11_fug',      'MPCS21_fug'
+                , 'MNCM13_id' ]
+                #, 'MNCM13_id',       'MNCM14_id',       'MNCM15_id' ]
 
 def transform( constraints: dict, nmos: pt.nn.Module, pmos: pt.nn.Module
-             , gmid_cm1: float, gmid_cm2: float, gmid_cm3: float
-             , gmid_ls1: float, gmid_ls2: float, gmid_dp1: float
-             , fug_cm1: float,  fug_cm2: float,  fug_cm3: float
-             , fug_ls1: float,  fug_ls2: float,  fug_dp1: float
-             , i1: float, i4: float ) -> pd.DataFrame:
-    """ Electrical to Geometrical Transforation for FCA """
+             , gmid_dp1: float, gmid_dp2: float, gmid_dp3: float
+             , gmid_cm1: float, gmid_cm2: float
+             , gmid_cs1: float, gmid_cs2: float
+             , fug_dp1: float,  fug_dp2: float,  fug_dp3: float
+             , fug_cm1: float,  fug_cm2: float
+             , fug_cs1: float,  fug_cs2: float
+             , i1: float ) -> pd.DataFrame:
+    #, i1: float, i2: float, i3: float ) -> pd.DataFrame:
+    """ Electrical to Geometrical Transforation for FFA """
 
-    i2      = i1
-    i3      = (i1 / 2.0) + i4
+    i2      = i3 = i1
+    i4      = 2  * i1
 
     i0      = constraints.get('i0',   3e-6)
     vdd     = constraints.get('vsup', 1.8)
 
     M1_lim  = int(constraints.get('Mcm13', 42))
-    M2_lim  = int(constraints.get('Mcm23', 42))
-
-    W1_lim  = float(constraints.get('width', {}).get('max', 100e-6))
-    W2_lim  = float(constraints.get('width', {}).get('max', 100e-6))
-    W3_lim  = float(constraints.get('width', {}).get('max', 100e-6))
-
     M1      = Fraction(i0 / i1).limit_denominator(M1_lim)
-    M2      = Fraction(i2 / i3).limit_denominator(M2_lim)
-
+    
     Mdp11   = constraints.get('Mdp11', 2)
-    Mdp12   = constraints.get('Mdp11', Mdp11)
+    Mdp12   = constraints.get('Mdp12', Mdp11)
+    Mdp21   = constraints.get('Mdp21', 2)
+    Mdp22   = constraints.get('Mdp22', Mdp21)
+    Mdp31   = constraints.get('Mdp31', 2)
+    Mdp32   = constraints.get('Mdp32', Mdp31)
 
     Mcm11   = max(M1.numerator, 1)
-    Mcm12   = Mcm13 = max(M1.denominator, 1)
-    Mcm21   = max(M2.numerator, 1)
-    Mcm22   = Mcm23 = max(M2.denominator, 1)
+    Mcm12   = Mcm13 = Mcm14 = Mcm15 = max(M1.denominator, 1)
 
-    cm1_in  = pt.Tensor([[gmid_cm1, fug_cm1,  (vdd / 5.0),         0.0 ]])
-    cm2_in  = pt.Tensor([[gmid_cm2, fug_cm2, -(vdd / 3.0),  (vdd / 5.0)]])
-    cm3_in  = pt.Tensor([[gmid_cm3, fug_cm3,  (vdd / 3.5), -(vdd / 5.0)]])
-    ls1_in  = pt.Tensor([[gmid_ls1, fug_ls1,  (vdd / 4.5),         0.0 ]])
-    ls2_in  = pt.Tensor([[gmid_ls2, fug_ls2, -(vdd / 3.5),         0.0 ]])
+    Mcm21   = 2
+    Mcm22   = Mcm23 = 1
+
+    Mcs11   = Mcs12 = Mcm21
+    Mcs21   = Mcs22 = Mcm21
+
     dp1_in  = pt.Tensor([[gmid_dp1, fug_dp1,  (vdd / 2.0), -(vdd / 4.5)]])
+    dp2_in  = pt.Tensor([[gmid_dp2, fug_dp2,  (vdd / 2.0), -(vdd / 4.5)]])
+    dp3_in  = pt.Tensor([[gmid_dp3, fug_dp3,  (vdd / 2.0), -(vdd / 4.5)]])
+    cm1_in  = pt.Tensor([[gmid_cm1, fug_cm1,  (vdd / 5.0),         0.0 ]])
+    cm2_in  = pt.Tensor([[gmid_cm2, fug_cm2, -(vdd / 3.6),         0.0 ]])
+    cs1_in  = pt.Tensor([[gmid_cs1, fug_cs1, -(vdd / 2.0),         0.0 ]])
+    cs2_in  = pt.Tensor([[gmid_cs2, fug_cs2, -(vdd / 2.0),         0.0 ]])
 
-    cm1_out = nmos(cm1_in).numpy()[0]
-    cm2_out = pmos(cm2_in).numpy()[0]
-    cm3_out = nmos(cm3_in).numpy()[0]
-    ls1_out = nmos(ls1_in).numpy()[0]
-    ls2_out = pmos(ls2_in).numpy()[0]
     dp1_out = nmos(dp1_in).numpy()[0]
+    dp2_out = nmos(dp2_in).numpy()[0]
+    dp3_out = nmos(dp3_in).numpy()[0]
+    cm1_out = nmos(cm1_in).numpy()[0]
+    cm2_out = nmos(cm2_in).numpy()[0]
+    cs1_out = nmos(cs1_in).numpy()[0]
+    cs2_out = nmos(cs2_in).numpy()[0]
 
+    Ldp1    = dp1_out[1]
+    Ldp2    = dp2_out[1]
+    Ldp3    = dp3_out[1]
     Lcm1    = cm1_out[1]
     Lcm2    = cm2_out[1]
-    Lcm3    = cm3_out[1]
-    Lls1    = ls1_out[1]
-    Lls2    = ls2_out[1]
-    Ldp1    = dp1_out[1]
+    Lcs1    = cs1_out[1]
+    Lcs2    = cs2_out[1]
 
-    Wl1     = i4 / ls1_out[0]
-    Wl2     = i4 / ls2_out[0]
-    Wc3     = i4 / cm3_out[0]
-    Mls11   = Mls12 = np.ceil(Wl1 / W1_lim).item()
-    Mls21   = Mls22 = np.ceil(Wl2 / W2_lim).item()
-    Mcm31   = Mcm32 = np.ceil(Wc3 / W3_lim).item()
-    Wls1    = Wl1 / Mls11
-    Wls2    = Wl2 / Mls21
-    Wcm3    = Wc3 / Mcm31
-
-    Wcm1    = i0       / cm1_out[0] / Mcm11
-    Wcm2    = i2       / cm2_out[0] / Mcm21
     Wdp1    = i1 / 2.0 / dp1_out[0] / Mdp11
+    Wdp2    = i2 / 2.0 / dp1_out[0] / Mdp21
+    Wdp3    = i3 / 2.0 / dp1_out[0] / Mdp31
 
-    keys = [ 'Ldp1',  'Lcm1',  'Lcm2',  'Lcm3',  'Lls1',  'Lls2'
-           , 'Wdp1',  'Wcm1',  'Wcm2',  'Wcm3',  'Wls1',  'Wls2'
-           , 'Mdp11', 'Mcm11', 'Mcm21', 'Mcm31', 'Mls11', 'Mls21'
-           , 'Mdp12', 'Mcm12', 'Mcm22', 'Mcm32', 'Mls12', 'Mls22'
-                    , 'Mcm13', 'Mcm23' ]
+    Wcm1    = i0 / 1.0 / cm1_out[0] / Mcm11
+    Wcm2    = i1 / 1.0 / cm2_out[0] / Mcm21
 
-    values  = [ Ldp1,  Lcm1,  Lcm2,  Lcm3,  Lls1,  Lls2
-              , Wdp1,  Wcm1,  Wcm2,  Wcm3,  Wls1,  Wls2
-              , Mdp11, Mcm11, Mcm21, Mcm31, Mls11, Mls21
-              , Mdp12, Mcm12, Mcm22, Mcm32, Mls12, Mls22
-                     , Mcm13, Mcm23 ]
+    Wcs1    = i2 / 2.0 / cs1_out[0] / Mcs11
+    Wcs2    = i3 / 2.0 / cs2_out[0] / Mcs21
+
+
+    keys    = [ 'Ldp1',  'Ldp2',  'Ldp3',  'Lcm1',  'Lcm2',  'Lcs1',  'Lcs2'
+              , 'Wdp1',  'Wdp2',  'Wdp3',  'Wcm1',  'Wcm2',  'Wcs1',  'Wcs2'
+              , 'Mdp11', 'Mdp21', 'Mdp31', 'Mcm11', 'Mcm21', 'Mcs11', 'Mcs21'
+              , 'Mdp12', 'Mdp22', 'Mdp32', 'Mcm12', 'Mcm22', 'Mcs12', 'Mcs22'
+                                         , 'Mcm13', 'Mcm23'
+                                         , 'Mcm14'
+                                         , 'Mcm15' ]
+
+    values  = [ Ldp1,  Ldp2,  Ldp3,  Lcm1,  Lcm2,  Lcs1,  Lcs2
+              , Wdp1,  Wdp2,  Wdp3,  Wcm1,  Wcm2,  Wcs1,  Wcs2
+              , Mdp11, Mdp21, Mdp31, Mcm11, Mcm21, Mcs11, Mcs21
+              , Mdp12, Mdp22, Mdp32, Mcm12, Mcm22, Mcs12, Mcs22 
+                                   , Mcm13, Mcm23
+                                   , Mcm14
+                                   , Mcm15 ]
 
     sizing  = pd.DataFrame(np.array([values]), columns = keys)
 
@@ -107,15 +121,15 @@ def transform( constraints: dict, nmos: pt.nn.Module, pmos: pt.nn.Module
 def unscaler() -> tuple[ np.ndarray, np.ndarray, np.ndarray
                        , np.ndarray, np.ndarray]:
     """ Upper and lower bounds and selection masks """
-    x_min = np.array([ 5.0, 5.0, 5.0, 5.0, 5.0, 5.0
-                     , 7.0, 7.0, 7.0, 7.0, 7.0, 7.0
-                     , 1.0, 3.0 ])
-    x_max = np.array([ 15.0, 15.0, 15.0, 15.0, 15.0, 15.0
-                     , 9.0, 9.0, 9.0, 9.0, 9.0, 9.0
-                     , 6.0, 9.0 ])
-    gm    = np.array([(i in range(0,6))   for i in range(14)])
-    fm    = np.array([(i in range(6,12))  for i in range(14)])
-    im    = np.array([(i in range(12,14)) for i in range(14)])
+    x_min = np.array([ 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0
+                     , 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0
+                     , 1.0 ])
+    x_max = np.array([ 15.0, 15.0, 15.0, 15.0, 15.0, 15.0, 15.0
+                     , 9.0,  9.0,  9.0,  9.0,  9.0,  9.0,  9.0
+                     , 15.0 ])
+    gm    = np.array([(i in range(0,7))   for i in range(15)])
+    fm    = np.array([(i in range(7,14))  for i in range(15)])
+    im    = np.array([(i in range(14,15)) for i in range(15)])
     return (x_min, x_max, gm, fm, im)
 
 def reference_goal(constraints: dict) -> np.ndarray:

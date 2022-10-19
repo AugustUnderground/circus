@@ -7,6 +7,7 @@ import pandas as pd
 from circus.trafo import mil
 from circus.trafo import sym
 from circus.trafo import fca
+from circus.trafo import ffa
 from circus.trafo import rfa
 
 def transformation(ckt_id: str) -> Callable:
@@ -15,6 +16,7 @@ def transformation(ckt_id: str) -> Callable:
     return { 'mil': mil.transform
            , 'sym': sym.transform
            , 'fca': fca.transform
+           , 'ffa': ffa.transform
            , 'rfa': rfa.transform
            , }.get(ckt_id, NotImplementedError(err_msg))
 
@@ -24,6 +26,7 @@ def electric_identifiers(ckt_id: str) -> [str]:
     return { 'mil': mil.INPUTS
            , 'sym': sym.INPUTS
            , 'fca': fca.INPUTS
+           , 'ffa': ffa.INPUTS
            , 'rfa': rfa.INPUTS
            , }.get(ckt_id, NotImplementedError(err_msg))
 
@@ -33,6 +36,7 @@ def electric_unscaler(ckt_id: str) -> Callable:
     x_min,x_max,gm,fm,im = { 'mil': mil.unscaler()
                            , 'sym': sym.unscaler()
                            , 'fca': fca.unscaler()
+                           , 'ffa': ffa.unscaler()
                            , 'rfa': rfa.unscaler()
                            , }.get(ckt_id, NotImplementedError(err_msg))
 
@@ -53,6 +57,7 @@ def performance_scale( ckt_id: str, constraints: dict
     return { 'mil': mil.output_scale
            , 'sym': sym.output_scale
            , 'fca': fca.output_scale
+           , 'ffa': ffa.output_scale
            , 'rfa': rfa.output_scale
            , }.get(ckt_id, NotImplementedError(err_msg)
                   )(constraints)
@@ -64,6 +69,7 @@ def reference_goal( ckt_id: str, constraints: dict
     goal    = { 'mil': mil.reference_goal
               , 'sym': sym.reference_goal
               , 'fca': fca.reference_goal
+              , 'ffa': ffa.reference_goal
               , 'rfa': rfa.reference_goal
               , }.get(ckt_id, NotImplementedError(err_msg)
                      )(constraints)

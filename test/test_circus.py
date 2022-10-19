@@ -237,8 +237,8 @@ def test_fca_gpdk180_geom_v0():
     _test_op_v0('circus:fca-gpdk180-geom-v0')
 def test_rfa_gpdk180_geom_v0():
     _test_op_v0('circus:rfa-gpdk180-geom-v0')
-#def test_ffa_gpdk180_geom_v0():
-#    _test_op_v0('circus:ffa-gpdk180-geom-v0')
+def test_ffa_gpdk180_geom_v0():
+    _test_op_v0('circus:ffa-gpdk180-geom-v0')
 def test_mil_gpdk180_elec_v0():
     _test_op_v0('circus:mil-gpdk180-elec-v0')
 def test_sym_gpdk180_elec_v0():
@@ -247,8 +247,8 @@ def test_fca_gpdk180_elec_v0():
     _test_op_v0('circus:fca-gpdk180-elec-v0')
 def test_rfa_gpdk180_elec_v0():
     _test_op_v0('circus:rfa-gpdk180-elec-v0')
-#def test_ffa_gpdk180_elec_v0():
-#    _test_op_v0('circus:ffa-gpdk180-elec-v0')
+def test_ffa_gpdk180_elec_v0():
+    _test_op_v0('circus:ffa-gpdk180-elec-v0')
 
 #def test_mil_gpdk090_geom_v0():
 #    _test_op_v0('circus:mil-gpdk090-geom-v0')
