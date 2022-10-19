@@ -292,8 +292,8 @@ def test_fca_xh018_geom_v0():
     _test_op_v0('circus:fca-xh018-geom-v0')
 def test_rfa_xh018_geom_v0():
     _test_op_v0('circus:rfa-xh018-geom-v0')
-#def test_ffa_xh018_geom_v0():
-#    _test_op_v0('circus:ffa-xh018-geom-v0')
+def test_ffa_xh018_geom_v0():
+    _test_op_v0('circus:ffa-xh018-geom-v0')
 def test_mil_xh018_elec_v0():
     _test_op_v0('circus:mil-xh018-elec-v0')
 def test_sym_xh018_elec_v0():
@@ -302,8 +302,8 @@ def test_fca_xh018_elec_v0():
     _test_op_v0('circus:fca-xh018-elec-v0')
 def test_rfa_xh018_elec_v0():
     _test_op_v0('circus:rfa-xh018-elec-v0')
-#def test_ffa_xh018_elec_v0():
-#    _test_op_v0('circus:ffa-xh018-elec-v0')
+def test_ffa_xh018_elec_v0():
+    _test_op_v0('circus:ffa-xh018-elec-v0')
 
 def test_mil_xt018_geom_v0():
     _test_op_v0('circus:mil-xt018-geom-v0')
@@ -313,8 +313,8 @@ def test_fca_xt018_geom_v0():
     _test_op_v0('circus:fca-xt018-geom-v0')
 def test_rfa_xt018_geom_v0():
     _test_op_v0('circus:rfa-xt018-geom-v0')
-#def test_ffa_xt018_geom_v0():
-#    _test_op_v0('circus:ffa-xt018-geom-v0')
+def test_ffa_xt018_geom_v0():
+    _test_op_v0('circus:ffa-xt018-geom-v0')
 def test_mil_xt018_elec_v0():
     _test_op_v0('circus:mil-xt018-elec-v0')
 def test_sym_xt018_elec_v0():
@@ -323,5 +323,5 @@ def test_fca_xt018_elec_v0():
     _test_op_v0('circus:fca-xt018-elec-v0')
 def test_rfa_xt018_elec_v0():
     _test_op_v0('circus:rfa-xt018-elec-v0')
-#def test_ffa_xt018_elec_v0():
-#    _test_op_v0('circus:ffa-xt018-elec-v0')
+def test_ffa_xt018_elec_v0():
+    _test_op_v0('circus:ffa-xt018-elec-v0')
