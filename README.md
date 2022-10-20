@@ -13,17 +13,8 @@ $ pip install git+https://github.com/augustunderground/circus.git
 Or clone and install a local copy
 
 ```bash
-$ git clone https://github.com/augustunderground/gace.git
+$ git clone https://github.com/augustunderground/circus.git
 $ pip install .
-```
-
-## Testing
-
-After installation, running the [pytest](https://docs.pytest.org/) test suite
-in the `circuis` directory takes about ~5min.
-
-```bash
-$ pytest
 ```
 
 ## Demonsrtraion / Baseline
