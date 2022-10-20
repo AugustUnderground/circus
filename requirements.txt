@@ -1,9 +1,9 @@
+setuptools
+torch==1.10.*
+numpy
 pyyaml
 serafin
 Expression
 Flask
 joblib
-numpy
-setuptools
 stable_baselines3
-torch
